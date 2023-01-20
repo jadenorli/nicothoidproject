@@ -1,0 +1,58 @@
+---
+title: " Analysis"
+author: "Jaden Orli"
+date: '2023-01-14'
+output: html_document
+---
+
+```{r}
+#read the dataset
+autoinfection <- read.csv("Autoinfection Export One.csv")
+
+#view the dataset
+View(autoinfection)
+
+#rename the columns
+colnames(autoinfection)[1] <- "trial_ID"
+
+colnames(autoinfection)[2] <- "crab_ID"
+
+colnames(autoinfection)[3] <- "date"
+
+colnames(autoinfection)[4] <- "EDS"
+
+colnames(autoinfection)[5] <- "crab_egg_total"
+
+colnames(autoinfection)[6] <- "crab_egg_viable"
+
+colnames(autoinfection)[7] <- "adult_nico_total"
+
+colnames(autoinfection)[8] <- "ratio"
+
+```
+
+
+```{r}
+is.numeric(autoinfection$adult_nico_total)
+
+```
+
+
+```{r}
+dotchart(autoinfection$adult_nico_total, labels= row.names(autoinfection$crab_ID), cex=.7,
+   xlab="Total Number of Adults")
+```
+
+
+```{r}
+average <- read.csv("Autoinfection Average.csv")
+
+```
+
+
+```{r}
+plot(Average~EDS, data= average,
+     type= "p",
+     ylim= c(0,0.01))
+```
+

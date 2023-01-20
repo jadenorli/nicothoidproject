@@ -1,0 +1,84 @@
+---
+title: "Life Cycle Analysis"
+author: "Jaden Orli"
+date: '2023-01-14'
+output: html_document
+---
+
+```{r}
+#read the dataset
+lifecycle <- read.csv("Life Cycle Export.csv")
+
+#view the dataset
+#View(lifecycle)
+
+#rename the columns
+colnames(lifecycle)[1] <- "trial_ID"
+
+colnames(lifecycle)[2] <- "crab_ID"
+
+colnames(lifecycle)[3] <- "date"
+
+colnames(lifecycle)[4] <- "day"
+
+colnames(lifecycle)[5] <- "EDS"
+
+colnames(lifecycle)[6] <- "nico_egg_total"
+
+
+```
+
+
+```{r}
+#subset the data by the trial ID
+lifecycle002 <- lifecycle[lifecycle$trial_ID == "LifeCycle-002",]
+
+lifecycle003 <- lifecycle[lifecycle$trial_ID == "LifeCycle-003",]
+
+lifecycle004 <- lifecycle[lifecycle$trial_ID == "LifeCycle-004",]
+
+lifecycle005 <- lifecycle[lifecycle$trial_ID == "LifeCycle-005",]
+
+lifecycle006 <- lifecycle[lifecycle$trial_ID == "LifeCycle-006",]
+
+lifecycle007 <- lifecycle[lifecycle$trial_ID == "LifeCycle-007",]
+
+lifecycle008 <- lifecycle[lifecycle$trial_ID == "LifeCycle-008",]
+
+lifecycle009 <- lifecycle[lifecycle$trial_ID == "LifeCycle-009",]
+
+lifecycle011 <- lifecycle[lifecycle$trial_ID == "LifeCycle-011",]
+
+lifecycle012 <- lifecycle[lifecycle$trial_ID == "LifeCycle-012",]
+
+lifecycle014 <- lifecycle[lifecycle$trial_ID == "LifeCycle-014",]
+
+lifecycle016 <- lifecycle[lifecycle$trial_ID == "LifeCycle-016",]
+
+```
+
+
+
+```{r}
+#make a line plot of the number of nicothoid eggs against the EDS per nico ID
+plot(nico_egg_total~day, data= lifecycle, 
+     type= "p",
+     col= c("black","red", "orange", "yellow", "green", "blue", "violet", "purple", "brown", "lightblue", "lightgreen", "darkgreen" [trial_ID]))
+
+lines(nico_egg_total~day, data= lifecycle002)
+lines(nico_egg_total~day, data= lifecycle003)
+lines(nico_egg_total~day, data= lifecycle004)
+lines(nico_egg_total~day, data= lifecycle005)
+lines(nico_egg_total~day, data= lifecycle006)
+lines(nico_egg_total~day, data= lifecycle007)
+lines(nico_egg_total~day, data= lifecycle008)
+lines(nico_egg_total~day, data= lifecycle009)
+lines(nico_egg_total~day, data= lifecycle011)
+lines(nico_egg_total~day, data= lifecycle012)
+lines(nico_egg_total~day, data= lifecycle014)
+lines(nico_egg_total~day, data= lifecycle016)
+
+```
+
+
+
