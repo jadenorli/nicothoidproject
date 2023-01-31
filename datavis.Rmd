@@ -8,11 +8,25 @@ date: "2023-01-20"
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(janitor)
 
 ```
+Looking at egg mortality from winter 2023
+- 9 crabs
+- egg dev varied from G to spawn
+- we think that number of adult nicos will directly affect egg mortality
+```{r visualize egg mortality data}
 
-```{r import data}
-nico_unclean <- read_csv("NicothoidProjectAnalysis/RawData/AutoinfectionExportOne.csv")
+eggs <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_w2023.csv") %>% 
+  clean_names() %>% 
+  select(!16:27) %>% 
+  mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
+  mutate(prop_nonviable = total_number_non_viable_crab_eggs/total_number_crab_eggs)
+
+nico_v_eggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_viable_eggs)) +
+  geom_point()
+
+nico_v_nveggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_nonviable)) +
+  geom_point()
 ```
 
-hello again, this is Jaden
