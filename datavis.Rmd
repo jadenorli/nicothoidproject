@@ -30,3 +30,19 @@ nico_v_nveggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_nonvia
   geom_point()
 ```
 
+
+```{r}
+eggs2 <- read_csv("LifeCycleExport2.csv")%>% 
+  clean_names() %>% 
+  select(!16:27) %>% 
+  mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
+  mutate(prop_nonviable = total_number_non_viable_crab_eggs/total_number_crab_eggs)%>%
+  mutate(prop_adult_nicos = number_adult_nicos/total_number_crab_eggs)
+
+nico_v_eggs_2 <- ggplot(data = eggs2, aes(x = prop_adult_nicos, y = prop_viable_eggs)) +
+  geom_point()
+
+nico_v_nveggs_2 <- ggplot(data = eggs2, aes(x = prop_adult_nicos, y = prop_nonviable)) +
+  geom_point()
+```
+
