@@ -31,7 +31,7 @@ nico_v_nveggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_nonvia
 ```
 
 
-```{r}
+```{r, visualize full first trial of egg mort data}
 eggs2 <- read_csv("LifeCycleExport2.csv")%>% 
   clean_names() %>% 
   select(!16:27) %>% 
@@ -44,5 +44,19 @@ nico_v_eggs_2 <- ggplot(data = eggs2, aes(x = prop_adult_nicos, y = prop_viable_
 
 nico_v_nveggs_2 <- ggplot(data = eggs2, aes(x = prop_adult_nicos, y = prop_nonviable)) +
   geom_point()
+```
+
+
+```{r, visualize autoinfeciton data}
+autoinfeciton_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_all.csv") %>% 
+  clean_names()  %>% 
+  mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
+  mutate(prop_nonviable_eggs = number_nonviable_crab_eggs/total_number_crab_eggs) 
+
+autoinfection_nv <- ggplot(data = autoinfeciton_all, aes(x = egg_development_stage, y = prop_nonviable_eggs)) +
+  geom_point()
+
+##I want to add and average the prop_nonviable_eggs per EDS on monday 
+
 ```
 
