@@ -38,9 +38,12 @@ nico_v_nveggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_nonvia
 
 ```{r, visualize full first trial of egg mort data}
 #create an eggs_mort_all dataframe with columns for the prop of the values at that time
-eggs_mort_all <- read_csv("LifeCycleExport2.csv")%>% 
-  clean_names() %>% 
+eggs_mort_all <- read_csv("NicothoidProjectAnalysis/RawData/LifeCycleExport2.csv")%>% 
+  clean_names() %>%
   select(!16:27) %>% 
+  filter(!is.na(pleopod_number)) %>%
+  filter(!eds == "M") %>%
+  mutate_at(c(6:15), as.numeric) %>%
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs)%>%
   mutate(prop_damaged_eggs = number_damaged_crab_eggs/total_number_crab_eggs) %>%
@@ -86,11 +89,9 @@ eggs_mort_vis <- ggplot(data = eggs_mort_long,
   ylab("Average Proportion") +
   xlab("Egg Development Stage") + 
   ggtitle("Egg Mortality Across Egg Development Stages") +
-   theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))
 
 eggs_mort_vis
-
-
 ```
 ##Visualize Autoinfection Data
 
@@ -142,7 +143,7 @@ autoinfection_vis <- ggplot(data = auotinfection_long,
   ylab("Average Proportion") +
   xlab("Egg Development Stage") + 
   ggtitle("Autoinfection Across Egg Development Stages") +
-   theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))
 
 autoinfection_vis
 
