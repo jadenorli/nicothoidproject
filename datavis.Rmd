@@ -7,16 +7,19 @@ date: "2023-01-20"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(tidyverse)
-library(janitor)
 
+library(RColorBrewer)
+library(caret)
+source("my_functions.R")
+setup_libs()
+
+display.brewer.all(colorblindFriendly = TRUE)
 ```
 Looking at egg mortality from winter 2023
 - 9 crabs
 - egg dev varied from G to spawn
 - we think that number of adult nicos will directly affect egg mortality
 ```{r visualize egg mortality data}
-
 eggs <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_w2023.csv") %>% 
   clean_names() %>% 
   select(!16:27) %>% 
@@ -48,15 +51,50 @@ nico_v_nveggs_2 <- ggplot(data = eggs2, aes(x = prop_adult_nicos, y = prop_nonvi
 
 
 ```{r, visualize autoinfeciton data}
+#create an autoinfection_all dataframe with columns for the prop of the values at that time
 autoinfeciton_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_all.csv") %>% 
   clean_names()  %>% 
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
-  mutate(prop_nonviable_eggs = number_nonviable_crab_eggs/total_number_crab_eggs) 
+  mutate(prop_nonviable_eggs = number_nonviable_crab_eggs/total_number_crab_eggs) %>%
+  mutate(prop_adult_copepods = number_adult_copepods/total_number_crab_eggs) %>%
+  mutate(prop_copepod_eggs = number_copepod_eggs/total_number_crab_eggs)
 
-autoinfection_nv <- ggplot(data = autoinfeciton_all, aes(x = egg_development_stage, y = prop_nonviable_eggs)) +
-  geom_point()
+#create a data frame with the average values across each EDS 
+autoinfection_avg <- autoinfeciton_all %>%
+  group_by(egg_development_stage) %>%
+  summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
+            avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_prop_adult_copepods = mean(prop_adult_copepods),
+            avg_prop_copepod_eggs = mean(prop_copepod_eggs)) %>%
+  as_data_frame()
 
-##I want to add and average the prop_nonviable_eggs per EDS on monday 
+#create a normalized version of that dataframe
+autoinfection_process <- autoinfection_avg %>%
+  preProcess(method = c("range"))
+
+
+autoinfection_norm <- predict(autoinfection_process, as.data.frame(autoinfection_avg)) %>%
+  as_data_frame()
+
+
+auotinfection_long <- autoinfection_norm %>%
+  pivot_longer(names_to = "averages",
+               cols = c("avg_prop_nonviable_eggs" : "avg_prop_copepod_eggs"))
+
+as.numeric(auotinfection_long$averages)
+
+
+ggplot(data = auotinfection_long, 
+       aes(x = egg_development_stage, y = value, group = averages, col = averages)) +
+  scale_color_brewer(palette = "OrRd",
+    labels = c("Adult Copepods", "Copepod Eggs", "Nonviable Eggs", "Viable Eggs" ),
+                     name = "Legend") +
+  geom_point() +
+  geom_line() +
+  theme_dark() +
+  ylab("Average Proportion") +
+  xlab("Egg Development Stage") 
+
 
 ```
 
