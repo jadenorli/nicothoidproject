@@ -72,18 +72,17 @@ autoinfection_avg <- autoinfeciton_all %>%
 autoinfection_process <- autoinfection_avg %>%
   preProcess(method = c("range"))
 
-
 autoinfection_norm <- predict(autoinfection_process, as.data.frame(autoinfection_avg)) %>%
   as_data_frame()
 
-
+#pivot the data longer 
 auotinfection_long <- autoinfection_norm %>%
   pivot_longer(names_to = "averages",
                cols = c("avg_prop_nonviable_eggs" : "avg_prop_copepod_eggs"))
 
 as.numeric(auotinfection_long$averages)
 
-
+#plot the data for the longer dataframe with the averages as groups
 ggplot(data = auotinfection_long, 
        aes(x = egg_development_stage, y = value, group = averages, col = averages)) +
   scale_color_brewer(palette = "OrRd",
