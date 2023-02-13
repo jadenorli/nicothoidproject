@@ -15,7 +15,7 @@ setup_libs()
 display.brewer.all(colorblindFriendly = TRUE)
 ```
 
-##Visualize Egg Mort Data
+#1.Egg Mort Data 
 
 Looking at egg mortality from winter 2023
 - 9 crabs
@@ -93,11 +93,12 @@ eggs_mort_vis <- ggplot(data = eggs_mort_long,
 
 eggs_mort_vis
 ```
-##Visualize Autoinfection Data
+#2.Autoinfection Data 
 
+##2.a) Visualize All
 ```{r, visualize autoinfeciton data}
 #create an autoinfection_all dataframe with columns for the prop of the values at that time
-autoinfeciton_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_all.csv") %>% 
+autoinfection_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_all.csv") %>%
   clean_names()  %>% 
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = number_nonviable_crab_eggs/total_number_crab_eggs) %>%
@@ -113,17 +114,22 @@ autoinfection_avg <- autoinfeciton_all %>%
             avg_prop_copepod_eggs = mean(prop_copepod_eggs)) %>%
   as_data_frame()
 
-#create a normalized version of that dataframe
-autoinfection_process <- autoinfection_avg %>%
-  preProcess(method = c("range"))
+#create a standardized version of that dataframe by standard deviation 
+##not sure if this is the best way to do this -- I also have the code for if we normalize around zero but this should show outliers better?
+autoinfection_standard <- autoinfection_avg %>%
+  mutate(stand_avg_prop_nonviable_eggs = scale(avg_prop_nonviable_eggs)) %>% 
+  mutate(stand_avg_prop_viable_eggs = scale(avg_prop_viable_eggs)) %>%
+  mutate(stand_avg_prop_adult_copepods = scale(avg_prop_adult_copepods)) %>%
+  mutate(stand_avg_prop_copepod_eggs = scale(avg_prop_copepod_eggs))
 
-autoinfection_norm <- predict(autoinfection_process, as_data_frame(autoinfection_avg)) %>%
-  as_data_frame()
+
+autoinfection_norm <- autoinfection_standard %>%
+  select(1, 6:9)
 
 #pivot the data longer 
 auotinfection_long <- autoinfection_norm %>%
   pivot_longer(names_to = "averages",
-               cols = c("avg_prop_nonviable_eggs" : "avg_prop_copepod_eggs"))
+               cols = c("stand_avg_prop_nonviable_eggs" : "stand_avg_prop_copepod_eggs"))
 
 as.numeric(auotinfection_long$averages)
 
@@ -134,7 +140,7 @@ nico_colors <- brewer.pal(n = 9, name = "OrRd")
 #plot the data for the longer dataframe with the averages as groups
 autoinfection_vis <- ggplot(data = auotinfection_long, 
        aes(x = egg_development_stage, y = value, group = averages, col = averages)) +
-  scale_color_manual(values = c("#FDD49E","#EF6548","#D7301F", "#7F0000"),
+  scale_color_manual(values = c("#FDD49E","#EF6548","#B30000", "#7F0000"),
                      labels = c("Adult Copepods", "Copepod Eggs", "Nonviable Eggs", "Viable Eggs" ),
                      name = "Legend") +
   geom_point() +
@@ -146,6 +152,19 @@ autoinfection_vis <- ggplot(data = auotinfection_long,
   theme(plot.title = element_text(hjust = 0.5))
 
 autoinfection_vis
+
+```
+
+##2.b) Visualize by Crab
+```{r}
+#create a data frame with the crab IDs in groups 
+autoinfection_group <- autoinfection_all %>%
+  group_by(crab_id) %>%
+  summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
+            avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_prop_adult_copepods = mean(prop_adult_copepods),
+            avg_prop_copepod_eggs = mean(prop_copepod_eggs)) %>%
+  as_data_frame()
 
 ```
 
