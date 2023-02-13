@@ -61,7 +61,7 @@ eggs_mort_avg <- eggs_mort_all %>%
             avg_prop_stunted_eggs = mean(prop_stunted_eggs),
             avg_prop_adult_nicos = mean(prop_adult_nicos),
             avg_prop_juvenile_nicos = mean(prop_juvenile_nicos),
-            avg_prop_nico_eggs = mean(prop_nico_eggs)) %>%
+            avg_prop_nico_eggs = mean(prop_nico_eggs)) %>% 
   as_tibble()
 
 #create a normalized version of that dataframe
@@ -106,7 +106,7 @@ autoinfection_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_al
   mutate(prop_copepod_eggs = number_copepod_eggs/total_number_crab_eggs)
 
 #create a data frame with the average values across each EDS 
-autoinfection_avg <- autoinfeciton_all %>%
+autoinfection_avg <- autoinfection_all %>%
   group_by(egg_development_stage) %>%
   summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
             avg_prop_viable_eggs = mean(prop_viable_eggs),
@@ -127,11 +127,11 @@ autoinfection_norm <- autoinfection_standard %>%
   select(1, 6:9)
 
 #pivot the data longer 
-auotinfection_long <- autoinfection_norm %>%
+autoinfection_long <- autoinfection_norm %>%
   pivot_longer(names_to = "averages",
                cols = c("stand_avg_prop_nonviable_eggs" : "stand_avg_prop_copepod_eggs"))
 
-as.numeric(auotinfection_long$averages)
+as.numeric(autoinfection_long$averages)
 
 #create a good color palette
 nico_colors <- brewer.pal(n = 9, name = "OrRd")
@@ -157,6 +157,7 @@ autoinfection_vis
 
 ##2.b) Visualize by Crab
 ```{r}
+
 #create a data frame with the crab IDs in groups 
 autoinfection_group <- autoinfection_all %>%
   group_by(crab_id) %>%
@@ -164,7 +165,45 @@ autoinfection_group <- autoinfection_all %>%
             avg_prop_viable_eggs = mean(prop_viable_eggs),
             avg_prop_adult_copepods = mean(prop_adult_copepods),
             avg_prop_copepod_eggs = mean(prop_copepod_eggs)) %>%
-  as_data_frame()
+  as_tibble()
 
+  # from jaden: The first thing I want to do is plot the values by crab so I need to make a wide data frame then group by crab then group by EDS and average across EDS per crab to compare the per crab data to the average of all 
+  # zoe added onto this code to group first by INDIVIDUAL CRAB and then by EDS
+
+autoinfection_crabmeans <- autoinfection_all %>%
+  group_by(crab_id, egg_development_stage) %>%
+  summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
+            avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_prop_adult_copepods = mean(prop_adult_copepods),
+            avg_prop_copepod_eggs = mean(prop_copepod_eggs), 
+            .groups = 'drop')
+
+autoinfection_crabmeans
+
+
+#plotting means by individual creab
+crab_vis <- ggplot(data = autoinfection_crabmeans, 
+       aes(x = egg_development_stage, y = avg_prop_viable_eggs, 
+           group = 1 ,     # necessary if we don't actually group
+           col = "#7F0000"
+           #, group = crab_id # this is one way to do it, but decided instead to facet so we can see each indiv crab
+           )) + 
+  geom_point() +
+  geom_line() +
+  geom_point(aes(y = avg_prop_nonviable_eggs, col = "#B30000")) +
+  geom_line(aes(y = avg_prop_nonviable_eggs, col = "#B30000")) +
+  geom_point(aes(y = avg_prop_adult_copepods, col = "#FDD49E")) +
+  geom_line(aes(y = avg_prop_adult_copepods, col = "#FDD49E")) +
+  geom_point(aes(y = avg_prop_copepod_eggs, col = "#EF6548")) +
+  geom_line(aes(y = avg_prop_copepod_eggs, col = "#EF6548")) +
+  facet_wrap(vars(crab_id)) +
+  scale_color_manual(values = c("#FDD49E","#EF6548","#B30000", "#7F0000"),
+                     labels = c("Adult Copepods", "Copepod Eggs", "Nonviable Eggs", "Viable Eggs" ),
+                     name = "Legend") +
+  theme_gray() +
+  ylab("Average Proportion") +
+  xlab("Egg Development Stage") + 
+  ggtitle("Autoinfection Across Egg Development Stages") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
