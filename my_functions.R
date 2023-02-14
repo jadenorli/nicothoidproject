@@ -5,12 +5,12 @@ setup_libs = function(){ #read in my general use packages
   library(lubridate)
 }
 
-stats_libs = function(){ #read in packages for a specific purpose (e.g. your stats toolkit)
-  library(tidybayes)
-  library(rethinking)
-  library(bayesplot)
-  library(brms)
-}
+#stats_libs = function(){ #read in packages for a specific purpose (e.g. your stats toolkit)
+#  library(tidybayes)
+#  library(rethinking)
+#  library(bayesplot)
+#  library(brms)
+#}
 
 read_data = function(file){ #expedite your file loading! this saves a couple steps, though may be a bit silly
   require(tidyverse)
