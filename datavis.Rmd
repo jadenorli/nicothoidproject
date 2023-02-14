@@ -21,6 +21,8 @@ Looking at egg mortality from winter 2023
 - 9 crabs
 - egg dev varied from G to spawn
 - we think that number of adult nicos will directly affect egg mortality
+
+## 1.a) First Visualization
 ```{r visualize egg mortality data}
 eggs <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_w2023.csv") %>% 
   clean_names() %>% 
@@ -35,12 +37,12 @@ nico_v_nveggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_nonvia
   geom_point()
 ```
 
-
+## 1.b) Second Visualization 
 ```{r, visualize full first trial of egg mort data}
 #create an eggs_mort_all dataframe with columns for the prop of the values at that time
-eggs_mort_all <- read_csv("NicothoidProjectAnalysis/RawData/LifeCycleExport2.csv")%>% 
+eggs_mort_all <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality2.csv")%>% 
   clean_names() %>%
-  select(!16:27) %>% 
+  select(!16:18) %>% 
   filter(!is.na(pleopod_number)) %>%
   filter(!eds == "M") %>%
   mutate_at(c(6:15), as.numeric) %>%
@@ -99,7 +101,7 @@ eggs_mort_vis
 ```{r, visualize autoinfeciton data}
 #create an autoinfection_all dataframe with columns for the prop of the values at that time
 autoinfection_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_all.csv") %>%
-  clean_names()  %>% 
+  clean_names() %>% 
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = number_nonviable_crab_eggs/total_number_crab_eggs) %>%
   mutate(prop_adult_copepods = number_adult_copepods/total_number_crab_eggs) %>%
@@ -134,6 +136,7 @@ auotinfection_long <- autoinfection_norm %>%
 as.numeric(auotinfection_long$averages)
 
 #create a good color palette
+#look at the colorblind palette and decide on some good colors for a custom palette
 nico_colors <- brewer.pal(n = 9, name = "OrRd")
 
 
@@ -154,6 +157,7 @@ autoinfection_vis <- ggplot(data = auotinfection_long,
 autoinfection_vis
 
 ```
+
 
 ##2.b) Visualize by Crab
 ```{r}
