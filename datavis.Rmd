@@ -37,6 +37,7 @@ nico_v_nveggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_nonvia
   geom_point()
 ```
 
+
 ## 1.b) Second Visualization 
 ```{r, visualize full first trial of egg mort data}
 #create an eggs_mort_all dataframe with columns for the prop of the values at that time
@@ -49,10 +50,10 @@ eggs_mort_all <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality2.csv")%
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs)%>%
   mutate(prop_damaged_eggs = number_damaged_crab_eggs/total_number_crab_eggs) %>%
-  mutate(prop_stunted_eggs = number_stunted_crab_eggs/total_number_crab_eggs)%>%
-  mutate(prop_adult_nicos = number_adult_nicos/total_number_crab_eggs) %>%
-  mutate(prop_juvenile_nicos = number_juvenile_nicos/total_number_crab_eggs) %>%
-  mutate(prop_nico_eggs = number_nico_eggs/total_number_crab_eggs)
+  mutate(prop_stunted_eggs = number_stunted_crab_eggs/total_number_crab_eggs) %>%
+  mutate(log_normal_adult_nicos = dlnorm(number_adult_nicos)) %>%
+  mutate(log_normal_juvenile_nicos = dlnorm(number_juvenile_nicos)) %>%
+  mutate(log_normal_nico_eggs = dlnorm(number_nico_eggs))
 
 #create a data frame with the average values across each EDS 
 eggs_mort_avg <- eggs_mort_all %>%
@@ -61,23 +62,15 @@ eggs_mort_avg <- eggs_mort_all %>%
             avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
             avg_prop_damaged_eggs = mean(prop_damaged_eggs),
             avg_prop_stunted_eggs = mean(prop_stunted_eggs),
-            avg_prop_adult_nicos = mean(prop_adult_nicos),
-            avg_prop_juvenile_nicos = mean(prop_juvenile_nicos),
-            avg_prop_nico_eggs = mean(prop_nico_eggs)) %>%
+            avg_log_adult_nicos = mean(log_normal_adult_nicos),
+            avg_log_juvenile_nicos = mean(log_normal_juvenile_nicos),
+            avg_log_nico_eggs = mean(log_normal_nico_eggs)) %>%
   as_tibble()
 
-#create a normalized version of that dataframe
-eggs_mort_process <- eggs_mort_avg %>%
-  preProcess(method = c("range"))
-
-eggs_mort_norm <- predict(eggs_mort_process, as_data_frame(eggs_mort_avg)) %>%
-  filter(!is.na(avg_prop_viable_eggs)) %>%
-  as_data_frame() 
-
 #pivot the data longer 
-eggs_mort_long <- eggs_mort_norm %>%
+eggs_mort_long <- eggs_mort_avg %>%
   pivot_longer(names_to = "averages",
-               cols = c("avg_prop_viable_eggs" : "avg_prop_nico_eggs"))
+               cols = c("avg_prop_viable_eggs" : "avg_log_nico_eggs"))
 
 
 #plot the data for the longer dataframe with the averages as groups
@@ -104,34 +97,22 @@ autoinfection_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_al
   clean_names() %>% 
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = number_nonviable_crab_eggs/total_number_crab_eggs) %>%
-  mutate(prop_adult_copepods = number_adult_copepods/total_number_crab_eggs) %>%
-  mutate(prop_copepod_eggs = number_copepod_eggs/total_number_crab_eggs)
+  mutate(log_normal_adult_copepods = dlnorm(number_adult_copepods)) %>%
+  mutate(log_normal_copepod_eggs = dlnorm(number_copepod_eggs))
 
 #create a data frame with the average values across each EDS 
-autoinfection_avg <- autoinfeciton_all %>%
+autoinfection_avg <- autoinfection_all %>%
   group_by(egg_development_stage) %>%
   summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
             avg_prop_viable_eggs = mean(prop_viable_eggs),
-            avg_prop_adult_copepods = mean(prop_adult_copepods),
-            avg_prop_copepod_eggs = mean(prop_copepod_eggs)) %>%
+            avg_log_adult_copepods = mean(log_normal_adult_copepods),
+            avg_log_copepod_eggs = mean(log_normal_copepod_eggs)) %>%
   as_data_frame()
 
-#create a standardized version of that dataframe by standard deviation 
-##not sure if this is the best way to do this -- I also have the code for if we normalize around zero but this should show outliers better?
-autoinfection_standard <- autoinfection_avg %>%
-  mutate(stand_avg_prop_nonviable_eggs = scale(avg_prop_nonviable_eggs)) %>% 
-  mutate(stand_avg_prop_viable_eggs = scale(avg_prop_viable_eggs)) %>%
-  mutate(stand_avg_prop_adult_copepods = scale(avg_prop_adult_copepods)) %>%
-  mutate(stand_avg_prop_copepod_eggs = scale(avg_prop_copepod_eggs))
-
-
-autoinfection_norm <- autoinfection_standard %>%
-  select(1, 6:9)
-
 #pivot the data longer 
-auotinfection_long <- autoinfection_norm %>%
+auotinfection_long <- autoinfection_avg %>%
   pivot_longer(names_to = "averages",
-               cols = c("stand_avg_prop_nonviable_eggs" : "stand_avg_prop_copepod_eggs"))
+               cols = c("avg_prop_nonviable_eggs" : "avg_log_copepod_eggs"))
 
 as.numeric(auotinfection_long$averages)
 
@@ -170,7 +151,7 @@ autoinfection_group <- autoinfection_all %>%
             avg_prop_copepod_eggs = mean(prop_copepod_eggs)) %>%
   as_tibble()
 
-  # zoe added onto this code to group first by INDIVIDUAL CRAB and then by EDS
+  #zoe added onto this code to group first by INDIVIDUAL CRAB and then by EDS
 autoinfection_crabmeans <- autoinfection_all %>%
   group_by(crab_id, egg_development_stage) %>%
   summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
@@ -180,7 +161,7 @@ autoinfection_crabmeans <- autoinfection_all %>%
             .groups = 'drop')
 autoinfection_crabmeans
 
-#plotting means by individual creab
+#plotting means by individual crab
 crab_vis <- ggplot(data = autoinfection_crabmeans, 
        aes(x = egg_development_stage, y = avg_prop_viable_eggs, 
            group = 1 ,     # necessary if we don't actually group
@@ -205,6 +186,8 @@ crab_vis <- ggplot(data = autoinfection_crabmeans,
   ggtitle("Autoinfection Across Egg Development Stages") +
   theme(plot.title = element_text(hjust = 0.5))
 
+
+crab_vis
 ```
 ```
 
