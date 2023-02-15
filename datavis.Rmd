@@ -142,16 +142,7 @@ autoinfection_vis
 
 ##2.b) Visualize by Crab
 ```{r}
-#create a data frame with the crab IDs in groups 
-autoinfection_group <- autoinfection_all %>%
-  group_by(crab_id) %>%
-  summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
-            avg_prop_viable_eggs = mean(prop_viable_eggs),
-            avg_prop_adult_copepods = mean(prop_adult_copepods),
-            avg_prop_copepod_eggs = mean(prop_copepod_eggs)) %>%
-  as_tibble()
-
-  #zoe added onto this code to group first by INDIVIDUAL CRAB and then by EDS
+#zoe added onto this code to group first by INDIVIDUAL CRAB and then by EDS
 autoinfection_crabmeans <- autoinfection_all %>%
   group_by(crab_id, egg_development_stage) %>%
   summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
@@ -162,7 +153,7 @@ autoinfection_crabmeans <- autoinfection_all %>%
 autoinfection_crabmeans
 
 #plotting means by individual crab
-crab_vis <- ggplot(data = autoinfection_crabmeans, 
+crab_vis_1 <- ggplot(data = autoinfection_crabmeans, 
        aes(x = egg_development_stage, y = avg_prop_viable_eggs, 
            group = 1 ,     # necessary if we don't actually group
            col = "#7F0000"
@@ -177,8 +168,8 @@ crab_vis <- ggplot(data = autoinfection_crabmeans,
   geom_point(aes(y = avg_prop_copepod_eggs, col = "#EF6548")) +
   geom_line(aes(y = avg_prop_copepod_eggs, col = "#EF6548")) +
   facet_wrap(vars(crab_id)) +
-  scale_color_manual(values = c("#FDD49E","#EF6548","#B30000", "#7F0000"),
-                     labels = c("Adult Copepods", "Copepod Eggs", "Nonviable Eggs", "Viable Eggs" ),
+  scale_color_manual(values = c("#7F0000","#B30000","#FDD49E", "#EF6548"),
+                     labels = c("Viable Eggs", "Nonviable Eggs", "Adult Copepods", "Copepod Eggs" ),
                      name = "Legend") +
   theme_gray() +
   ylab("Average Proportion") +
@@ -187,7 +178,36 @@ crab_vis <- ggplot(data = autoinfection_crabmeans,
   theme(plot.title = element_text(hjust = 0.5))
 
 
-crab_vis
+#plotting means by individual crab without viable eggs
+crab_vis_2 <- ggplot(data = autoinfection_crabmeans, 
+       aes(x = egg_development_stage, y = avg_prop_nonviable_eggs, 
+           group = 1 ,     # necessary if we don't actually group
+           col = "#B30000"
+           #, group = crab_id # this is one way to do it, but decided instead to facet so we can see each indiv crab
+           )) + 
+  geom_point() +
+  geom_line() +
+  geom_point(aes(y = avg_prop_adult_copepods, col = "#FDD49E")) +
+  geom_line(aes(y = avg_prop_adult_copepods, col = "#FDD49E")) +
+  geom_point(aes(y = avg_prop_copepod_eggs, col = "#EF6548")) +
+  geom_line(aes(y = avg_prop_copepod_eggs, col = "#EF6548")) +
+  facet_wrap(vars(crab_id)) +
+  scale_color_manual(values = c("#B30000","#FDD49E", "#EF6548"),
+                     labels = c("Nonviable Eggs", "Adult Copepods", "Copepod Eggs" ),
+                     name = "Legend") +
+  theme_gray() +
+  ylab("Average Proportion") +
+  xlab("Egg Development Stage") + 
+  ggtitle("Autoinfection Across Egg Development Stages") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+crab_vis_2
 ```
+
+
+## 2.c) Decrease Visualization Complexity 
+```{r}
+
+
 ```
 
