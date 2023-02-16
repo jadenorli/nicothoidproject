@@ -35,6 +35,7 @@ nico_v_eggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_viable_e
 
 nico_v_nveggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_nonviable)) +
   geom_point()
+
 ```
 
 
@@ -92,6 +93,7 @@ eggs_mort_vis <- ggplot(data = eggs_mort_long,
 
 eggs_mort_vis
 ```
+
 
 
 ```{r}
