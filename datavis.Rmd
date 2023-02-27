@@ -187,6 +187,17 @@ autoinfection_vis <- ggplot(data = auotinfection_long,
 autoinfection_vis
 
 ```
+##2.a.a) Visualize on same scale by logging COUNTS (not proportions)
+```{r}
+autoinfection_log <- autoinfection_all %>%
+  mutate(log_adults = log10(number_adult_copepods))
+  group_by(egg_development_stage) %>%
+  summarize(avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
+            avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_log_adult_copepods = mean(log_normal_adult_copepods),
+            avg_log_copepod_eggs = mean(log_normal_copepod_eggs)) %>%
+  as_data_frame()
+```
 
 
 ##2.b) Visualize by Crab
