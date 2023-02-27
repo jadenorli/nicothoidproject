@@ -146,8 +146,8 @@ autoinfection_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_al
   clean_names() %>% 
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = number_nonviable_crab_eggs/total_number_crab_eggs) %>%
-  mutate(log_normal_adult_copepods = dlnorm(number_adult_copepods)) %>%
-  mutate(log_normal_copepod_eggs = dlnorm(number_copepod_eggs))
+  mutate(log_normal_adult_copepods = log10(number_adult_copepods)) %>%
+  mutate(log_normal_copepod_eggs = log10(number_copepod_eggs))
 
 #create a data frame with the average values across each EDS 
 autoinfection_avg <- autoinfection_all %>%
