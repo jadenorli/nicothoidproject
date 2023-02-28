@@ -139,6 +139,12 @@ eggs_mort_vis_new
 
 #2.Autoinfection Data 
 
+Goals for this data:
+- rates of 
+- visualize change in number of adult copepods over egg stage
+- visualize change in number of copepod eggs over egg stage
+- egg mortality data is better so maybe we start there
+
 ##2.a) Visualize All
 ```{r, visualize autoinfeciton data}
 #create an autoinfection_all dataframe with columns for the prop of the values at that time
@@ -146,8 +152,8 @@ autoinfection_all <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_al
   clean_names() %>% 
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = number_nonviable_crab_eggs/total_number_crab_eggs) %>%
-  mutate(log_normal_adult_copepods = log10(number_adult_copepods)) %>%
-  mutate(log_normal_copepod_eggs = log10(number_copepod_eggs))
+  mutate(log_normal_adult_copepods = log(1 + number_adult_copepods)) %>%
+  mutate(log_normal_copepod_eggs = log(1 + number_copepod_eggs))
 
 #create a data frame with the average values across each EDS 
 autoinfection_avg <- autoinfection_all %>%
@@ -265,9 +271,35 @@ crab_vis_2
 ```
 
 
-## 2.c) Decrease Visualization Complexity 
-```{r}
+## 2.c) What is the relationship between egg stage and number of adult copepods
 
+visualization is difficult because although there is a relaitonship between nicos (adults and juvs) and damaged eggs, the nicos don't have to be present in that sample to do damage. looking at number of nico eggs is a good way to see relationship between NICO CONSUMPTION and dead eggs
+```{r egg vs copepods}
+
+# just with autoinfection data
+stage_v_adults <- ggplot(autoinfection_all, aes(x = egg_development_stage, y = number_adult_copepods)) +
+  geom_boxplot()
+
+# just with egg mortality data
+
+stage_v_adults2 <- ggplot(eggs_mort_all, aes(x = eds, y = number_adult_nicos)) + # different col names
+  geom_point()
+
+stage_v_juvs <- stage_v_adults2 <- ggplot(eggs_mort_all, aes(x = eds, y = number_juvenile_nicos)) +
+  geom_point()
+
+freq_dist <- ggplot(eggs_mort_all, aes(x = number_adult_nicos)) + 
+  geom_bar()
+
+badeggs_v_adults <- ggplot(eggs_mort_all, aes(x = number_adult_nicos, y = total_number_non_viable_crab_eggs)) +
+  geom_point()
+
+badeggs_v_all <- ggplot(eggs_mort_all, aes(x = number_juvenile_nicos, y = total_number_non_viable_crab_eggs)) +
+  geom_point() +
+  geom_point(aes(x = number_adult_nicos, y = total_number_non_viable_crab_eggs, color = "red")) # adults are red
+
+nicoeggs_v_badeggs <- ggplot(eggs_mort_all, aes(x = number_nico_eggs, y = total_number_non_viable_crab_eggs)) +
+  geom_point() 
 
 ```
 
