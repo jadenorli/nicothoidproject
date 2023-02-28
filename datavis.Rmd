@@ -137,6 +137,7 @@ eggs_mort_vis_new
 ```
 
 
+
 #2.Autoinfection Data 
 
 ##2.a) Visualize All
@@ -187,7 +188,8 @@ autoinfection_vis <- ggplot(data = auotinfection_long,
 autoinfection_vis
 
 ```
-##2.a.a) Visualize on same scale by logging COUNTS (not proportions)
+
+##2.a.ii) Visualize on same scale by logging COUNTS (not proportions)
 ```{r}
 autoinfection_log <- autoinfection_all %>%
   mutate(log_adults = log10(number_adult_copepods))
