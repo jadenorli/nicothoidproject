@@ -276,7 +276,7 @@ crab_vis_2
 ## 2.c) What is the relationship between egg stage and number of adult copepods
 
 visualization is difficult because although there is a relaitonship between nicos (adults and juvs) and damaged eggs, the nicos don't have to be present in that sample to do damage. looking at number of nico eggs is a good way to see relationship between NICO CONSUMPTION and dead eggs
-```{r egg vs copepods}
+```{r egg vs copepods visualisation}
 
 # just with autoinfection data
 stage_v_adults <- ggplot(autoinfection_all, aes(x = egg_development_stage, y = number_adult_copepods)) +
@@ -303,5 +303,38 @@ badeggs_v_all <- ggplot(eggs_mort_all, aes(x = number_juvenile_nicos, y = total_
 nicoeggs_v_badeggs <- ggplot(eggs_mort_all, aes(x = number_nico_eggs, y = total_number_non_viable_crab_eggs)) +
   geom_point() 
 
+```
+
+Let's run some actual GLMs with negative binomial error distribution (aggregated count distribution) to understand how tight this relationship is
+
+```{r egg vs copepods glm}
+require(MASS) # we're going to try this the old way
+require(lme4) # and the new way
+
+# adults as predictor, random effect of individual crab
+# sam says use a poisson and account for extra overdispersion with crab id
+eggs_v_adults_lme4 <-glmer(total_number_non_viable_crab_eggs ~ number_adult_nicos + 1|crab_id, 
+                     data = eggs_mort_all,
+                     family = poisson
+                     )
+
+summary(eggs_v_adults_lme4)
+
+
+# juveniles as predictor, random effect of individual crab
+# sam says use a poisson and account for extra overdispersion with crab id
+eggs_v_juvs_lme4 <-glmer(total_number_non_viable_crab_eggs ~ number_juvenile_nicos + 1|crab_id, 
+                     data = eggs_mort_all,
+                     family = poisson
+                     )
+
+summary(eggs_v_juvs_lme4)
+
+eggs_v_eggs_lme4 <-glmer(total_number_non_viable_crab_eggs ~ number_nico_eggs + 1|crab_id, 
+                     data = eggs_mort_all,
+                     family = poisson
+                     )
+
+summary(eggs_v_eggs_lme4)
 ```
 
