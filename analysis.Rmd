@@ -241,7 +241,13 @@ ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
                            ncol = 2, nrow = 2)
 
 
+<<<<<<< HEAD
 ## we see that there is a clear relationship between the proportion of nonviable eggs and the number of nico eggs while there isn't always this clear relationship with the total number of nicos and the proportion of nonviable eggs
 ## this is why I want to do things in terms of biomass because the adult nicos are transforming the crab egg biomass directly into nico egg biomass
+=======
+
+#we see that there is a clear relationship between the proportion of nonviable eggs and the number of nico eggs while there isn't always this clear relationship with the total number of nicos and the proportion of nonviable eggs
+## this is why I want to make the model in terms of biomass because the adult nicos are transforming the crab egg biomass directly into nico egg biomass
+>>>>>>> 4fe5a1b0f86ab96a5b526542ddb9bd9d31b76dc9
 ```
 
