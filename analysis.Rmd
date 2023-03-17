@@ -44,7 +44,8 @@ egg_mortality <- read_csv("NicothoidProjectAnalysis/RawData/eggmortalitydata.csv
   filter(!is.na(pleopod_number)) %>%
   filter(!eds == "M") %>%
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
-  mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs)
+  mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs) %>%
+  mutate(total_nicos = (number_adult_nicos + number_juvenile_nicos)) 
 
 #read in the egg mortality data that has development days
 egg_mortality_day <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_day.csv") %>% 
@@ -98,7 +99,7 @@ eggs_mort_eds_avg_vis <- ggplot(data = eggs_mort_eds_avg,
   ggtitle("Average Egg Mortality Across EDS") +
   theme(plot.title = element_text(hjust = 0.5))
 
-<<<<<<< HEAD
+
 #remove the most highly infested crabs (037, 043, and 045)
 new_crab_eds <- egg_mortality %>%
   filter(!crab_id == "ANT-GAV-037") %>%
@@ -127,11 +128,6 @@ eggs_mort_vis_new_eds <- ggplot(data = eggs_mort_avg_new_eds,
 eggs_mort_eds_vis
 eggs_mort_eds_avg_vis
 eggs_mort_vis_new_eds
-=======
-#plot the graphs
-eggs_mort_eds_vis
-eggs_mort_eds_avg_vis
->>>>>>> 946eeef51b48c5041094f20141efc96cbb05624f
 
 ```
 
@@ -162,10 +158,6 @@ eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg,
   ggtitle("Egg Mortality Across Development Days") +
   theme(plot.title = element_text(hjust = 0.5))
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 946eeef51b48c5041094f20141efc96cbb05624f
 #remove the most highly infested crabs (037, 043, and 045)
 new_crab <- egg_mortality_day %>%
   filter(!crab_id == "ANT-GAV-037") %>%
@@ -194,5 +186,62 @@ eggs_mort_vis_new <- ggplot(data = eggs_mort_avg_new,
 eggs_mort_day_vis
 eggs_mort_vis_new
 
+```
+
+
+# 3. Counts Visualization
+```{r}
+#plot the number of adult nicos against the total number of nonviable eggs
+adult_plot <- ggplot(data = egg_mortality, 
+       aes( x = prop_viable_eggs, y = number_adult_nicos)) +
+  geom_point(color = adults) + 
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  ylab("Counts") +
+  xlab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#plot the number of juvenile nicos against the total number of nonviable eggs 
+juvenile_plot <- ggplot(data = egg_mortality, 
+       aes(x = prop_viable_eggs, y = number_juvenile_nicos)) +
+  geom_point(color = juveniles) + 
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  ylab("Counts") +
+  xlab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Juvenile Nicos") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+#plot the number of total number of nicos against the total number of nonviable eggs
+total_plot <- ggplot(data = egg_mortality, 
+       aes( x = prop_viable_eggs, y = total_nicos)) +
+  geom_point(color = totals) + 
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  ylab("Counts") +
+  xlab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+#plot the number of nico eggs against the total number of nonviable eggs
+nico_egg_plot <- ggplot(data = egg_mortality, 
+       aes(x = prop_viable_eggs, y = number_nico_eggs)) +
+  geom_point(color = nico_eggs) + 
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  ylab("Counts") +
+  xlab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Number Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+
+## we see that there is a clear relationship between the proportion of nonviable eggs and the number of nico eggs while there isn't always this clear relationship with the total number of nicos and the proportion of nonviable eggs
+## this is why I want to do things in terms of biomass because the adult nicos are transforming the crab egg biomass directly into nico egg biomass
 ```
 
