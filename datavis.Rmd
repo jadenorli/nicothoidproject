@@ -42,7 +42,7 @@ nico_v_nveggs <- ggplot(data = eggs, aes(x = number_adult_nicos, y = prop_nonvia
 ## 1.b) Second Visualization 
 ```{r, visualize full first trial of egg mort data}
 #create an eggs_mort_all dataframe with columns for the prop of the values at that time
-eggs_mort_all <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality2.csv")%>%
+eggs_mort_all <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality2.csv")%>% 
   clean_names() %>%
   select(!16:18) %>% 
   filter(!is.na(pleopod_number)) %>%

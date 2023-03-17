@@ -1,0 +1,164 @@
+---
+title: "analysis"
+author: "Jaden Orli"
+date: "2023-03-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(RColorBrewer)
+library(caret)
+library(ggpubr)
+source("my_functions.R")
+setup_libs()
+
+display.brewer.all(colorblindFriendly = TRUE)
+```
+
+
+#1. Set up 
+
+### a) Color Palette
+```{r}
+#choose a color palette
+#display.brewer.pal(n = 8, name = 'OrRd')
+#brewer.pal(n = 8, name = "OrRd")
+
+#assign colors to names
+adults = "#D7301F"
+juveniles = "#FDBB84"
+totals  = "#990000"
+nico_eggs = "#FCC5C0"
+crab_eggs = "#EF6548"
+```
+
+
+### b) Dataframes
+```{r}
+#read in the latest of the egg mortality data 
+egg_mortality <- read_csv("NicothoidProjectAnalysis/RawData/eggmortalitydata.csv") %>% 
+  clean_names() %>%
+  select(!16:18) %>% 
+  filter(!is.na(pleopod_number)) %>%
+  filter(!eds == "M") %>%
+  mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
+  mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs)
+
+#read in the egg mortality data that has development days
+egg_mortality_day <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_day.csv") %>% 
+  clean_names() %>%
+  select(!17:19) %>% 
+  filter(!is.na(pleopod_number)) %>%
+  filter(!eds == "M") %>%
+  mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
+  mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs)
+
+```
+
+
+# 2. Timeseries Visualization
+
+### a) Egg Mortality Data by EDS 
+```{r}
+#visualize the change in proportion of viable eggs over time
+#subset the data with the desireds columns
+egg_mort_viable <- egg_mortality %>%
+  select(4,16)
+
+
+#plot the data for the longer dataframe with the averages as groups
+eggs_mort_eds_vis <- ggplot(data = egg_mort_viable, 
+       aes(x = eds, y = prop_viable_eggs)) +
+  geom_point(color = crab_eggs) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Proportion Viable Crab Eggs") +
+  xlab("Egg Development Stage (EDS)") + 
+  ggtitle("Egg Mortality Across EDS") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#create a data frame with the average values across each EDS 
+eggs_mort_eds_avg <- eggs_mort_all %>%
+  group_by(eds) %>%
+  summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
+  as_tibble()
+
+
+#plot the data for the dataframe with the averages as groups
+eggs_mort_eds_avg_vis <- ggplot(data = eggs_mort_eds_avg, 
+       aes(x = eds, y = avg_prop_viable_eggs)) +
+  geom_point(color = crab_eggs) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Egg Development Stage (EDS)") + 
+  ggtitle("Average Egg Mortality Across EDS") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#plot the graphs
+eggs_mort_eds_vis
+eggs_mort_eds_avg_vis
+
+```
+
+
+### b) Egg Mortality Data by Development Day
+```{r}
+#create a data frame with the average values across each EDS 
+eggs_mort_day_avg <- egg_mortality_day %>%
+  group_by(day) %>%
+  summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
+  as_tibble()
+
+#pivot the data longer 
+eggs_mort_day_long <- eggs_mort_day_avg %>%
+  pivot_longer(names_to = "averages",
+               cols = c("avg_prop_viable_eggs", "avg_prop_nonviable_eggs"))
+
+
+#plot the data for the  dataframe with the averages as groups
+eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg, 
+       aes(x = day, y = avg_prop_viable_eggs)) +
+  geom_point(color= crab_eggs) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Development Day") + 
+  ggtitle("Egg Mortality Across Development Days") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+#remove the most highly infested crabs (037, 043, and 045)
+new_crab <- egg_mortality_day %>%
+  filter(!crab_id == "ANT-GAV-037") %>%
+  filter(!crab_id == "ANT-GAV-045") %>%
+  filter(!crab_id == "ANT-GAV-043")
+
+#create a data frame with the average values across each day 
+eggs_mort_avg_new <- new_crab %>%
+  group_by(day) %>%
+  summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
+  as_tibble()
+
+#plot the data for the longer dataframe with the averages as groups
+eggs_mort_vis_new <- ggplot(data = eggs_mort_avg_new, 
+       aes(x = day, y = avg_prop_viable_eggs)) +
+  geom_point(color= crab_eggs) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Development Day") + 
+  ggtitle("Egg Mortality Across Development Days (excluding highly infested hosts)") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#plot the two graphs
+eggs_mort_day_vis
+eggs_mort_vis_new
+
+```
+
