@@ -98,6 +98,7 @@ eggs_mort_eds_avg_vis <- ggplot(data = eggs_mort_eds_avg,
   ggtitle("Average Egg Mortality Across EDS") +
   theme(plot.title = element_text(hjust = 0.5))
 
+<<<<<<< HEAD
 #remove the most highly infested crabs (037, 043, and 045)
 new_crab_eds <- egg_mortality %>%
   filter(!crab_id == "ANT-GAV-037") %>%
@@ -126,6 +127,11 @@ eggs_mort_vis_new_eds <- ggplot(data = eggs_mort_avg_new_eds,
 eggs_mort_eds_vis
 eggs_mort_eds_avg_vis
 eggs_mort_vis_new_eds
+=======
+#plot the graphs
+eggs_mort_eds_vis
+eggs_mort_eds_avg_vis
+>>>>>>> 946eeef51b48c5041094f20141efc96cbb05624f
 
 ```
 
@@ -156,6 +162,10 @@ eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg,
   ggtitle("Egg Mortality Across Development Days") +
   theme(plot.title = element_text(hjust = 0.5))
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 946eeef51b48c5041094f20141efc96cbb05624f
 #remove the most highly infested crabs (037, 043, and 045)
 new_crab <- egg_mortality_day %>%
   filter(!crab_id == "ANT-GAV-037") %>%
