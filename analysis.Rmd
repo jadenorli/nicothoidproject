@@ -65,7 +65,8 @@ dissections <- read_csv("NicothoidProjectAnalysis/RawData/all_dissections.csv") 
   filter(!is.na(nicothoid_count)) %>%
   filter(!nicothoid_count == "N/A") %>%
   filter(!number_of_lamellae == "NA") %>%
-  mutate_at(c(5,6), as.numeric) 
+  mutate_at(c(5,6), as.numeric) %>%
+  mutate(prop_nicos = nicothoid_count/number_of_lamellae)
 
 ```
 
@@ -444,5 +445,32 @@ mean_density_gills
 #calculate the mean intensity for the nicos in the gills 
 mean_intensity_gills <- mean(dissections$nicothoid_count)
 mean_intensity_gills
+```
+
+
+# 7. Visualize Nico Counts in Gills 
+
+```{r}
+#visualize the number of nicos in the gills as an extension of the crabs 
+
+##subset the data frame to just include crab ID and proportion of nicos for the female yellow rock crabs 
+gills_visualize <- dissections %>%
+  select(2,7) %>%
+  filter(!crab_id == "MANT-GAV-001") %>%
+  filter(!crab_id == "MANT-GAV-002") %>%
+  filter(!crab_id == "MANT-GAV-003") %>%
+  filter(!crab_id == "MANT-GAV-005") %>%
+  filter(!crab_id == "PRO-GAV-001") %>%
+  filter(!crab_id == "PAG-GAV-001")
+
+#subset the egg mortality data to just include the prop of juveniles and the crab ID
+eggs_visualize <- egg_mortality %>%
+  mutate(prop_nicos = number_juvenile_nicos/total_number_crab_eggs) %>%
+  select(2, 19)
+
+#plot for the crabs that have dissection data and egg mortality data
+
+
+  
 ```
 
