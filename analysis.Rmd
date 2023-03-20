@@ -83,7 +83,7 @@ eggs_mort_eds_vis <- ggplot(data = egg_mort_viable,
   theme(plot.title = element_text(hjust = 0.5))
 
 #create a data frame with the average values across each EDS 
-eggs_mort_eds_avg <- eggs_mort_all %>%
+eggs_mort_eds_avg <- egg_mortality %>%
   group_by(eds) %>%
   summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
             avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
@@ -136,7 +136,7 @@ eggs_mort_vis_new_eds
 
 ### b) Egg Mortality Data by Development Day
 ```{r}
-#create a data frame with the average values across each EDS 
+#create a data frame with the average values across each development day 
 eggs_mort_day_avg <- egg_mortality_day %>%
   group_by(day) %>%
   summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
@@ -149,7 +149,7 @@ eggs_mort_day_long <- eggs_mort_day_avg %>%
                cols = c("avg_prop_viable_eggs", "avg_prop_nonviable_eggs"))
 
 
-#plot the data for the  dataframe with the averages as groups
+#plot the data for the dataframe with the averages as groups
 eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg, 
        aes(x = day, y = avg_prop_viable_eggs)) +
   geom_point(color= crab_eggs) +
@@ -343,29 +343,28 @@ glm.nicoeggs.nb <- glmer.nb(number_viable_crab_eggs ~ number_nico_eggs + (1|crab
 #evaluate with interactions of all of the states
 
 ##poisson 
-glm.combined.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos*number_juvenile_nicos*number_nico_eggs + (1|crab_id), 
-                   data = egg_mortality, 
-                   family = "poisson")
+#glm.combined.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos*number_juvenile_nicos*number_nico_eggs + (1|crab_id), 
+                   #data = egg_mortality, 
+                   #family = "poisson")
 
 ##negative binomial 
-glm.combined.nb <- glmer.nb(number_viable_crab_eggs ~ number_adult_nicos*number_juvenile_nicos*number_nico_eggs + (1|crab_id), 
-                   data = egg_mortality)
+#glm.combined.nb <- glmer.nb(number_viable_crab_eggs ~ number_adult_nicos*number_juvenile_nicos*number_nico_eggs + (1|crab_id), 
+                   #data = egg_mortality)
 
 ```
 
 
 
-### b). Mean Density
+### b) Mean Density
 ```{r}
-#create a data frame with density of the adults in the egg mas per 
+#create a data frame with the scaled density of the adults in the egg mass per 1000 eggs
 egg_mortality_density <- egg_mortality %>%
-  mutate(density_adult_nicos = (number_adult_nicos/total_number_crab_eggs)) %>%
-  mutate(density_juvenile_nicos = (number_juvenile_nicos/total_number_crab_eggs)) %>%
-  mutate(density_total_nicos = (total_nicos/total_number_crab_eggs)) %>%
-  mutate(density_nico_eggs = (number_nico_eggs/total_number_crab_eggs))
+  mutate(density_adult_nicos = ((number_adult_nicos/total_number_crab_eggs)*1000)) %>%
+  mutate(density_juvenile_nicos = ((number_juvenile_nicos/total_number_crab_eggs)*1000)) %>%
+  mutate(density_total_nicos = ((total_nicos/total_number_crab_eggs)*1000)) %>%
+  mutate(density_nico_eggs = ((number_nico_eggs/total_number_crab_eggs)*1000))
 
 #calculate the mean density of each of the values 
-## do I need to multiply these values by 1000? How do we get it to mean density per 1000 eggs?
 mean_adult_density <- mean(egg_mortality_density$density_adult_nicos)
 mean_adult_density
 
@@ -385,6 +384,36 @@ mean_nico_egg_density
 
 ### c) Mean Intensity 
 ```{r}
+#calculate the mean intensity of each of the values 
+mean_adult_intensity <- mean(egg_mortality$number_adult_nicos)
+mean_adult_intensity
 
+mean_juvenile_intensity <- mean(egg_mortality$number_juvenile_nicos)
+mean_juvenile_intensity
+
+mean_total_intensity <- mean(egg_mortality$total_nicos)
+mean_total_intensity
+
+mean_nico_egg_intensity <- mean(egg_mortality$number_nico_eggs)
+mean_nico_egg_intensity
+```
+
+### d) Mean Egg Mortality
+```{r}
+#look at the summary stats
+summary_egg_mortality <- summary(egg_mortality$prop_nonviable_eggs)
+summary_egg_mortality
+
+#calculate the mean egg mortality as a percent
+mean_egg_mortality <- mean((egg_mortality$prop_nonviable_eggs)*100)
+mean_egg_mortality
+
+#calculate the min egg mortality as a percent
+min_egg_mortality <- min((egg_mortality$prop_nonviable_eggs)*100)
+min_egg_mortality
+
+#calculate the max egg morality as a percent
+max_egg_mortality <- max((egg_mortality$prop_nonviable_eggs)*100)
+max_egg_mortality
 ```
 
