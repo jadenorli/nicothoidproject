@@ -364,8 +364,27 @@ egg_mortality_density <- egg_mortality %>%
   mutate(density_total_nicos = (total_nicos/total_number_crab_eggs)) %>%
   mutate(density_nico_eggs = (number_nico_eggs/total_number_crab_eggs))
 
+#calculate the mean density of each of the values 
+## do I need to multiply these values by 1000? How do we get it to mean density per 1000 eggs?
+mean_adult_density <- mean(egg_mortality_density$density_adult_nicos)
+mean_adult_density
+
+mean_juvenile_density <- mean(egg_mortality_density$density_juvenile_nicos)
+mean_juvenile_density
+
+mean_total_density <- mean(egg_mortality_density$density_total_nicos)
+mean_total_density
+
+mean_nico_egg_density <- mean(egg_mortality_density$density_nico_eggs)
+mean_nico_egg_density
 
 
+
+```
+
+
+### c) Mean Intensity 
+```{r}
 
 ```
 
