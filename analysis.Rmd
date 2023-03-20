@@ -58,6 +58,15 @@ egg_mortality_day <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_day
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs)
 
+#read in the dissections data
+dissections <- read_csv("NicothoidProjectAnalysis/RawData/all_dissections.csv") %>% 
+  clean_names() %>%
+  select(1:4, 9, 10) %>%
+  filter(!is.na(nicothoid_count)) %>%
+  filter(!nicothoid_count == "N/A") %>%
+  filter(!number_of_lamellae == "NA") %>%
+  mutate_at(c(5,6), as.numeric) 
+
 ```
 
 
@@ -303,7 +312,7 @@ ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_h
 
 
 
-# 5. Analysis
+# 5. Analysis (Egg Mass)
 
 ### a) Generalized Linear Models
 ```{r}
@@ -377,8 +386,6 @@ mean_total_density
 mean_nico_egg_density <- mean(egg_mortality_density$density_nico_eggs)
 mean_nico_egg_density
 
-
-
 ```
 
 
@@ -415,5 +422,27 @@ min_egg_mortality
 #calculate the max egg morality as a percent
 max_egg_mortality <- max((egg_mortality$prop_nonviable_eggs)*100)
 max_egg_mortality
+```
+
+# 6. Analysis (Gills)
+
+### a) Mean Density
+```{r}
+#create a data frame with the density of juvenile nicos per lamellae 
+gill_density <- dissections %>%
+  mutate(density_nicos_gills = (nicothoid_count/number_of_lamellae)) 
+
+#calculate the mean density of the nicos in the gills
+mean_density_gills<- mean(gill_density$density_nicos_gills)
+mean_density_gills
+
+```
+
+
+### b) Mean Intensity
+```{r}
+#calculate the mean intensity for the nicos in the gills 
+mean_intensity_gills <- mean(dissections$nicothoid_count)
+mean_intensity_gills
 ```
 
