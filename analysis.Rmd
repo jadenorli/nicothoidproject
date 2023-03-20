@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(RColorBrewer)
 library(caret)
 library(ggpubr)
+library(MASS)
+library(lme4)
 source("my_functions.R")
 setup_libs()
 
@@ -191,7 +193,7 @@ eggs_mort_vis_new
 
 # 3. Counts Visualization
 ```{r}
-#plot the number of adult nicos against the total number of nonviable eggs
+#plot the number of adult nicos against the total number of viable eggs
 adult_plot <- ggplot(data = egg_mortality, 
        aes( x = prop_viable_eggs, y = number_adult_nicos)) +
   geom_point(color = adults) + 
@@ -202,7 +204,7 @@ adult_plot <- ggplot(data = egg_mortality,
   ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5))
 
-#plot the number of juvenile nicos against the total number of nonviable eggs 
+#plot the number of juvenile nicos against the total number of viable eggs 
 juvenile_plot <- ggplot(data = egg_mortality, 
        aes(x = prop_viable_eggs, y = number_juvenile_nicos)) +
   geom_point(color = juveniles) + 
@@ -213,7 +215,7 @@ juvenile_plot <- ggplot(data = egg_mortality,
   ggtitle("Juvenile Nicos") +
   theme(plot.title = element_text(hjust = 0.5)) 
 
-#plot the number of total number of nicos against the total number of nonviable eggs
+#plot the number of total number of nicos against the total number of viable eggs
 total_plot <- ggplot(data = egg_mortality, 
        aes( x = prop_viable_eggs, y = total_nicos)) +
   geom_point(color = totals) + 
@@ -225,7 +227,7 @@ total_plot <- ggplot(data = egg_mortality,
   theme(plot.title = element_text(hjust = 0.5))
 
 
-#plot the number of nico eggs against the total number of nonviable eggs
+#plot the number of nico eggs against the total number of viable eggs
 nico_egg_plot <- ggplot(data = egg_mortality, 
        aes(x = prop_viable_eggs, y = number_nico_eggs)) +
   geom_point(color = nico_eggs) + 
@@ -241,13 +243,129 @@ ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
                            ncol = 2, nrow = 2)
 
 
-<<<<<<< HEAD
+
 ## we see that there is a clear relationship between the proportion of nonviable eggs and the number of nico eggs while there isn't always this clear relationship with the total number of nicos and the proportion of nonviable eggs
 ## this is why I want to do things in terms of biomass because the adult nicos are transforming the crab egg biomass directly into nico egg biomass
-=======
+```
 
-#we see that there is a clear relationship between the proportion of nonviable eggs and the number of nico eggs while there isn't always this clear relationship with the total number of nicos and the proportion of nonviable eggs
-## this is why I want to make the model in terms of biomass because the adult nicos are transforming the crab egg biomass directly into nico egg biomass
->>>>>>> 4fe5a1b0f86ab96a5b526542ddb9bd9d31b76dc9
+# 4. Visually Evaluate Normality
+```{r}
+#look at the frequency of the count data for all the life stages
+
+#plot the frequency of adult nicos 
+adult_plot_hist <- gghistogram(data = egg_mortality, 
+                               x = "number_adult_nicos", 
+                               fill = adults) +
+  theme_gray() +
+  ylab("Counts") +
+  xlab("Frequency") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#plot the frequency of juvenile nicos 
+juvenile_plot_hist <- gghistogram(data = egg_mortality, 
+                               x = "number_juvenile_nicos",
+                               fill = juveniles) +
+  theme_gray() +
+  ylab("Counts") +
+  xlab("Frequency") + 
+  ggtitle("Juvenile Nicos") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#plot the frequency of total nicos 
+total_plot_hist <- gghistogram(data = egg_mortality, 
+                               x = "total_nicos",
+                               fill = totals) +
+  theme_gray() +
+  ylab("Counts") +
+  xlab("Frequency") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+#plot the frequency of juvenile nicos 
+nico_eggs_plot_hist <- gghistogram(data = egg_mortality, 
+                               x = "number_nico_eggs",
+                               fill = nico_eggs) +
+  theme_gray() +
+  ylab("Counts") +
+  xlab("Frequency") + 
+  ggtitle("Nicos Eggs") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#combine the plots 
+ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_hist,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+## it is obvious that the count data is heavily right skewed
+```
+
+
+
+# 5. Analysis
+
+### a) Generalized Linear Models
+```{r}
+#create a generalized linear model to evaluate the relationship between viable eggs and number of adult nicos
+
+##poisson 
+glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos + (1|crab_id), 
+                   data = egg_mortality, 
+                   family = "poisson")
+
+##negative binomial 
+glm.adults.nb <- glmer.nb(number_viable_crab_eggs ~ number_adult_nicos + (1|crab_id), 
+                   data = egg_mortality)
+
+#create a generalized linear model to evaluate the relationship between viable eggs and number of juvenile nicos
+
+##poisson 
+glm.juveniles.poisson <- glmer(number_viable_crab_eggs ~ number_juvenile_nicos + (1|crab_id), 
+                   data = egg_mortality, 
+                   family = "poisson")
+
+##negative binomial 
+glm.juveniles.nb <- glmer.nb(number_viable_crab_eggs ~ number_juvenile_nicos + (1|crab_id), 
+                   data = egg_mortality)
+
+#create a generalized linear model to evaluate the relationship between viable eggs and number of nicos eggs
+
+##poisson 
+glm.nicoeggs.poisson <- glmer(number_viable_crab_eggs ~ number_nico_eggs + (1|crab_id), 
+                   data = egg_mortality, 
+                   family = "poisson")
+
+##negative binomial 
+glm.nicoeggs.nb <- glmer.nb(number_viable_crab_eggs ~ number_nico_eggs + (1|crab_id), 
+                   data = egg_mortality)
+
+#evaluate with interactions of all of the states
+
+##poisson 
+glm.combined.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos*number_juvenile_nicos*number_nico_eggs + (1|crab_id), 
+                   data = egg_mortality, 
+                   family = "poisson")
+
+##negative binomial 
+glm.combined.nb <- glmer.nb(number_viable_crab_eggs ~ number_adult_nicos*number_juvenile_nicos*number_nico_eggs + (1|crab_id), 
+                   data = egg_mortality)
+
+```
+
+
+
+### b). Mean Density
+```{r}
+#create a data frame with density of the adults in the egg mas per 
+egg_mortality_density <- egg_mortality %>%
+  mutate(density_adult_nicos = (number_adult_nicos/total_number_crab_eggs)) %>%
+  mutate(density_juvenile_nicos = (number_juvenile_nicos/total_number_crab_eggs)) %>%
+  mutate(density_total_nicos = (total_nicos/total_number_crab_eggs)) %>%
+  mutate(density_nico_eggs = (number_nico_eggs/total_number_crab_eggs))
+
+
+
+
 ```
 
