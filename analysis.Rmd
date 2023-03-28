@@ -68,6 +68,14 @@ dissections <- read_csv("NicothoidProjectAnalysis/RawData/all_dissections.csv") 
   mutate_at(c(5,6), as.numeric) %>%
   mutate(prop_nicos = nicothoid_count/number_of_lamellae)
 
+autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/first_broods_only.csv") %>% 
+  clean_names() %>%
+  select(!11) %>%
+  select(!13:18) %>%
+  filter(!experiment_id == "Autoinfection-055") %>%
+  mutate_at(9, as.numeric) %>%
+  filter(!total_number_of_eggs == 0)
+
 ```
 
 
@@ -379,7 +387,7 @@ glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos + (1|ed
 
 
 
-### b) Mean Density
+### c) Mean Density
 ```{r}
 #create a data frame with the scaled density of the adults in the egg mass per 1000 eggs
 egg_mortality_density <- egg_mortality %>%
@@ -402,9 +410,21 @@ mean_nico_egg_density <- mean(egg_mortality_density$density_nico_eggs)
 mean_nico_egg_density
 
 ```
-### c) MEAN DENSITY WITH ALL CRABS
+### d) Mean Density (adults with all data)
+```{r}
+#create a column in the autoinfection data with the density of adult nicos
+autoinfection_density <- autoinfection %>%
+  mutate(density_adult_nicos = ((number_of_adult_copepods/total_number_of_eggs)*1000)) %>%
+  select(1,13)
 
-### d) Mean Intensity 
+#subset the egg morality data for just the adults and the adult density
+mort_egg_density <- egg_mortality_density %>%
+  select(1,19)
+
+```
+
+
+### e) Mean Intensity 
 ```{r}
 #calculate the mean intensity of each of the values 
 mean_adult_intensity <- mean(egg_mortality$number_adult_nicos)
@@ -420,7 +440,7 @@ mean_nico_egg_intensity <- mean(egg_mortality$number_nico_eggs)
 mean_nico_egg_intensity
 ```
 
-### e) Mean Egg Mortality
+### f) Mean Egg Mortality
 ```{r}
 #look at the summary stats
 summary_egg_mortality <- summary(egg_mortality$prop_nonviable_eggs)
