@@ -150,7 +150,11 @@ eggs_mort_vis_new_eds
 eggs_mort_day_avg <- egg_mortality_day %>%
   group_by(day) %>%
   summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
-            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
+            avg_adult_nicos = mean(number_adult_nicos),
+            avg_juvenile_nicos = mean(number_juvenile_nicos),
+            avg_nico_eggs = mean(number_nico_eggs),
+            crab_id = crab_id) %>%
   as_tibble()
 
 #pivot the data longer 
@@ -315,7 +319,7 @@ ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_h
 
 # 5. Analysis (Egg Mass)
 
-### a) Generalized Linear Models
+### a) Generalized Linear Models EDS
 ```{r}
 #create a generalized linear model to evaluate the relationship between viable eggs and number of adult nicos
 
@@ -364,6 +368,15 @@ glm.nicoeggs.nb <- glmer.nb(number_viable_crab_eggs ~ number_nico_eggs + (1|crab
 ```
 
 
+### b) Generalized Linear Models Development Day
+```{r}
+glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos + (1|eds), 
+                   data = egg_mortality_day, 
+                   family = "poisson")
+```
+
+
+
 
 ### b) Mean Density
 ```{r}
@@ -390,7 +403,7 @@ mean_nico_egg_density
 ```
 
 
-### c) Mean Intensity 
+### d) Mean Intensity 
 ```{r}
 #calculate the mean intensity of each of the values 
 mean_adult_intensity <- mean(egg_mortality$number_adult_nicos)
@@ -406,7 +419,7 @@ mean_nico_egg_intensity <- mean(egg_mortality$number_nico_eggs)
 mean_nico_egg_intensity
 ```
 
-### d) Mean Egg Mortality
+### e) Mean Egg Mortality
 ```{r}
 #look at the summary stats
 summary_egg_mortality <- summary(egg_mortality$prop_nonviable_eggs)
@@ -469,8 +482,6 @@ eggs_visualize <- egg_mortality %>%
   select(2, 19)
 
 #plot for the crabs that have dissection data and egg mortality data
-
-
   
 ```
 
