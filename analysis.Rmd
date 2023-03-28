@@ -402,7 +402,7 @@ mean_nico_egg_density <- mean(egg_mortality_density$density_nico_eggs)
 mean_nico_egg_density
 
 ```
-
+### c) MEAN DENSITY WITH ALL CRABS
 
 ### d) Mean Intensity 
 ```{r}
@@ -448,7 +448,7 @@ gill_density <- dissections %>%
   mutate(density_nicos_gills = (nicothoid_count/number_of_lamellae)) 
 
 #calculate the mean density of the nicos in the gills
-mean_density_gills<- mean(gill_density$density_nicos_gills)
+mean_density_gills <- mean(gill_density$density_nicos_gills)
 mean_density_gills
 
 ```
@@ -456,9 +456,25 @@ mean_density_gills
 
 ### b) Mean Intensity
 ```{r}
+#divide the nicos/lamallae*the number of gills (12 gills per crab)
+gill_intensity <- gill_density %>%
+  mutate(intensity_nicos_gills = (density_nicos_gills*12))
+
 #calculate the mean intensity for the nicos in the gills 
-mean_intensity_gills <- mean(dissections$nicothoid_count)
+mean_intensity_gills <- mean(gill_intensity$intensity_nicos_gills)
 mean_intensity_gills
+
+```
+
+
+### c) Mean Density (Males)
+```{r}
+#subset for males only
+##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I belive that this is why they didn't have nicos -- we are planning to do a few more male dissections
+males <- gill_density %>%
+  filter(crab_id == "MANT-GAV-001") %>%
+  filter(crab_id == "MANT-GAV-002")
+
 ```
 
 
