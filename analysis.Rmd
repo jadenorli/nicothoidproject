@@ -342,6 +342,7 @@ glm.juveniles.poisson <- glmer(number_viable_crab_eggs ~ number_juvenile_nicos +
 ##negative binomial 
 glm.juveniles.nb <- glmer.nb(number_viable_crab_eggs ~ number_juvenile_nicos + (1|crab_id), 
                    data = egg_mortality)
+ 
 
 #create a generalized linear model to evaluate the relationship between viable eggs and number of nicos eggs
 
@@ -484,4 +485,5 @@ eggs_visualize <- egg_mortality %>%
 #plot for the crabs that have dissection data and egg mortality data
   
 ```
+
 
