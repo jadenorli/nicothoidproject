@@ -410,16 +410,16 @@ mean_nico_egg_density <- mean(egg_mortality_density$density_nico_eggs)
 mean_nico_egg_density
 
 ```
-### d) Mean Density (adults with all data)
+### d) Mean Density/Intensity (adults with all data)
 ```{r}
 #create a column in the autoinfection data with the density of adult nicos
 autoinfection_density <- autoinfection %>%
   mutate(density_adult_nicos = ((number_of_adult_copepods/total_number_of_eggs)*1000)) %>%
-  select(1,13)
+  select(1,9,13)
 
 #subset the egg morality data for just the adults and the adult density
 mort_egg_density <- egg_mortality_density %>%
-  select(1,19)
+  select(1,11,19)
 
 ```
 
