@@ -471,35 +471,40 @@ mean_intensity_gills
 ```{r}
 #subset for males only
 ##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I belive that this is why they didn't have nicos -- we are planning to do a few more male dissections
-males <- gill_density %>%
-  filter(crab_id == "MANT-GAV-001") %>%
-  filter(crab_id == "MANT-GAV-002")
+males <- gill_intensity %>%
+  filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002")) 
+
+males_mean_density <- mean(males$density_nicos_gills)
+males_mean_density
 
 ```
 
 
-# 7. Visualize Nico Counts in Gills 
-
+### d) Mean Density (Females)
 ```{r}
-#visualize the number of nicos in the gills as an extension of the crabs 
+#subset for males only
+##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I belive that this is why they didn't have nicos -- we are planning to do a few more male dissections
+females <- gill_intensity %>%
+  filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-003", "MANT-GAV-005", "PRO-GAV-001", "PAG-GAV-001")) 
 
-##subset the data frame to just include crab ID and proportion of nicos for the female yellow rock crabs 
-gills_visualize <- dissections %>%
-  select(2,7) %>%
-  filter(!crab_id == "MANT-GAV-001") %>%
-  filter(!crab_id == "MANT-GAV-002") %>%
-  filter(!crab_id == "MANT-GAV-003") %>%
-  filter(!crab_id == "MANT-GAV-005") %>%
-  filter(!crab_id == "PRO-GAV-001") %>%
-  filter(!crab_id == "PAG-GAV-001")
+females_mean_density <- mean(females$density_nicos_gills)
+females_mean_density
 
-#subset the egg mortality data to just include the prop of juveniles and the crab ID
-eggs_visualize <- egg_mortality %>%
-  mutate(prop_nicos = number_juvenile_nicos/total_number_crab_eggs) %>%
-  select(2, 19)
+```
 
-#plot for the crabs that have dissection data and egg mortality data
-  
+### e) Mean Intensity (Males)
+```{r}
+#calculate the mean intensity for the nicos in the gills 
+male_mean_intensity_gills <- mean(males$intensity_nicos_gills)
+male_mean_intensity_gills
+
 ```
 
 
+### f) Mean Intensity (Females)
+```{r}
+#calculate the mean intensity for the nicos in the gills 
+female_mean_intensity_gills <- mean(females$intensity_nicos_gills)
+female_mean_intensity_gills
+
+```
