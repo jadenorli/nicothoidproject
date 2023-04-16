@@ -569,7 +569,9 @@ max_egg_mortality
 
 # 6. Analysis (Gills)
 
-### a) Mean Density
+### a) Mean Density 
+
+#### i) All Species/All Sexes
 ```{r}
 #create a data frame with the density of juvenile nicos per lamellae 
 gill_density <- dissections %>%
@@ -579,6 +581,74 @@ gill_density <- dissections %>%
 mean_density_gills <- mean(gill_density$density_nicos_gills)
 mean_density_gills
 
+```
+
+#### ii) All Sexes Yellow Crabs
+```{r}
+#subset for yellows only
+
+##sample size n = 21
+yellow_all <- gill_density %>%
+  filter(!crab_id %in% c("PRO-GAV-001", "PAG-GAV-001", "MPRO-GAV-002")) 
+
+yellow_all_mean_density <- mean(yellow_all$density_nicos_gills)
+yellow_all_mean_density
+
+```
+
+
+#### iii) All Sexes Red Crabs 
+```{r}
+#subset for reds only
+
+##sample size n = 2
+red_all <- gill_density %>%
+  filter(crab_id %in% c("PRO-GAV-001","MPRO-GAV-002")) 
+
+red_all_mean_density <- mean(red_all$density_nicos_gills)
+red_all_mean_density
+
+```
+
+
+#### iv) All Sexes Brown Crabs
+```{r}
+#subset for browns only
+
+##sample size n = 1
+brown_all <- gill_density %>%
+  filter(crab_id %in% c("PAG-GAV-001")) 
+
+brown_all_mean_density <- mean(brown_all$density_nicos_gills)
+brown_all_mean_density
+
+```
+
+
+#### v) All Species Males
+```{r}
+#subset for all males
+
+##sample size n = 7
+males_all <- gill_density %>%
+  filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
+
+males_all_mean_density <- mean(males_all$density_nicos_gills)
+males_all_mean_density
+
+```
+
+
+#### vi) All Species Females
+```{r}
+#subset for all females
+
+##sample size n = 20
+females_all <- gill_density %>%
+  filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
+
+females_all_mean_density <- mean(females_all$density_nicos_gills)
+females_all_mean_density
 ```
 
 
@@ -595,32 +665,87 @@ mean_intensity_gills
 ```
 
 
-### c) Mean Density (Males)
+### c) Mean Density 
+
+#### i) Yellow Males
 ```{r}
-#subset for males only
-##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
-males <- gill_intensity %>%
+#subset for yellow males only
+##I chose to exclude two males we dissected because they had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
+
+##sample size n = 6
+yellow_males <- gill_density %>%
   filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011")) 
 
-males_mean_density <- mean(males$density_nicos_gills)
-males_mean_density
+yellow_males_mean_density <- mean(yellow_males$density_nicos_gills)
+yellow_males_mean_density
+
+```
+
+#### ii) Red Males
+```{r}
+#subset for red males only
+##I chose to exclude two males we dissected because they had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
+
+##sample size n = 1
+red_males <- gill_density %>%
+  filter(crab_id == "MPRO-GAV-002") 
+
+red_males_mean_density <- mean(red_males$density_nicos_gills)
+red_males_mean_density
+```
+
+#### iii) Brown Males
+```{r}
 
 ```
 
 
-### d) Mean Density (Females)
+### d) Mean Density 
+
+#### i) Yellow Females
 ```{r}
-#subset for females only
-##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
-females <- gill_intensity %>%
+#subset for yellow females only
+
+##sample size n = 16
+yellow_females <- gill_density %>%
   filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-003", "MANT-GAV-005", "PRO-GAV-001", "PAG-GAV-001", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
 
-females_mean_density <- mean(females$density_nicos_gills)
-females_mean_density
+yellow_females_mean_density <- mean(yellow_females$density_nicos_gills)
+yellow_females_mean_density
 
 ```
 
-### e) Mean Intensity (Males) (ignore)
+
+#### ii) Red Females
+```{r}
+#subset for red females only
+
+##sample size n = 1
+red_females <- gill_density %>%
+  filter(crab_id == "PRO-GAV-001") 
+
+red_females_mean_density <- mean(red_females$density_nicos_gills)
+red_females_mean_density
+
+```
+
+
+#### iii) Brown Females
+```{r}
+#subset for brown females only
+
+##sample size n = 1
+brown_females <- gill_density %>%
+  filter(crab_id == "PAG-GAV-001") 
+
+brown_females_mean_density <- mean(brown_females$density_nicos_gills)
+brown_females_mean_density
+
+```
+
+
+
+### e) Mean Intensity (Yellow Males) (ignore)
 ```{r}
 #calculate the mean intensity for the nicos in the gills 
 male_mean_intensity_gills <- mean(males$intensity_nicos_gills)
@@ -629,7 +754,7 @@ male_mean_intensity_gills
 ```
 
 
-### f) Mean Intensity (Females) (ignore)
+### f) Mean Intensity (Yellow Females) (ignore)
 ```{r}
 #calculate the mean intensity for the nicos in the gills 
 female_mean_intensity_gills <- mean(females$intensity_nicos_gills)
