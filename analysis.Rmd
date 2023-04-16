@@ -600,7 +600,7 @@ mean_intensity_gills
 #subset for males only
 ##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
 males <- gill_intensity %>%
-  filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002")) 
+  filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011")) 
 
 males_mean_density <- mean(males$density_nicos_gills)
 males_mean_density
@@ -613,7 +613,7 @@ males_mean_density
 #subset for females only
 ##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
 females <- gill_intensity %>%
-  filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-003", "MANT-GAV-005", "PRO-GAV-001", "PAG-GAV-001")) 
+  filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-003", "MANT-GAV-005", "PRO-GAV-001", "PAG-GAV-001", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
 
 females_mean_density <- mean(females$density_nicos_gills)
 females_mean_density
