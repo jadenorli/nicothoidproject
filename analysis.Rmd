@@ -141,8 +141,10 @@ eggs_mort_vis_new_eds <- ggplot(data = eggs_mort_avg_new_eds,
   geom_smooth(method = lm, level = 0.95, color = "black") +
   ylab("Average Proportion Viable Crab Eggs") +
   xlab("Egg Development Stage (EDS)") + 
-  ggtitle("Egg Mortality Across EDS (excluding highly infested hosts)") +
-  theme(plot.title = element_text(hjust = 0.5))
+  ggtitle(label = "Average Egg Mortality Across EDS",
+          subtitle = "Low Infestation Crabs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 
 #plot the graphs
 eggs_mort_eds_vis
@@ -153,6 +155,8 @@ eggs_mort_vis_new_eds
 
 
 ### b) Egg Mortality Data by Development Day
+
+#### i) All the Crabs
 ```{r}
 #create a data frame with the average values across each development day 
 eggs_mort_day_avg <- egg_mortality_day %>%
@@ -172,7 +176,7 @@ eggs_mort_day_long <- eggs_mort_day_avg %>%
 
 
 #plot the data for the dataframe with the averages as groups
-eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg, 
+eggs_mort_day_vis_abline <- ggplot(data = eggs_mort_day_avg, 
        aes(x = day, y = avg_prop_viable_eggs)) +
   geom_point(color= crab_eggs) +
   theme_gray() +
@@ -182,33 +186,117 @@ eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg,
   ggtitle("Egg Mortality Across Development Days") +
   theme(plot.title = element_text(hjust = 0.5))
 
+#plot the graphs
+eggs_mort_day_vis_abline
+
+#plot the data for the dataframe with the averages as groups
+eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg, 
+       aes(x = day, y = avg_prop_viable_eggs)) +
+  geom_point(color= crab_eggs) +
+  theme_gray() +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Development Day") + 
+  ggtitle("Egg Mortality Across Development Days") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#plot the graphs
+eggs_mort_day_vis
+
+```
+
+
+#### ii) Low Infestation Only
+```{r}
 #remove the most highly infested crabs (037, 043, and 045)
-new_crab <- egg_mortality_day %>%
+low_infested <- egg_mortality_day %>%
   filter(!crab_id == "ANT-GAV-037") %>%
   filter(!crab_id == "ANT-GAV-045") %>%
   filter(!crab_id == "ANT-GAV-043")
 
 #create a data frame with the average values across each day 
-eggs_mort_avg_new <- new_crab %>%
+eggs_mort_avg_low <- low_infested %>%
   group_by(day) %>%
   summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
             avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
   as_tibble()
 
-#plot the data for the longer dataframe with the averages as groups
-eggs_mort_vis_new <- ggplot(data = eggs_mort_avg_new, 
+#plot the data for the longer dataframe with the averages as groups with an abline
+eggs_mort_vis_low_abline <- ggplot(data = eggs_mort_avg_low, 
        aes(x = day, y = avg_prop_viable_eggs)) +
-  geom_point(color= crab_eggs) +
+  geom_point(color = crab_eggs) +
   theme_gray() +
   geom_smooth(method = lm, level = 0.95, color = "black") +
   ylab("Average Proportion Viable Crab Eggs") +
   xlab("Development Day") + 
-  ggtitle("Egg Mortality Across Development Days (excluding highly infested hosts)") +
-  theme(plot.title = element_text(hjust = 0.5))
+  ggtitle(label = "Average Egg Mortality Across Development Day",
+          subtitle = "Low Infestation Crabs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 
-#plot the two graphs
-eggs_mort_day_vis
-eggs_mort_vis_new
+#plot the graph
+eggs_mort_vis_low_abline
+
+#plot the data for the longer dataframe with the averages as groups wihtout an abline
+eggs_mort_vis_low <- ggplot(data = eggs_mort_avg_low, 
+       aes(x = day, y = avg_prop_viable_eggs)) +
+  geom_point(color = crab_eggs) +
+  theme_gray() +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Development Day") + 
+  ggtitle(label = "Average Egg Mortality Across Development Day",
+          subtitle = "Low Infestation Crabs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+#plot the graph
+eggs_mort_vis_low
+
+```
+
+
+#### iii) High Infestation Only
+```{r}
+#keep the most highly infested crabs (037, 043, and 045)
+high_infested <- egg_mortality_day %>%
+  filter(crab_id == "ANT-GAV-037" |crab_id == "ANT-GAV-045") 
+
+#create a data frame with the average values across each day 
+eggs_mort_avg_high <- high_infested %>%
+  group_by(day) %>%
+  summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
+  as_tibble()
+
+#plot the data for the longer dataframe with the averages as groups with an abline
+eggs_mort_vis_high_abline <- ggplot(data = eggs_mort_avg_high, 
+       aes(x = day, y = avg_prop_viable_eggs)) +
+  geom_point(color = crab_eggs) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Development Day") + 
+  ggtitle(label = "Average Egg Mortality Across Development Day",
+          subtitle = "High Infestation Crabs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+#plot the graph
+eggs_mort_vis_high_abline
+
+#plot the data for the longer dataframe with the averages as groups without an abline
+eggs_mort_vis_high <- ggplot(data = eggs_mort_avg_high, 
+       aes(x = day, y = avg_prop_viable_eggs)) +
+  geom_point(color = crab_eggs) +
+  theme_gray() +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Development Day") + 
+  ggtitle(label = "Average Egg Mortality Across Development Day",
+          subtitle = "High Infestation Crabs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+#plot the graph
+eggs_mort_vis_high
 
 ```
 
@@ -217,49 +305,60 @@ eggs_mort_vis_new
 ```{r}
 #plot the number of adult nicos against the total number of viable eggs
 adult_plot <- ggplot(data = egg_mortality, 
-       aes( x = prop_viable_eggs, y = number_adult_nicos)) +
+       aes( y = prop_viable_eggs, x = number_adult_nicos)) +
   geom_point(color = adults) + 
   geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  ylab("Counts") +
-  xlab("Proportion of Viable Crab Eggs") + 
+  xlab("Counts") +
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Adult Nicos") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = ))
 
 #plot the number of juvenile nicos against the total number of viable eggs 
 juvenile_plot <- ggplot(data = egg_mortality, 
-       aes(x = prop_viable_eggs, y = number_juvenile_nicos)) +
+       aes(y = prop_viable_eggs, x = number_juvenile_nicos)) +
   geom_point(color = juveniles) + 
   geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  ylab("Counts") +
-  xlab("Proportion of Viable Crab Eggs") + 
+  xlab("Counts") +
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Juvenile Nicos") +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 7)) 
 
 #plot the number of total number of nicos against the total number of viable eggs
 total_plot <- ggplot(data = egg_mortality, 
-       aes( x = prop_viable_eggs, y = total_nicos)) +
+       aes( y = prop_viable_eggs, x = total_nicos)) +
   geom_point(color = totals) + 
   geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  ylab("Counts") +
-  xlab("Proportion of Viable Crab Eggs") + 
+  xlab("Counts") +
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Total Nicos") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 7))
 
 
 #plot the number of nico eggs against the total number of viable eggs
 nico_egg_plot <- ggplot(data = egg_mortality, 
-       aes(x = prop_viable_eggs, y = number_nico_eggs)) +
+       aes(y = prop_viable_eggs, x = number_nico_eggs)) +
   geom_point(color = nico_eggs) + 
   geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  ylab("Counts") +
-  xlab("Proportion of Viable Crab Eggs") + 
+  xlab("Counts") +
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Number Nico Eggs") +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 7)) 
 
+nico_egg_plot
+  
+#add the plots together
 ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
@@ -410,25 +509,34 @@ mean_nico_egg_density <- mean(egg_mortality_density$density_nico_eggs)
 mean_nico_egg_density
 
 ```
-### d) Mean Density/Intensity (adults with all data)
+### d) Mean Density (adults with all data)
 ```{r}
 #create a column in the autoinfection data with the density of adult nicos
 autoinfection_density <- autoinfection %>%
   mutate(density_adult_nicos = ((number_of_adult_copepods/total_number_of_eggs)*1000)) %>%
-  select(1,9,13)
+  select(1,9,13) %>%
+  rename(number_adult_nicos = number_of_adult_copepods)
 
 #subset the egg morality data for just the adults and the adult density
 mort_egg_density <- egg_mortality_density %>%
   select(1,11,19)
 
+#join the two dataframes for the adult density
+mort_egg_density_combined <- rbind(mort_egg_density, autoinfection_density)
+
+#calculate the mean density of the adults
+mean_adult_density_all <- mean(mort_egg_density_combined$density_adult_nicos)
+mean_adult_density_all
+
 ```
 
 
-### e) Mean Intensity 
+### e) Mean Intensity (ignore)
 ```{r}
 #calculate the mean intensity of each of the values 
 mean_adult_intensity <- mean(egg_mortality$number_adult_nicos)
 mean_adult_intensity
+# we need to eventually find a way to scale this up to the whole crab ΟTHERWISE ITS NOT INTENSITY - 700 thousand to 3.3 millon eggs 
 
 mean_juvenile_intensity <- mean(egg_mortality$number_juvenile_nicos)
 mean_juvenile_intensity
@@ -474,7 +582,7 @@ mean_density_gills
 ```
 
 
-### b) Mean Intensity
+### b) Mean Intensity (ignore)
 ```{r}
 #divide the nicos/lamallae*the number of gills (12 gills per crab)
 gill_intensity <- gill_density %>%
@@ -490,7 +598,7 @@ mean_intensity_gills
 ### c) Mean Density (Males)
 ```{r}
 #subset for males only
-##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I belive that this is why they didn't have nicos -- we are planning to do a few more male dissections
+##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
 males <- gill_intensity %>%
   filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002")) 
 
@@ -502,8 +610,8 @@ males_mean_density
 
 ### d) Mean Density (Females)
 ```{r}
-#subset for males only
-##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I belive that this is why they didn't have nicos -- we are planning to do a few more male dissections
+#subset for females only
+##I chose to only include two of the fours males we dissected because the other two males had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
 females <- gill_intensity %>%
   filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-003", "MANT-GAV-005", "PRO-GAV-001", "PAG-GAV-001")) 
 
@@ -512,7 +620,7 @@ females_mean_density
 
 ```
 
-### e) Mean Intensity (Males)
+### e) Mean Intensity (Males) (ignore)
 ```{r}
 #calculate the mean intensity for the nicos in the gills 
 male_mean_intensity_gills <- mean(males$intensity_nicos_gills)
@@ -521,7 +629,7 @@ male_mean_intensity_gills
 ```
 
 
-### f) Mean Intensity (Females)
+### f) Mean Intensity (Females) (ignore)
 ```{r}
 #calculate the mean intensity for the nicos in the gills 
 female_mean_intensity_gills <- mean(females$intensity_nicos_gills)
