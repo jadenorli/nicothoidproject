@@ -315,7 +315,7 @@ adult_plot <- ggplot(data = egg_mortality,
   ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
-        axis.title.x = element_text(size = ))
+        axis.title.x = element_text(size = 8))
 
 #plot the number of juvenile nicos against the total number of viable eggs 
 juvenile_plot <- ggplot(data = egg_mortality, 
@@ -328,7 +328,7 @@ juvenile_plot <- ggplot(data = egg_mortality,
   ggtitle("Juvenile Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
-        axis.title.x = element_text(size = 7)) 
+        axis.title.x = element_text(size = 8)) 
 
 #plot the number of total number of nicos against the total number of viable eggs
 total_plot <- ggplot(data = egg_mortality, 
@@ -341,7 +341,7 @@ total_plot <- ggplot(data = egg_mortality,
   ggtitle("Total Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
-        axis.title.x = element_text(size = 7))
+        axis.title.x = element_text(size = 8))
 
 
 #plot the number of nico eggs against the total number of viable eggs
@@ -355,7 +355,7 @@ nico_egg_plot <- ggplot(data = egg_mortality,
   ggtitle("Number Nico Eggs") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
-        axis.title.x = element_text(size = 7)) 
+        axis.title.x = element_text(size = 8)) 
   
 #add the plots together
 ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
