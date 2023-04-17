@@ -13,6 +13,7 @@ library(caret)
 library(ggpubr)
 library(MASS)
 library(lme4)
+library(kableExtra)
 source("my_functions.R")
 setup_libs()
 
@@ -355,8 +356,6 @@ nico_egg_plot <- ggplot(data = egg_mortality,
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
         axis.title.x = element_text(size = 7)) 
-
-nico_egg_plot
   
 #add the plots together
 ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
@@ -761,3 +760,28 @@ female_mean_intensity_gills <- mean(females$intensity_nicos_gills)
 female_mean_intensity_gills
 
 ```
+
+# 7. Table with Density
+
+#### a) Create a Table 
+```{r}
+#create a string with all the data 
+data_yellow <- c(NA, NA, yellow_males_mean_density, NA, mean_nico_egg_density, mean_juvenile_density, yellow_females_mean_density, mean_adult_density_all)
+
+#turn the string into a matrix
+matrix_yellow <- matrix(data_yellow, ncol = 4, byrow = TRUE)
+colnames(matrix_yellow) <- c("Nicothoid Eggs", "Juvenile Nicothoids in Egg Mass", "Juvenile Nicothoids in Gills", "Adult Nicothoids in Egg Mass")
+rownames(matrix_yellow) <- c("Male C. anthonyi", "Female C. anthonyi")
+
+#create the table
+table_yellow <- matrix_yellow %>%
+  kbl(caption = "<center>Density of Nicothoids</center>", html_font = "Times New Roman") %>%
+  kable_classic(full_width = F, html_font = "Times New Roman") %>%
+  row_spec(row = 1, italic = TRUE) %>%
+  row_spec(row = 2, italic = TRUE) %>%
+  kable_styling(font_size = 8) %>%
+  footnote(symbol = "The density of the nicothoids in the egg mass are calculated per one thousand crab eggs.")
+
+table_yellow
+```
+
