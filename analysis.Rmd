@@ -425,7 +425,7 @@ ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_h
 
 # 5. Analysis (Egg Mass)
 
-### a) Generalized Linear Models EDS
+### a) Generalized Linear Models EDS (ignore)
 ```{r}
 #create a generalized linear model to evaluate the relationship between viable eggs and number of adult nicos
 
@@ -475,7 +475,7 @@ glm.nicoeggs.nb <- glmer.nb(number_viable_crab_eggs ~ number_nico_eggs + (1|crab
 ```
 
 
-### b) Generalized Linear Models Development Day
+### b) Generalized Linear Models Development Day (ignore)
 ```{r}
 glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos + (1|eds), 
                    data = egg_mortality_day, 
@@ -494,18 +494,45 @@ egg_mortality_density <- egg_mortality %>%
   mutate(density_total_nicos = ((total_nicos/total_number_crab_eggs)*1000)) %>%
   mutate(density_nico_eggs = ((number_nico_eggs/total_number_crab_eggs)*1000))
 
-#calculate the mean density of each of the values 
+#calculate the mean density and standard deviation of each of the values 
+
+##calculate mean adult density 
 mean_adult_density <- mean(egg_mortality_density$density_adult_nicos)
 mean_adult_density
 
+##calculate standard deviation of mean adult density
+mean_adult_density_sd <- sd(egg_mortality_density$density_adult_nicos)
+mean_adult_density_sd
+
+
+
+##calculate mean juvenile density 
 mean_juvenile_density <- mean(egg_mortality_density$density_juvenile_nicos)
 mean_juvenile_density
 
+##calculate standard deviation of mean juvenile density
+mean_juvenile_density_sd <- sd(egg_mortality_density$density_juvenile_nicos)
+mean_juvenile_density_sd
+
+
+
+##calculate mean total density 
 mean_total_density <- mean(egg_mortality_density$density_total_nicos)
 mean_total_density
 
+##calculate standard deviation of mean total nico density
+mean_total_density_sd <- sd(egg_mortality_density$density_total_nicos)
+mean_total_density_sd
+
+
+
+##calculate mean nico egg density 
 mean_nico_egg_density <- mean(egg_mortality_density$density_nico_eggs)
 mean_nico_egg_density
+
+##calculate standard deviation of mean nico egg density
+mean_nico_egg_density_sd <- sd(egg_mortality_density$density_nico_eggs)
+mean_nico_egg_density_sd
 
 ```
 ### d) Mean Density (adults with all data)
@@ -526,6 +553,10 @@ mort_egg_density_combined <- rbind(mort_egg_density, autoinfection_density)
 #calculate the mean density of the adults
 mean_adult_density_all <- mean(mort_egg_density_combined$density_adult_nicos)
 mean_adult_density_all
+
+#calculate standard deviation of mean adult density of all the adults 
+mean_adult_density_all_sd <- sd(mort_egg_density_combined$density_adult_nicos)
+mean_adult_density_all_sd
 
 ```
 
@@ -580,6 +611,10 @@ gill_density <- dissections %>%
 mean_density_gills <- mean(gill_density$density_nicos_gills)
 mean_density_gills
 
+#calculate standard deviation of mean density of the adults in the gills
+mean_density_gills_sd <- sd(gill_density$density_nicos_gills)
+mean_density_gills_sd
+
 ```
 
 #### ii) All Sexes Yellow Crabs
@@ -590,8 +625,13 @@ mean_density_gills
 yellow_all <- gill_density %>%
   filter(!crab_id %in% c("PRO-GAV-001", "PAG-GAV-001", "MPRO-GAV-002")) 
 
+#calculate the mean density of the nicos in the gills of both male and female yellows
 yellow_all_mean_density <- mean(yellow_all$density_nicos_gills)
 yellow_all_mean_density
+
+#calculate standard deviation of the mean density
+yellow_all_mean_density_gills_sd <- sd(yellow_all$density_nicos_gills)
+yellow_all_mean_density_gills_sd
 
 ```
 
@@ -604,8 +644,13 @@ yellow_all_mean_density
 red_all <- gill_density %>%
   filter(crab_id %in% c("PRO-GAV-001","MPRO-GAV-002")) 
 
+#calculate the mean density of the nicos in the gills of both male and female reds
 red_all_mean_density <- mean(red_all$density_nicos_gills)
 red_all_mean_density
+
+#calculate standard deviation of the mean density
+red_all_mean_density_gills_sd <- sd(red_all$density_nicos_gills)
+red_all_mean_density_gills_sd
 
 ```
 
@@ -618,8 +663,13 @@ red_all_mean_density
 brown_all <- gill_density %>%
   filter(crab_id %in% c("PAG-GAV-001")) 
 
+#calculate the mean density of the nicos in the gills of both male and female browns
 brown_all_mean_density <- mean(brown_all$density_nicos_gills)
 brown_all_mean_density
+
+#calculate standard deviation of the mean density
+brown_all_mean_density_gills_sd <- sd(brown_all$density_nicos_gills)
+brown_all_mean_density_gills_sd
 
 ```
 
@@ -632,8 +682,13 @@ brown_all_mean_density
 males_all <- gill_density %>%
   filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
 
+#calculate the mean density of the nicos in the gills of males of all species
 males_all_mean_density <- mean(males_all$density_nicos_gills)
 males_all_mean_density
+
+#calculate standard deviation of the mean density
+males_all_mean_density_gills_sd <- sd(males_all$density_nicos_gills)
+males_all_mean_density_gills_sd
 
 ```
 
@@ -646,8 +701,14 @@ males_all_mean_density
 females_all <- gill_density %>%
   filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
 
+#calculate the mean density of the nicos in the gills of females of all species
 females_all_mean_density <- mean(females_all$density_nicos_gills)
 females_all_mean_density
+
+#calculate standard deviation of the mean density
+females_all_mean_density_gills_sd <- sd(females_all$density_nicos_gills)
+females_all_mean_density_gills_sd
+
 ```
 
 
@@ -675,8 +736,13 @@ mean_intensity_gills
 yellow_males <- gill_density %>%
   filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011")) 
 
+#calculate the mean density of the nicos in the gills of yellow males
 yellow_males_mean_density <- mean(yellow_males$density_nicos_gills)
 yellow_males_mean_density
+
+#calculate standard deviation of the mean density
+yellow_males_mean_density_gills_sd <- sd(yellow_males$density_nicos_gills)
+yellow_males_mean_density_gills_sd
 
 ```
 
@@ -689,8 +755,14 @@ yellow_males_mean_density
 red_males <- gill_density %>%
   filter(crab_id == "MPRO-GAV-002") 
 
+#calculate the mean density of the nicos in the gills of red males
 red_males_mean_density <- mean(red_males$density_nicos_gills)
 red_males_mean_density
+
+#calculate standard deviation of the mean density
+red_males_mean_density_gills_sd <- sd(red_males$density_nicos_gills)
+red_males_mean_density_gills_sd
+
 ```
 
 #### iii) Brown Males
@@ -709,8 +781,13 @@ red_males_mean_density
 yellow_females <- gill_density %>%
   filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-003", "MANT-GAV-005", "PRO-GAV-001", "PAG-GAV-001", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
 
+#calculate the mean density of the nicos in the gills of yellow females
 yellow_females_mean_density <- mean(yellow_females$density_nicos_gills)
 yellow_females_mean_density
+
+#calculate standard deviation of the mean density
+yellow_females_mean_density_gills_sd <- sd(yellow_females$density_nicos_gills)
+yellow_females_mean_density_gills_sd
 
 ```
 
@@ -723,8 +800,13 @@ yellow_females_mean_density
 red_females <- gill_density %>%
   filter(crab_id == "PRO-GAV-001") 
 
+#calculate the mean density of the nicos in the gills of red females
 red_females_mean_density <- mean(red_females$density_nicos_gills)
 red_females_mean_density
+
+#calculate standard deviation of the mean density
+red_females_mean_density_gills_sd <- sd(red_females$density_nicos_gills)
+red_females_mean_density_gills_sd
 
 ```
 
@@ -737,8 +819,13 @@ red_females_mean_density
 brown_females <- gill_density %>%
   filter(crab_id == "PAG-GAV-001") 
 
+#calculate the mean density of the nicos in the gills of red females
 brown_females_mean_density <- mean(brown_females$density_nicos_gills)
 brown_females_mean_density
+
+#calculate standard deviation of the mean density
+brown_females_mean_density_gills_sd <- sd(brown_females$density_nicos_gills)
+brown_females_mean_density_gills_sd
 
 ```
 
@@ -758,6 +845,7 @@ male_mean_intensity_gills
 #calculate the mean intensity for the nicos in the gills 
 female_mean_intensity_gills <- mean(females$intensity_nicos_gills)
 female_mean_intensity_gills
+
 
 ```
 
