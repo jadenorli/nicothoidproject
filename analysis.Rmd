@@ -310,7 +310,7 @@ adult_plot <- ggplot(data = egg_mortality,
   geom_point(color = adults) + 
   geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  xlab("Counts") +
+  xlab("Number of Adult Nicos") +
   ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
@@ -323,7 +323,7 @@ juvenile_plot <- ggplot(data = egg_mortality,
   geom_point(color = juveniles) + 
   geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  xlab("Counts") +
+  xlab("Number of Juvenile Nicos") +
   ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Juvenile Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
@@ -336,7 +336,7 @@ total_plot <- ggplot(data = egg_mortality,
   geom_point(color = totals) + 
   geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  xlab("Counts") +
+  xlab("Total Number of Nicos (Juveniles/Adults)") +
   ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Total Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
@@ -350,7 +350,7 @@ nico_egg_plot <- ggplot(data = egg_mortality,
   geom_point(color = nico_eggs) + 
   geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  xlab("Counts") +
+  xlab("Number of Nico Eggs") +
   ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Number Nico Eggs") +
   theme(plot.title = element_text(hjust = 0.5),
@@ -584,13 +584,13 @@ mean_nico_egg_intensity
 summary_egg_mortality <- summary(egg_mortality$prop_nonviable_eggs)
 summary_egg_mortality
 
-#calculate the mean egg mortality as a percent
-mean_egg_mortality <- mean((egg_mortality$prop_nonviable_eggs)*100)
-mean_egg_mortality
-
 #calculate the min egg mortality as a percent
 min_egg_mortality <- min((egg_mortality$prop_nonviable_eggs)*100)
 min_egg_mortality
+
+#calculate the mean egg mortality as a percent
+mean_egg_mortality <- mean((egg_mortality$prop_nonviable_eggs)*100)
+mean_egg_mortality
 
 #calculate the max egg morality as a percent
 max_egg_mortality <- max((egg_mortality$prop_nonviable_eggs)*100)
@@ -603,6 +603,8 @@ max_egg_mortality
 
 #### i) All Species/All Sexes
 ```{r}
+##sample size n = 27
+
 #create a data frame with the density of juvenile nicos per lamellae 
 gill_density <- dissections %>%
   mutate(density_nicos_gills = (nicothoid_count/number_of_lamellae)) 
@@ -871,5 +873,6 @@ table_yellow <- matrix_yellow %>%
   footnote(symbol = "The density of the nicothoids in the egg mass are calculated per one thousand crab eggs.")
 
 table_yellow
+
 ```
 
