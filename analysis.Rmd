@@ -1000,7 +1000,7 @@ gill_density <- dissections %>%
   mutate(density_nicos_gills = (nicothoid_count/number_of_lamellae)) 
 
 #remove the two males that were held too long before being dissected (MANT-GAV-003 and MANT-GAV-005)
-clean_dissections <- dissections %>%
+clean_dissections <- gill_density %>%
   filter(!crab_id %in% c("MANT-GAV-003", "MANT-GAV-005"))
 
 ##sample size n = 25
