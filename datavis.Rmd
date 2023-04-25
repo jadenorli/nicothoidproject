@@ -299,7 +299,8 @@ badeggs_v_all <- ggplot(eggs_mort_all, aes(x = number_juvenile_nicos, y = total_
   geom_point(aes(x = number_adult_nicos, y = total_number_non_viable_crab_eggs, color = "red")) # adults are red
 
 nicoeggs_v_badeggs <- ggplot(eggs_mort_all, aes(x = number_nico_eggs, y = total_number_non_viable_crab_eggs)) +
-  geom_point() 
+  geom_point() +
+  geom_smooth(method = "lm")
 
 ```
 
@@ -333,6 +334,8 @@ eggs_v_eggs_lme4 <-glmer(total_number_non_viable_crab_eggs ~ number_nico_eggs + 
                      family = poisson
                      )
 
-summary(eggs_v_eggs_lme4)
+summary(eggs_v_eggs_lme4) # thrwoing a convergence warning
+# https://rstudio-pubs-static.s3.amazonaws.com/33653_57fc7b8e5d484c909b615d8633c01d51.html
+# https://www.learn-mlms.com/07-module-7.html
 ```
 
