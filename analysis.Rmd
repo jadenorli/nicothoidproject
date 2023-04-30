@@ -41,7 +41,7 @@ crab_eggs = "#EF6548"
 ### b) Dataframes
 ```{r}
 #read in the latest of the egg mortality data 
-egg_mortality <- read_csv("NicothoidProjectAnalysis/RawData/eggmortalitydata.csv") %>% 
+egg_mortality <- read_csv("NicothoidProjectAnalysis/RawData/eggmortalitydata2.csv") %>% 
   clean_names() %>%
   select(!16:18) %>% 
   filter(!is.na(pleopod_number)) %>%
@@ -51,10 +51,11 @@ egg_mortality <- read_csv("NicothoidProjectAnalysis/RawData/eggmortalitydata.csv
   mutate(total_nicos = (number_adult_nicos + number_juvenile_nicos)) 
 
 #read in the egg mortality data that has development days
-egg_mortality_day <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_day.csv") %>% 
+egg_mortality_day <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_day2.csv") %>% 
   clean_names() %>%
   select(!17:19) %>% 
   filter(!is.na(pleopod_number)) %>%
+  filter(!is.na(day)) %>%
   filter(!eds == "M") %>%
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs) %>%
@@ -86,12 +87,12 @@ autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/first_broods_only.cs
 ### a) Egg Mortality Data by EDS 
 ```{r}
 #visualize the change in proportion of viable eggs over time
-#subset the data with the desireds columns
+#subset the data with the desired columns
 egg_mort_viable <- egg_mortality %>%
   select(4,16)
 
 
-#plot the data for the longer dataframe with the averages as groups
+#plot the data for the longer data frame with the averages as groups
 eggs_mort_eds_vis <- ggplot(data = egg_mort_viable, 
        aes(x = eds, y = prop_viable_eggs)) +
   geom_point(color = crab_eggs) +
@@ -128,7 +129,7 @@ new_crab_eds <- egg_mortality %>%
   filter(!crab_id == "ANT-GAV-045") %>%
   filter(!crab_id == "ANT-GAV-043")
 
-#create a data frame with the average values across each day 
+#create a data frame with the average values across each eds 
 eggs_mort_avg_new_eds <- new_crab_eds %>%
   group_by(eds) %>%
   summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
@@ -186,7 +187,8 @@ eggs_mort_day_vis_abline <- ggplot(data = eggs_mort_day_avg,
   ylab("Average Proportion Viable Crab Eggs") +
   xlab("Development Day") + 
   ggtitle("Egg Mortality Across Development Days") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(limits = c(0, 1))
 
 #plot the graphs
 eggs_mort_day_vis_abline
@@ -199,7 +201,8 @@ eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg,
   ylab("Average Proportion Viable Crab Eggs") +
   xlab("Development Day") + 
   ggtitle("Egg Mortality Across Development Days") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(limits = c(0, 1))
 
 #plot the graphs
 eggs_mort_day_vis
@@ -207,89 +210,16 @@ eggs_mort_day_vis
 ```
 
 
-```{r}
-low <- egg_mortality_day %>%
-  filter(!crab_id %in% c("ANT-GAV-031", "ANT-GAV-032", "ANT-GAV-033", "ANT-GAV-035", "ANT-GAV-043", "ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-038", "ANT-GAV-045"))
-
-low_late <- egg_mortality_day %>%
-  mutate(total_nicos = (number_adult_nicos + number_juvenile_nicos)) %>%
-  mutate(density_adult_nicos = ((number_adult_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_juvenile_nicos = ((number_juvenile_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_total_nicos = ((total_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_nico_eggs = ((number_nico_eggs/total_number_crab_eggs)*1000)) %>%
-  filter(day >= 40) %>%
-  filter(!crab_id %in% c("ANT-GAV-031", "ANT-GAV-032", "ANT-GAV-033", "ANT-GAV-035", "ANT-GAV-043", "ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-038", "ANT-GAV-045"))
-
-#look at the summary stats for high infestation crabs
-summary_low_late <- summary(low_late$prop_nonviable_eggs)
-summary_low_late
-
-med <- egg_mortality_day %>%
-  filter(crab_id %in% c("ANT-GAV-031", "ANT-GAV-032", "ANT-GAV-033", "ANT-GAV-035"))
-
-med_late <- egg_mortality_day %>%
-  mutate(total_nicos = (number_adult_nicos + number_juvenile_nicos)) %>%
-  mutate(density_adult_nicos = ((number_adult_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_juvenile_nicos = ((number_juvenile_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_total_nicos = ((total_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_nico_eggs = ((number_nico_eggs/total_number_crab_eggs)*1000)) %>%
-  filter(day >= 40) %>%
-  filter(crab_id %in% c("ANT-GAV-031", "ANT-GAV-032", "ANT-GAV-033", "ANT-GAV-035"))
-
-#look at the summary stats for high infestation crabs
-summary_med_late <- summary(med_late$prop_nonviable_eggs)
-summary_med_late
-
-high <- egg_mortality_day %>%
-  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-038", "ANT-GAV-045"))
-
-high_late <- egg_mortality_day %>%
-  mutate(total_nicos = (number_adult_nicos + number_juvenile_nicos)) %>%
-  mutate(density_adult_nicos = ((number_adult_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_juvenile_nicos = ((number_juvenile_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_total_nicos = ((total_nicos/total_number_crab_eggs)*1000)) %>%
-  mutate(density_nico_eggs = ((number_nico_eggs/total_number_crab_eggs)*1000)) %>%
-  filter(day >= 40) %>%
-  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-038", "ANT-GAV-045"))
-
-#look at the summary stats for high infestation crabs
-summary_high_late <- summary(high_late$prop_nonviable_eggs)
-summary_high_late
-
-#create a data frame with the average values across each day 
-high_vis_data <- high_late %>%
-  group_by(day) %>%
-  summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
-            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
-  as_tibble()
-
-
-#plot the data for the longer dataframe with the averages as groups wihtout an abline
-high_vis <- ggplot(data = high_vis_data, 
-       aes(x = day, y = avg_prop_viable_eggs)) +
-  geom_point(color = crab_eggs) +
-  theme_gray() +
-  ylab("Average Proportion Viable Crab Eggs") +
-  xlab("Development Day") + 
-  ggtitle(label = "Average Egg Mortality Across Development Day",
-          subtitle = "Low Infestation Crabs") +
-  theme(plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5))
-
-#plot the graph
-high_vis
-
-```
-
-
 
 #### ii) Low Infestation Only
 ```{r}
-#remove the most highly infested crabs (ANT-GAV-037, ANT-GAV-043, and ANT-GAV-045)
+#remove the most highly infested crabs (034, 037, 045, and 053)
 low_infested <- egg_mortality_day %>%
+  filter(!crab_id == "ANT-GAV-034") %>%
   filter(!crab_id == "ANT-GAV-037") %>%
   filter(!crab_id == "ANT-GAV-045") %>%
-  filter(!crab_id == "ANT-GAV-043")
+  filter(!crab_id == "ANT-GAV-053") 
+  
 
 #create a data frame with the average values across each day 
 eggs_mort_day_avg_low <- low_infested %>%
@@ -309,7 +239,7 @@ eggs_mort_vis_low_abline <- ggplot(data = eggs_mort_day_avg_low,
   ggtitle(label = "Average Egg Mortality Across Development Day",
           subtitle = "Low Infestation Crabs") +
   theme(plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5))
+        plot.subtitle = element_text(hjust = 0.5)) 
 
 #plot the graph
 eggs_mort_vis_low_abline
@@ -317,14 +247,15 @@ eggs_mort_vis_low_abline
 #plot the data for the longer dataframe with the averages as groups wihtout an abline
 eggs_mort_vis_low <- ggplot(data = eggs_mort_day_avg_low, 
        aes(x = day, y = avg_prop_viable_eggs)) +
-  geom_point(color = crab_eggs) +
+  geom_point(color = crab_eggs) + 
   theme_gray() +
   ylab("Average Proportion Viable Crab Eggs") +
   xlab("Development Day") + 
   ggtitle(label = "Average Egg Mortality Across Development Day",
           subtitle = "Low Infestation Crabs") +
   theme(plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5))
+        plot.subtitle = element_text(hjust = 0.5)) +
+  scale_y_continuous(limits = c(0, 1))
 
 #plot the graph
 eggs_mort_vis_low
@@ -334,9 +265,9 @@ eggs_mort_vis_low
 
 #### iii) High Infestation Only
 ```{r}
-#keep the most highly infested crabs (037, 043, and 045)
+#keep the most highly infested crabs (034, 037, 045, 053)
 high_infested <- egg_mortality_day %>%
-  filter(crab_id %in% c("ANT-GAV-037", "ANT-GAV-045"))
+  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-053"))
 
 #create a data frame with the average values across each day 
 eggs_mort_day_avg_high <- high_infested %>%
@@ -371,7 +302,8 @@ eggs_mort_vis_high <- ggplot(data = eggs_mort_day_avg_high,
   ggtitle(label = "Average Egg Mortality Across Development Day",
           subtitle = "High Infestation Crabs") +
   theme(plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5))
+        plot.subtitle = element_text(hjust = 0.5)) +
+  scale_y_continuous(limits = c(0, 1))
 
 #plot the graph
 eggs_mort_vis_high
@@ -394,18 +326,14 @@ crab_id <- egg_mortality_day %>%
             avg_nico_eggs = mean(prop_nico_eggs)) %>%
   as_tibble()
 
-#low infestation crabs
-low_crab_id <- crab_id %>%
-  filter(avg_total_nicos <= 20)
-
-
-#med infestation crabs
-med_crab_id <- crab_id %>%
-  filter(between(avg_total_nicos, 20, 90)) 
-
 #high infestation crabs
 high_crab_id <- crab_id %>%
-  filter(avg_total_nicos >= 90) 
+  filter(avg_adult_nicos >= 20 | avg_juvenile_nicos >= 120)
+
+#low infestation crabs 
+low_crab_id <- crab_id %>%
+  filter(avg_adult_nicos < 20) %>%
+  filter(avg_juvenile_nicos < 120)
   
 ```
 
@@ -476,7 +404,7 @@ ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
 ## this is why I want to do things in terms of biomass because the adult nicos are transforming the crab egg biomass directly into nico egg biomass
 ```
 
-# 4. Visually Evaluate Normality
+# 4. Visually Evaluate Normality (ignore)
 ```{r}
 #look at the frequency of the count data for all the life stages
 
@@ -794,10 +722,10 @@ max_egg_mortality_late
 ```{r}
 #create a dataframe for the low infestation crabs 
 egg_mortality_density_low <- egg_mortality_density %>%
-  filter(!crab_id %in% c("ANT-GAV-037", "ANT-GAV-043", "ANT-GAV-045"))
+  filter(!crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-053"))
 
 
-#calculate the mean density and standard deviation of each of the values for the low infestation crabs (all the crabs expect ANT-GAV-037, ANT-GAV-043, and ANT-GAV-045)
+#calculate the mean density and standard deviation of each of the values for the low infestation crabs (all the crabs expect ANT-GAV-034, ANT-GAV-037, ANT-GAV-045, and ANT-GAV-053)
 
 ##calculate mean adult density 
 mean_adult_density_low <- mean(egg_mortality_density_low$density_adult_nicos)
@@ -872,7 +800,7 @@ late_eds_low <- egg_mortality_day %>%
   mutate(density_total_nicos = ((total_nicos/total_number_crab_eggs)*1000)) %>%
   mutate(density_nico_eggs = ((number_nico_eggs/total_number_crab_eggs)*1000)) %>%
   filter(day >= 40) %>%
-  filter(!crab_id %in% c("ANT-GAV-037", "ANT-GAV-043", "ANT-GAV-045"))
+  filter(!crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-053"))
   
 
 #calculate the mean density and standard deviation of each of the values 
@@ -951,9 +879,9 @@ egg_mortality_density_high <- egg_mortality_density %>%
   mutate(density_juvenile_nicos = ((number_juvenile_nicos/total_number_crab_eggs)*1000)) %>%
   mutate(density_total_nicos = ((total_nicos/total_number_crab_eggs)*1000)) %>%
   mutate(density_nico_eggs = ((number_nico_eggs/total_number_crab_eggs)*1000)) %>%
-  filter(crab_id %in% c("ANT-GAV-037", "ANT-GAV-043", "ANT-GAV-045"))
+  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-053"))
 
-#calculate the mean density and standard deviation of each of the values for the high infestation crabs (ANT-GAV-037, ANT-GAV-043, and ANT-GAV-045)
+#calculate the mean density and standard deviation of each of the values for the high infestation crabs (ANT-GAV-034, ANT-GAV-037, ANT-GAV-045, and ANT-GAV-053)
 
 ##calculate mean adult density 
 mean_adult_density_high <- mean(egg_mortality_density_high$density_adult_nicos)
@@ -1028,7 +956,7 @@ late_eds_high <- egg_mortality_day %>%
   mutate(density_total_nicos = ((total_nicos/total_number_crab_eggs)*1000)) %>%
   mutate(density_nico_eggs = ((number_nico_eggs/total_number_crab_eggs)*1000)) %>%
   filter(day >= 40) %>%
-  filter(crab_id %in% c("ANT-GAV-037", "ANT-GAV-043", "ANT-GAV-045"))
+  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-053"))
   
 
 #calculate the mean density and standard deviation of each of the values 
