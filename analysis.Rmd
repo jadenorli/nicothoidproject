@@ -46,6 +46,7 @@ egg_mortality <- read_csv("NicothoidProjectAnalysis/RawData/eggmortalitydata2.cs
   select(!16:18) %>% 
   filter(!is.na(pleopod_number)) %>%
   filter(!eds == "M") %>%
+  filter(!experiment_id == "Mortality-034") %>%
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs) %>%
   mutate(total_nicos = (number_adult_nicos + number_juvenile_nicos)) 
@@ -57,6 +58,7 @@ egg_mortality_day <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_day
   filter(!is.na(pleopod_number)) %>%
   filter(!is.na(day)) %>%
   filter(!eds == "M") %>%
+  filter(!experiment_id == "Mortality-034") %>%
   mutate(prop_viable_eggs = number_viable_crab_eggs/total_number_crab_eggs) %>% 
   mutate(prop_nonviable_eggs = total_number_non_viable_crab_eggs/total_number_crab_eggs) %>%
   mutate(total_nicos = (number_adult_nicos + number_juvenile_nicos))
@@ -471,8 +473,8 @@ glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos + (1|cr
                    family = "poisson")
 
 ##negative binomial 
-glm.adults.nb <- glmer.nb(number_viable_crab_eggs ~ number_adult_nicos + (1|crab_id), 
-                   data = egg_mortality)
+#glm.adults.nb <- glmer.nb(number_viable_crab_eggs ~ number_adult_nicos + (1|crab_id), 
+                   #data = egg_mortality)
 
 #create a generalized linear model to evaluate the relationship between viable eggs and number of juvenile nicos
 
