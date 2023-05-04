@@ -497,19 +497,19 @@ ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_h
 #use Freedman Diaconis rule to determine optimal binwidth:
 bw <-2 *IQR(adult_summary$total_nicos)/length(adult_summary$total_nicos)^(1/3)
 
-freqdist_adults <- ggplot(adult_summary)+
-  geom_histogram(aes(total_nicos, fill = adults
-                      ),
-                 binwidth = bw)+
+freqdist_adults <- gghistogram(data = adult_summary, 
+                              x = "total_nicos", 
+                              fill = "#D7301F",
+                              binwidth = bw)+
   ylab("Frequency of Crabs") +
   xlab("Average Count of Adult Nicothoids/1000 Eggs") + 
   #ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5))+
   scale_y_continuous(expand =c(0,0))+
-  geom_vline(aes(xintercept = 20))+
+  geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
   theme_classic()
 
-
+ggsave("adult_nico_freq_distribution.png", freqdist_adults, device = "png")
 ```
 
 
