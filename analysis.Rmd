@@ -102,7 +102,13 @@ adult_counts <- autoinfection %>%
 # want to make a summary table now with extrapolated count assuming 1 million eggs, total count of nicos, total number of crab eggs searched, number of observations on that crab, all per crab    
 adult_summary <- adult_counts %>% 
   group_by(crab_id) %>% 
-  summarise()
+  summarise(total_nicos = sum(adult_nicos),
+            mean_nicos_per_count = mean(adult_nicos),
+            observations = n(), 
+            eggs_searched = sum(crab_eggs)) %>% 
+  mutate(nicos_per_egg = total_nicos/eggs_searched) %>% 
+  mutate(nicos_extrapolated_1mil = nicos_per_egg*1000000)
+       
 
 ```
 
@@ -485,22 +491,25 @@ ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_h
 ### b) Make a nice frequency distribution figure - just adults
 ```{r a nice freq dist histogram}
 #plot the frequency of adult nicos 
-## need to use crab_id data to accurately understand distribution among crabs
+## need to use data grouped by crab_id to accurately understand distribution among crabs
+## made a new df above (1c)
 
-freqdist_adults <- gghistogram(crab_id, 
-                               crab_id$avg_adult_nicos, 
-                               fill = adults) +
+#use Freedman Diaconis rule to determine optimal binwidth:
+bw <-2 *IQR(adult_summary$total_nicos)/length(adult_summary$total_nicos)^(1/3)
+
+freqdist_adults <- ggplot(adult_summary)+
+  geom_histogram(aes(total_nicos, fill = adults
+                      ),
+                 binwidth = bw)+
   ylab("Frequency of Crabs") +
   xlab("Average Count of Adult Nicothoids/1000 Eggs") + 
   #ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5))+
   scale_y_continuous(expand =c(0,0))+
+  geom_vline(aes(xintercept = 20))+
   theme_classic()
 
-# To make it easier to compare distributions with very different counts,
-# put density on the y axis instead of the default count
-#ggplot(egg_mortality, aes(price, after_stat(density), colour = cut)) +
-#  geom_freqpoly(binwidth = 500)
+
 ```
 
 
