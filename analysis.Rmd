@@ -435,6 +435,8 @@ ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
 ## this is why I want to do things in terms of biomass because the adult nicos are transforming the crab egg biomass directly into nico egg biomass
 ```
 
+
+
 # 4. Visually Evaluate Normality and Create Frequency Distribution
 ### a) look at distributions (all counts)
 ```{r}
@@ -488,6 +490,8 @@ ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_h
 
 ## it is obvious that the count data is heavily right skewed
 ```
+
+
 ### b) Make a nice frequency distribution figure - just adults
 ```{r a nice freq dist histogram}
 #plot the frequency of adult nicos 
@@ -510,6 +514,9 @@ freqdist_adults <- gghistogram(data = adult_summary,
   theme_classic()
 
 ggsave("adult_nico_freq_distribution.png", freqdist_adults, device = "png")
+
+freqdist_adults
+
 ```
 
 
