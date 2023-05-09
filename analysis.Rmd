@@ -475,10 +475,13 @@ total_nicos_timeseries <- ggplot(data = timeseries_avg,
         axis.title.x = element_text(size = 8)) 
 
 #add the plots together
-ggarrange(adult_timeseries, juvenile_timeseries, total_nicos_timeseries, nico_egg_timeseries,
+all_timeseries_day <- ggarrange(adult_timeseries, juvenile_timeseries, total_nicos_timeseries, nico_egg_timeseries,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
 
+#add a title for the figure 
+annotate_figure(all_timeseries_day,
+               top = text_grob("Timeseries by Development Day", color = "black", face = "bold", size = 14))
 
 ##BY EDS BELOW
 
@@ -543,9 +546,13 @@ total_nicos_timeseries_eds <- ggplot(data = timeseries_avg_eds,
         axis.title.x = element_text(size = 8)) 
 
 #add the plots together
-ggarrange(adult_timeseries_eds, juvenile_timeseries_eds, total_nicos_timeseries_eds, nico_egg_timeseries_eds,
+all_timeseries_eds <- ggarrange(adult_timeseries_eds, juvenile_timeseries_eds, total_nicos_timeseries_eds, nico_egg_timeseries_eds,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(all_timeseries_eds,
+               top = text_grob("Timeseries by EDS", color = "black", face = "bold", size = 14))
 
 ```
 
@@ -620,9 +627,13 @@ total_nicos_timeseries_high <- ggplot(data = high_timeseries_avg,
         axis.title.x = element_text(size = 8)) 
 
 #add the plots together
-ggarrange(adult_timeseries_high, juvenile_timeseries_high, total_nicos_timeseries_high, nico_egg_timeseries_high,
+high_timeseries_day <- ggarrange(adult_timeseries_high, juvenile_timeseries_high, total_nicos_timeseries_high, nico_egg_timeseries_high,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(high_timeseries_day,
+               top = text_grob("Timeseries by Development Day", color = "black", face = "bold", size = 14))
   
 ##BY EDS BELOW
 
@@ -687,9 +698,13 @@ total_nicos_timeseries_high_eds <- ggplot(data = high_timeseries_avg_eds,
         axis.title.x = element_text(size = 8)) 
 
 #add the plots together
-ggarrange(adult_timeseries_high_eds, juvenile_timeseries_high_eds, total_nicos_timeseries_high_eds, nico_egg_timeseries_high_eds,
+high_timeseries_eds <- ggarrange(adult_timeseries_high_eds, juvenile_timeseries_high_eds, total_nicos_timeseries_high_eds, nico_egg_timeseries_high_eds,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(high_timeseries_eds,
+               top = text_grob("Timeseries by EDS", color = "black", face = "bold", size = 14))
 
 ```
 
@@ -766,10 +781,13 @@ total_nicos_timeseries_low <- ggplot(data = low_timeseries_avg,
         axis.title.x = element_text(size = 8)) 
 
 #add the plots together
-ggarrange(adult_timeseries_low, juvenile_timeseries_low, total_nicos_timeseries_low, nico_egg_timeseries_low,
+low_timeseries_day <- ggarrange(adult_timeseries_low, juvenile_timeseries_low, total_nicos_timeseries_low, nico_egg_timeseries_low,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
 
+#add a title for the figure 
+annotate_figure(low_timeseries_day,
+               top = text_grob("Timeseries by Development Day", color = "black", face = "bold", size = 14))
 
 ##BY EDS BELOW
 
@@ -834,9 +852,13 @@ total_nicos_timeseries_low_eds <- ggplot(data = low_timeseries_avg_eds,
         axis.title.x = element_text(size = 8)) 
 
 #add the plots together
-ggarrange(adult_timeseries_low_eds, juvenile_timeseries_low_eds, total_nicos_timeseries_low_eds, nico_egg_timeseries_low_eds,
+low_timeseries_eds <- ggarrange(adult_timeseries_low_eds, juvenile_timeseries_low_eds, total_nicos_timeseries_low_eds, nico_egg_timeseries_low_eds,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(low_timeseries_eds,
+               top = text_grob("Timeseries by EDS", color = "black", face = "bold", size = 14))
 
 ```
 
@@ -862,8 +884,12 @@ adult_timeseries_all <- ggplot(data = adult_all_avg,
   theme_gray() +
   ylab("Adults per One Thousand Host Eggs") +
   xlab("EDS") + 
-  ggtitle("Adult Nicos") +
-  theme(plot.title = element_text(hjust = 0.5))
+  ggtitle(label = "Adult Nicos",
+          subtitle = "First Brood Only Data") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        plot.subtitle = element_text(hjust = 0.5))
 
 adult_timeseries_all
 
@@ -886,8 +912,12 @@ adult_timeseries_all_broods <- ggplot(data = adult_all_broods_avg,
   theme_gray() +
   ylab("Adults per One Thousand Host Eggs") +
   xlab("EDS") + 
-  ggtitle("Adult Nicos") +
-  theme(plot.title = element_text(hjust = 0.5))
+  ggtitle(label = "Adult Nicos",
+          subtitle = "All Brood Data") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        plot.subtitle = element_text(hjust = 0.5))
 
 adult_timeseries_all_broods
   
@@ -914,8 +944,12 @@ nico_egg_timeseries_all <- ggplot(data = nico_egg_all_avg,
   theme_gray() +
   ylab("Nico Eggs per One Thousand Host Eggs") +
   xlab("EDS") + 
-  ggtitle("Nico Eggs") +
-  theme(plot.title = element_text(hjust = 0.5))
+  ggtitle(label = "Nico Eggs",
+          subtitle = "First Brood Only Data") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        plot.subtitle = element_text(hjust = 0.5))
 
 nico_egg_timeseries_all
 
@@ -938,8 +972,12 @@ nico_egg_timeseries_all_broods <- ggplot(data = nico_egg_all_broods_avg,
   theme_gray() +
   ylab("Nico Eggs per One Thousand Host Eggs") +
   xlab("EDS") + 
-  ggtitle("Nico Eggs") +
-  theme(plot.title = element_text(hjust = 0.5))
+  ggtitle(label = "Nico Eggs",
+          subtitle = "All Brood Data") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        plot.subtitle = element_text(hjust = 0.5))
 
 nico_egg_timeseries_all_broods
 
@@ -949,9 +987,14 @@ nico_egg_timeseries_all_broods
 #### vi) Plot all of the Brood Data
 ```{r}
 #add the plots together
-ggarrange(adult_timeseries_all, adult_timeseries_all_broods, nico_egg_timeseries_all, nico_egg_timeseries_all_broods,
+brood_choices <- ggarrange(adult_timeseries_all, adult_timeseries_all_broods, nico_egg_timeseries_all, nico_egg_timeseries_all_broods,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(brood_choices,
+               top = text_grob("First Brood vs. All Broods", color = "black", face = "bold", size = 14))
+
 ```
 
 ### d) Timeseries for ANT-GAV-009
