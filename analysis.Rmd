@@ -27,8 +27,8 @@ display.brewer.all(colorblindFriendly = TRUE)
 ### a) Color Palette
 ```{r}
 #choose a color palette
-#display.brewer.pal(n = 8, name = 'OrRd')
-#brewer.pal(n = 8, name = "OrRd")
+display.brewer.pal(n = 8, name = 'OrRd')
+brewer.pal(n = 8, name = "OrRd")
 
 #assign colors to names
 adults = "#D7301F"
@@ -36,6 +36,10 @@ juveniles = "#FDBB84"
 totals  = "#990000"
 nico_eggs = "#FCC5C0"
 crab_eggs = "#EF6548"
+low = "#FC8D59"
+high = "#990000"
+
+
 ```
 
 
@@ -376,9 +380,9 @@ eggs_mort_vis_high
 #plot the data for the low and high infestations 
 eggs_mort_vis_both <- ggplot() +
   geom_point(data = eggs_mort_day_avg_high, 
-       aes(x = day, y = avg_prop_viable_eggs), color = "red") +
+       aes(x = day, y = avg_prop_viable_eggs), color = low) +
   geom_point(data = eggs_mort_day_avg_low, 
-       aes(x = day, y = avg_prop_viable_eggs), color = "blue") +
+       aes(x = day, y = avg_prop_viable_eggs), color = high) +
   theme_gray() +
   ylab("Average Proportion Viable Crab Eggs") +
   xlab("Development Day") + 
