@@ -446,11 +446,11 @@ eggs_mort_vis_both
 
 
 
-### c) Life Stage Timeseries 
+### c) Life Stage Timeseries (only egg mortality data)
 
 #### i) Life Stages All Crabs
 ```{r}
-#create a dataframe which has the propotion of the life stage per the number of crab eggs in the sample then times 1000 (scaled)
+#create a dataframe which has the proportion of the life stage per the number of crab eggs in the sample then times 1000 (scaled)
 timeseries <- egg_mortality_day %>%
   mutate(prop_adults = (number_adult_nicos/total_number_crab_eggs)*1000) %>%
   mutate(prop_juveniles = (number_juvenile_nicos/total_number_crab_eggs)*1000) %>%
