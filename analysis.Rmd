@@ -1484,7 +1484,7 @@ ggarrange(adult_plot_trans, juvenile_plot_trans, total_plot_trans, nico_egg_plot
 
 ## b) Log Transform the Data
 
-#### i) Proportion Viable Host Eggs
+#### i) All the Crabs
 ```{r}
 #scale up the data then log transform the data
 egg_mortality_log <- egg_mortality %>%
@@ -1560,54 +1560,50 @@ annotate_figure(log_transformed,
 
 ```
 
-
-
-#### ii) Proportion Nonviable Host Eggs
+#### ii) Low Infestation 
 ```{r}
-#scale up the data then log transform the data
-egg_mortality_log_non <- egg_mortality %>%
-  mutate(scale_prop_nonviable_eggs = prop_nonviable_eggs*1000) %>%
-  mutate(log_prop_nonviable_eggs = log(scale_prop_nonviable_eggs)) %>%
-  mutate(log_adult_nicos = log(number_adult_nicos + 1)) %>%
-  mutate(log_juvenile_nicos = log(number_juvenile_nicos + 1)) %>%
-  mutate(log_total_nicos = log(total_nicos + 1)) %>%
-  mutate(log_nico_eggs = log(number_nico_eggs + 1)) 
+#filter for the low infestation crabs 
+egg_mortality_log_low <- egg_mortality_log%>%
+  filter(!crab_id == "ANT-GAV-034") %>%
+  filter(!crab_id == "ANT-GAV-037") %>%
+  filter(!crab_id == "ANT-GAV-045") %>%
+  filter(!crab_id == "ANT-GAV-053") 
 
-
-#plot the number of adult nicos against the total number of viable eggs
-adult_plot_log_non <- ggplot(data = egg_mortality_log_non, 
-       aes(y = prop_nonviable_eggs, x = log_adult_nicos)) +
-  geom_point(color = adults) + 
+#plot the number of adult nicos against the total number of viable eggs 
+adult_plot_log_low <- ggplot() +
+  geom_point(data = egg_mortality_log_low, 
+       aes(y = prop_viable_eggs, x = log_adult_nicos), color = low) +
   #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Number of Adult Nicos") +
-  ylab("Proportion of Nonviable Crab Eggs") + 
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
         axis.title.x = element_text(size = 8))
 
 #plot the number of juvenile nicos against the total number of viable eggs 
-juvenile_plot_log_non <- ggplot(data = egg_mortality_log_non, 
-       aes(y = prop_nonviable_eggs, x = log_juvenile_nicos)) +
-  geom_point(color = juveniles) + 
+juvenile_plot_log_low <- ggplot() +
+  geom_point(data = egg_mortality_log_low, 
+       aes(y = prop_viable_eggs, x = log_juvenile_nicos), color = low) +
   #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Number of Larval Nicos") +
-  ylab("Proportion of Nonviable Crab Eggs") + 
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Larval Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
         axis.title.x = element_text(size = 8)) 
 
 #plot the number of total number of nicos against the total number of viable eggs
-total_plot_log_non <- ggplot(data = egg_mortality_log_non, 
-       aes( y = prop_nonviable_eggs, x = log_total_nicos)) +
+total_plot_log_low <- ggplot() +
+  geom_point(data = egg_mortality_log_low, 
+       aes(y = prop_viable_eggs, x = log_total_nicos), color = low) +
   geom_point(color = totals) + 
   #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Total Number of Nicos (Larvae/Adults)") +
-  ylab("Proportion of Nonviable Crab Eggs") + 
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Total Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
@@ -1615,30 +1611,187 @@ total_plot_log_non <- ggplot(data = egg_mortality_log_non,
 
 
 #plot the number of nico eggs against the total number of viable eggs
-nico_egg_plot_log_non <- ggplot(data = egg_mortality_log_non, 
-       aes(y = prop_nonviable_eggs, x = log_nico_eggs)) +
-  geom_point(color = nico_eggs) + 
+nico_egg_plot_log_low <- ggplot() +
+  geom_point(data = egg_mortality_log_low, 
+       aes(y = prop_viable_eggs, x = log_nico_eggs), color = low) + 
   #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Number of Nico Eggs") +
-  ylab("Proportion of Nonviable Crab Eggs") + 
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Nico Eggs") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
         axis.title.x = element_text(size = 8)) 
   
 #add the plots together
-log_transformed_non <- ggarrange(adult_plot_log_non, juvenile_plot_log_non, total_plot_log_non, nico_egg_plot_log_non,
+log_transformed_low <- ggarrange(adult_plot_log_low, juvenile_plot_log_low, total_plot_log_low, nico_egg_plot_log_low,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
 
 #add a title for the figure 
-annotate_figure(log_transformed_non,
-               top = text_grob("Log-Transformed Data", color = "black", face = "bold", size = 14))
+annotate_figure(log_transformed_low,
+               top = text_grob("Log-Transformed Data (Low Infestation)", color = "black", face = "bold", size = 14))
+
 
 ```
 
-## c) Squareroot Trasform the Data (no)
+
+#### iii) High Infestation
+```{r}
+#filter for the high infestation crabs 
+egg_mortality_log_high <- egg_mortality_log %>%
+  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-053"))
+
+
+#plot the number of adult nicos against the total number of viable eggs 
+adult_plot_log_high <- ggplot() +
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = log_adult_nicos), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+#plot the number of juvenile nicos against the total number of viable eggs 
+juvenile_plot_log_high <- ggplot() +
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = log_juvenile_nicos), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Larval Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Larval Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+
+#plot the number of total number of nicos against the total number of viable eggs
+total_plot_log_high <- ggplot() +
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = log_total_nicos), color = high) + 
+  geom_point(color = totals) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Total Number of Nicos (Larvae/Adults)") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_log_high <- ggplot() +
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = log_nico_eggs), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Nico Eggs") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+  
+#add the plots together
+log_transformed_high <- ggarrange(adult_plot_log_high, juvenile_plot_log_high, total_plot_log_high, nico_egg_plot_log_high,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(log_transformed_high,
+               top = text_grob("Log-Transformed Data (High Infestation)", color = "black", face = "bold", size = 14))
+
+
+```
+
+
+
+
+#### iv) Combined Plots 
+```{r}
+#plot the number of adult nicos against the total number of viable eggs 
+adult_plot_log_both <- ggplot() +
+  geom_point(data = egg_mortality_log_low, 
+       aes(y = prop_viable_eggs, x = log_adult_nicos), color = low) + 
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = log_adult_nicos), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+#plot the number of juvenile nicos against the total number of viable eggs 
+juvenile_plot_log_both <- ggplot() +
+  geom_point(data = egg_mortality_log_low, 
+       aes(y = prop_viable_eggs, x = log_juvenile_nicos), color = low) + 
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = log_juvenile_nicos), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Larval Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Larval Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+
+#plot the number of total number of nicos against the total number of viable eggs
+total_plot_log_both <- ggplot() +
+  geom_point(data = egg_mortality_log_low, 
+       aes(y = prop_viable_eggs, x = log_total_nicos), color = low) + 
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = log_total_nicos), color = high) + 
+  geom_point(color = totals) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Total Number of Nicos (Larvae/Adults)") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_log_both <- ggplot() +
+  geom_point(data = egg_mortality_log_low, 
+       aes(y = prop_viable_eggs, x = log_nico_eggs), color = low) + 
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = log_nico_eggs), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Nico Eggs") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+  
+#add the plots together
+log_transformed_both <- ggarrange(adult_plot_log_both, juvenile_plot_log_both, total_plot_log_both, nico_egg_plot_log_both,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(log_transformed_both,
+               top = text_grob("Log-Transformed Data (Combined)", color = "black", face = "bold", size = 14))
+
+
+
+```
+
+## c) Squareroot Trasform the Data 
+
+#### i) All the Crabs
 ```{r}
 #scale up the data then sqrt transform the data
 egg_mortality_sqrt <- egg_mortality %>%
@@ -1714,59 +1867,245 @@ annotate_figure(sqrt_transformed,
 
 ```
 
-
-# 4. Visually Evaluate Normality and Create Frequency Distribution
-### a) look at distributions (all counts)
+#### ii) Low Infestation 
 ```{r}
-#look at the frequency of the count data for all the life stages (multiple counts per crab)
+#filter for the low infestation crabs 
+egg_mortality_sqrt_low <- egg_mortality_sqrt %>%
+  filter(!crab_id == "ANT-GAV-034") %>%
+  filter(!crab_id == "ANT-GAV-037") %>%
+  filter(!crab_id == "ANT-GAV-045") %>%
+  filter(!crab_id == "ANT-GAV-053") 
 
-#plot the frequency of adult nicos 
-adult_plot_hist <- gghistogram(data = egg_mortality, 
-                               x = "number_adult_nicos", 
-                               fill = adults) +
+#plot the number of adult nicos against the total number of viable eggs 
+adult_plot_sqrt_low <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_low, 
+       aes(y = prop_viable_eggs, x = sqrt_adult_nicos), color = low) +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  ylab("Counts") +
-  xlab("Frequency") + 
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Adult Nicos") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
 
-#plot the frequency of juvenile nicos 
-juvenile_plot_hist <- gghistogram(data = egg_mortality, 
-                               x = "number_juvenile_nicos",
-                               fill = juveniles) +
+#plot the number of juvenile nicos against the total number of viable eggs 
+juvenile_plot_sqrt_low <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_low, 
+       aes(y = prop_viable_eggs, x = sqrt_juvenile_nicos), color = low) +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  ylab("Counts") +
-  xlab("Frequency") + 
+  xlab("Number of Larval Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Larval Nicos") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
 
-#plot the frequency of total nicos 
-total_plot_hist <- gghistogram(data = egg_mortality, 
-                               x = "total_nicos",
-                               fill = totals) +
+#plot the number of total number of nicos against the total number of viable eggs
+total_plot_sqrt_low <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_low, 
+       aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = low) +
+  geom_point(color = totals) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  ylab("Counts") +
-  xlab("Frequency") + 
+  xlab("Total Number of Nicos (Larvae/Adults)") +
+  ylab("Proportion of Viable Crab Eggs") + 
   ggtitle("Total Nicos") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
 
 
-#plot the frequency of nico eggs 
-nico_eggs_plot_hist <- gghistogram(data = egg_mortality, 
-                               x = "number_nico_eggs",
-                               fill = nico_eggs) +
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_sqrt_low <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_low, 
+       aes(y = prop_viable_eggs, x = sqrt_nico_eggs), color = low) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
-  ylab("Counts") +
-  xlab("Frequency") + 
-  ggtitle("Nicos Eggs") +
-  theme(plot.title = element_text(hjust = 0.5))
-
-#combine the plots 
-ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_hist,
+  xlab("Number of Nico Eggs") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+  
+#add the plots together
+sqrt_transformed_low <- ggarrange(adult_plot_sqrt_low, juvenile_plot_sqrt_low, total_plot_sqrt_low, nico_egg_plot_sqrt_low,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
 
-## it is obvious that the count data is heavily right skewed
+#add a title for the figure 
+annotate_figure(sqrt_transformed_low,
+               top = text_grob("Squareroot-Transformed Data (Low Infestation)", color = "black", face = "bold", size = 14))
+
+
+```
+
+
+#### iii) High Infestation
+```{r}
+#filter for the high infestation crabs 
+egg_mortality_sqrt_high <- egg_mortality_sqrt %>%
+  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-053"))
+
+
+#plot the number of adult nicos against the total number of viable eggs 
+adult_plot_sqrt_high <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_high, 
+       aes(y = prop_viable_eggs, x = sqrt_adult_nicos), color = high) +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+#plot the number of juvenile nicos against the total number of viable eggs 
+juvenile_plot_sqrt_high <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_high, 
+       aes(y = prop_viable_eggs, x = sqrt_juvenile_nicos), color = high) +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Larval Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Larval Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+
+#plot the number of total number of nicos against the total number of viable eggs
+total_plot_sqrt_high <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_high, 
+       aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = high) +
+  geom_point(color = totals) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Total Number of Nicos (Larvae/Adults)") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_sqrt_high <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_high, 
+       aes(y = prop_viable_eggs, x = sqrt_nico_eggs), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Nico Eggs") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+  
+#add the plots together
+sqrt_transformed_high <- ggarrange(adult_plot_sqrt_high, juvenile_plot_sqrt_high, total_plot_sqrt_high, nico_egg_plot_sqrt_high,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(sqrt_transformed_high,
+               top = text_grob("Squareroot-Transformed Data (High Infestation)", color = "black", face = "bold", size = 14))
+
+```
+
+
+
+
+#### iv) Combined Plots 
+```{r}
+#plot the number of adult nicos against the total number of viable eggs 
+adult_plot_sqrt_both <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_low, 
+       aes(y = prop_viable_eggs, x = sqrt_adult_nicos), color = low) + 
+  geom_point(data = egg_mortality_sqrt_high, 
+       aes(y = prop_viable_eggs, x = sqrt_adult_nicos), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+#plot the number of juvenile nicos against the total number of viable eggs 
+juvenile_plot_sqrt_both <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_low, 
+       aes(y = prop_viable_eggs, x = sqrt_juvenile_nicos), color = low) + 
+  geom_point(data = egg_mortality_sqrt_high, 
+       aes(y = prop_viable_eggs, x = sqrt_juvenile_nicos), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Larval Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Larval Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+
+#plot the number of total number of nicos against the total number of viable eggs
+total_plot_sqrt_both <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_low, 
+       aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = low) + 
+  geom_point(data = egg_mortality_log_high, 
+       aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = high) + 
+  geom_point(color = totals) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Total Number of Nicos (Larvae/Adults)") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_sqrt_both <- ggplot() +
+  geom_point(data = egg_mortality_sqrt_low, 
+       aes(y = prop_viable_eggs, x = sqrt_nico_eggs), color = low) + 
+  geom_point(data = egg_mortality_sqrt_high, 
+       aes(y = prop_viable_eggs, x = sqrt_nico_eggs), color = high) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Nico Eggs") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+  
+#add the plots together
+sqrt_transformed_both <- ggarrange(adult_plot_sqrt_both, juvenile_plot_sqrt_both, total_plot_sqrt_both, nico_egg_plot_sqrt_both,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(sqrt_transformed_both,
+               top = text_grob("Squareroot-Transformed Data (Combined)", color = "black", face = "bold", size = 14))
+
+
+```
+
+
+
+# 4. Frequency Distribution
+
+### a) Distribution from Egg Mortality Data
+```{r}
+#use Freedman Diaconis rule to determine optimal binwidth:
+bw <-2 *IQR(egg_mortality_density$total_nicos)/length(adult_summary$total_nicos)^(1/3)
+
+#look at the frequency of the proportion of each life stage in a sample of 1000 eggs 
+
+
 ```
 
 
@@ -1808,6 +2147,7 @@ freqdist_adults
 #use Freedman Diaconis rule to determine optimal binwidth:
 bw <-2 *IQR(adult_counts_summary_new$total_nicos)/length(adult_counts_summary_new$total_nicos)^(1/3)
 
+#create a histogram of the frequency distribution of the all the adult nicos found in a crab
 freqdist_adults_new <- gghistogram(data = adult_counts_summary_new, 
                               x = "total_nicos", 
                               fill = "#D7301F",
