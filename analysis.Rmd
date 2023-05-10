@@ -96,10 +96,24 @@ all_broods <- read_csv("NicothoidProjectAnalysis/RawData/all_broods.csv") %>%
   mutate_at(9, as.numeric) %>%
   filter(!total_number_of_eggs == 0)
 
+#read in the newly cleaned autoinfection data 
+new_autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_new_first.csv") %>% 
+  clean_names() %>%
+  select(!12) %>%
+  select(!14:16) %>%
+  rename(eds = egg_development_stage) %>%
+  filter(!eds == "M") %>%
+  mutate_at(9, as.numeric) %>%
+  mutate_at(10, as.numeric) %>%
+  filter(!experiment_id == "Autoinfection-005") %>%
+  filter(!total_number_of_eggs == 0)
+
 ```
 
 
-### c) Zoe creates a dataframe of all counts of adult nicothoids ever done
+### c) Dataframe All Adults 
+
+#### i) Old Autoinfection Data 
 ```{r all adult nicothoid counts by crab ID}
 # want a table with cols:
 ## crab_id, study (diss, autoinf, eggmort), count_date, nico_count, total_crab_eggs, num_nemerteans
@@ -145,6 +159,37 @@ adult_counts_summary <- adult_counts%>%
 
 ```
 
+
+#### ii) New Autoinfection Data 
+```{r all adult nicothoid counts by crab ID}
+# want a table with cols:
+## crab_id, study (diss, autoinf, eggmort), count_date, nico_count, total_crab_eggs, num_nemerteans
+
+adult_counts_new <- new_autoinfection %>% 
+  select(experiment_id, crab_id, day, eds, number_of_adult_copepods, number_of_nemerteans, total_number_of_eggs, number_of_copepod_eggs) %>% 
+  rename(number_adult_nicos =  number_of_adult_copepods,
+         total_number_crab_eggs = total_number_of_eggs,
+         number_nico_eggs = number_of_copepod_eggs) %>% 
+  full_join(., egg_mortality_day) %>% 
+  select(experiment_id, crab_id, day, eds, number_adult_nicos, number_of_nemerteans, total_number_crab_eggs, number_nico_eggs) %>% 
+  rename(adult_nicos = number_adult_nicos,
+         nemerteans = number_of_nemerteans, 
+         crab_eggs = total_number_crab_eggs,
+         nico_eggs = number_nico_eggs)
+
+
+# want to make a summary table now with extrapolated count assuming 1 million eggs, total count of nicos, total number of crab eggs searched, number of observations on that crab, all per crab    
+adult_counts_summary_new <- adult_counts_new %>% 
+  group_by(crab_id) %>% 
+  summarise(total_nicos = sum(adult_nicos),
+            mean_nicos_per_count = mean(adult_nicos),
+            observations = n(), 
+            eggs_searched = sum(crab_eggs)) %>% 
+  mutate(nicos_per_egg = total_nicos/eggs_searched) %>% 
+  mutate(nicos_extrapolated_1mil = nicos_per_egg*1000000)
+       
+
+```
 
 # 2. Timeseries Visualization
 
@@ -863,7 +908,11 @@ annotate_figure(low_timeseries_eds,
 ```
 
 
-#### iv) All Adults by EDS
+### d) Examine by EDS 
+
+#### i) All Adults
+
+##### - old autoinfection
 ```{r}
 ##autoinfection data from first broods and egg mortality
 #create a dataframe with the proportion of adult nicos per 1000 eggs for all samples
@@ -885,7 +934,7 @@ adult_timeseries_all <- ggplot(data = adult_all_avg,
   ylab("Adults per One Thousand Host Eggs") +
   xlab("EDS") + 
   ggtitle(label = "Adult Nicos",
-          subtitle = "First Brood Only Data") +
+          subtitle = "Old Autoinfection") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
         axis.title.x = element_text(size = 8),
@@ -923,7 +972,43 @@ adult_timeseries_all_broods
   
 ```
 
-#### v) All Nico Eggs by EDS
+
+##### - new autoinfection
+```{r}
+##autoinfection data from first broods and egg mortality
+#create a dataframe with the proportion of adult nicos per 1000 eggs for all samples
+adult_all_new <- adult_counts_new %>%
+  mutate(prop_adults = (adult_nicos/crab_eggs)*1000)
+
+#create a dataframe with the average adults
+adult_all_avg_new <-  adult_all_new %>%
+  group_by(eds) %>%
+  summarize(avg_prop_adults = mean(prop_adults)) %>%
+  as_tibble()
+
+
+#plot the number of adults over time per 1000 host eggs
+adult_timeseries_all_new <- ggplot(data = adult_all_avg_new, 
+       aes(x = eds, y = avg_prop_adults)) +
+  geom_point(color = adults) +
+  theme_gray() +
+  ylab("Adults per One Thousand Host Eggs") +
+  xlab("EDS") + 
+  ggtitle(label = "Adult Nicos",
+          subtitle = "New Autoinfection") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        plot.subtitle = element_text(hjust = 0.5))
+
+adult_timeseries_all_new
+
+```
+
+
+#### ii) All Nico Eggs by EDS
+
+##### - old autoinfection
 ```{r}
 ##autoinfection data from first broods and egg mortality
 #create a dataframe with the proportion of nico eggs per 1000 eggs for all samples
@@ -945,7 +1030,7 @@ nico_egg_timeseries_all <- ggplot(data = nico_egg_all_avg,
   ylab("Nico Eggs per One Thousand Host Eggs") +
   xlab("EDS") + 
   ggtitle(label = "Nico Eggs",
-          subtitle = "First Brood Only Data") +
+          subtitle = "Old Autoinfection") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 6),
         axis.title.x = element_text(size = 8),
@@ -984,7 +1069,42 @@ nico_egg_timeseries_all_broods
 
 ```
 
-#### vi) Plot all of the Brood Data
+##### - new autoinfection
+```{r}
+##autoinfection data from first broods and egg mortality
+#create a dataframe with the proportion of nico eggs per 1000 eggs for all samples
+nico_egg_all_new <- adult_counts_new %>%
+  mutate(prop_nico_eggs = (nico_eggs/crab_eggs)*1000)
+
+#create a dataframe with the average nico eggs
+nico_egg_all_avg_new <-  nico_egg_all_new %>%
+  group_by(eds) %>%
+  summarize(avg_prop_nico_eggs = mean(prop_nico_eggs)) %>%
+  as_tibble()
+
+
+#plot the number of nico eggs over time per 1000 host eggs
+nico_egg_timeseries_all_new <- ggplot(data = nico_egg_all_avg_new, 
+       aes(x = eds, y = avg_prop_nico_eggs)) +
+  geom_point(color = nico_eggs) +
+  theme_gray() +
+  ylab("Nico Eggs per One Thousand Host Eggs") +
+  xlab("EDS") + 
+  ggtitle(label = "Nico Eggs",
+          subtitle = "New Autoinfection") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        plot.subtitle = element_text(hjust = 0.5))
+
+nico_egg_timeseries_all_new
+
+```
+
+
+#### iii) Comparision Plots
+
+##### - first vs. all broods
 ```{r}
 #add the plots together
 brood_choices <- ggarrange(adult_timeseries_all, adult_timeseries_all_broods, nico_egg_timeseries_all, nico_egg_timeseries_all_broods,
@@ -997,7 +1117,95 @@ annotate_figure(brood_choices,
 
 ```
 
-### d) Timeseries for ANT-GAV-009
+##### - old vs. new autoinfection
+```{r}
+#add the plots together
+autoinfection_choices <- ggarrange(adult_timeseries_all, adult_timeseries_all_new, nico_egg_timeseries_all, nico_egg_timeseries_all_new,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(autoinfection_choices,
+               top = text_grob("Old Autoinfection vs. New Autoinfection", color = "black", face = "bold", size = 14))
+
+```
+
+### e) Examine by Day
+
+#### i) All Adults
+
+##### - old autoinfection
+```{r}
+
+```
+
+
+##### - new autoinfection
+```{r}
+#create a dataframe with the average adults
+adult_all_avg_new_day <-  adult_all_new %>%
+  group_by(day) %>%
+  summarize(avg_prop_adults = mean(prop_adults)) %>%
+  as_tibble()
+
+
+#plot the number of adults over time per 1000 host eggs
+adult_timeseries_all_new_day <- ggplot(data = adult_all_avg_new_day, 
+       aes(x = day, y = avg_prop_adults)) +
+  geom_point(color = adults) +
+  theme_gray() +
+  ylab("Adults per One Thousand Host Eggs") +
+  xlab("Development Day") + 
+  ggtitle(label = "Adult Nicos",
+          subtitle = "New Autoinfection") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        plot.subtitle = element_text(hjust = 0.5))
+
+adult_timeseries_all_new_day
+
+```
+
+
+#### ii) All Nico Eggs by EDS
+
+##### - old autoinfection
+```{r}
+
+```
+
+
+##### - new autoinfection
+```{r}
+#create a dataframe with the average nico eggs
+nico_egg_all_avg_new_day <-  nico_egg_all_new %>%
+  group_by(day) %>%
+  summarize(avg_prop_nico_eggs = mean(prop_nico_eggs)) %>%
+  as_tibble()
+
+
+#plot the number of nico eggs over time per 1000 host eggs
+nico_egg_timeseries_all_new_day <- ggplot(data = nico_egg_all_avg_new_day, 
+       aes(x = day, y = avg_prop_nico_eggs)) +
+  geom_point(color = nico_eggs) +
+  theme_gray() +
+  ylab("Nico Eggs per One Thousand Host Eggs") +
+  xlab("Development Day") + 
+  ggtitle(label = "Nico Eggs",
+          subtitle = "New Autoinfection") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        plot.subtitle = element_text(hjust = 0.5))
+
+nico_egg_timeseries_all_new_day
+
+```
+
+
+
+### f) Timeseries for ANT-GAV-009
 ```{r}
 #create a dataframe for just ANT-GAV-009 by eds
 ant_gav_009 <- all_broods %>%
@@ -1075,7 +1283,7 @@ nico_egg_timeseries_009
 ```
 
 
-### e) Group by Crab ID
+### g) Group by Crab ID
 ```{r}
 #group the data by crab ID
 crab_id <- egg_mortality_day %>%
@@ -1562,7 +1770,9 @@ ggarrange(adult_plot_hist, juvenile_plot_hist, total_plot_hist, nico_eggs_plot_h
 ```
 
 
-### b) Make a nice frequency distribution figure - just adults
+### b) Histogram for Adults
+
+#### i) Old Autoinfection Data
 ```{r a nice freq dist histogram}
 #plot the frequency of adult nicos 
 ## need to use data grouped by crab_id to accurately understand distribution among crabs
@@ -1589,6 +1799,33 @@ freqdist_adults
 
 ```
 
+#### ii) New Autoinfection Data
+```{r a nice freq dist histogram}
+#plot the frequency of adult nicos 
+## need to use data grouped by crab_id to accurately understand distribution among crabs
+## made a new df above (1c)
+
+#use Freedman Diaconis rule to determine optimal binwidth:
+bw <-2 *IQR(adult_counts_summary_new$total_nicos)/length(adult_counts_summary_new$total_nicos)^(1/3)
+
+freqdist_adults_new <- gghistogram(data = adult_counts_summary_new, 
+                              x = "total_nicos", 
+                              fill = "#D7301F",
+                              binwidth = bw)+
+  ylab("Frequency of Crabs") +
+  xlab("Average Count of Adult Nicothoids/1000 Eggs") + 
+  #ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5))+
+  scale_y_continuous(expand =c(0,0))+
+  geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  theme_classic()
+
+#save the output as as png
+ggsave("adult_nico_freq_distribution_new.png", freqdist_adults_new, device = "png")
+
+freqdist_adults_new
+
+```
 
 
 # 5. Analysis (Egg Mass)
