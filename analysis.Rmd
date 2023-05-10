@@ -1162,10 +1162,12 @@ nico_egg_plot <- ggplot(data = egg_mortality,
         axis.title.x = element_text(size = 8)) 
   
 #add the plots together
-ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
+non_transformed <- ggarrange(adult_plot, juvenile_plot, total_plot, nico_egg_plot,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
-
+#add a title for the figure 
+annotate_figure(non_transformed,
+               top = text_grob("Non-Transformed Data", color = "black", face = "bold", size = 14))
 
 
 ## we see that there is a clear relationship between the proportion of nonviable eggs and the number of nico eggs while there isn't always this clear relationship with the total number of nicos and the proportion of nonviable eggs
@@ -1273,6 +1275,8 @@ ggarrange(adult_plot_trans, juvenile_plot_trans, total_plot_trans, nico_egg_plot
 
 
 ## b) Log Transform the Data
+
+#### i) Proportion Viable Host Eggs
 ```{r}
 #scale up the data then log transform the data
 egg_mortality_log <- egg_mortality %>%
@@ -1338,14 +1342,93 @@ nico_egg_plot_log <- ggplot(data = egg_mortality_log,
         axis.title.x = element_text(size = 8)) 
   
 #add the plots together
-ggarrange(adult_plot_log, juvenile_plot_log, total_plot_log, nico_egg_plot_log,
+log_transformed <- ggarrange(adult_plot_log, juvenile_plot_log, total_plot_log, nico_egg_plot_log,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
 
-
+#add a title for the figure 
+annotate_figure(log_transformed,
+               top = text_grob("Log-Transformed Data", color = "black", face = "bold", size = 14))
 
 ```
 
+
+
+#### ii) Proportion Nonviable Host Eggs
+```{r}
+#scale up the data then log transform the data
+egg_mortality_log_non <- egg_mortality %>%
+  mutate(scale_prop_nonviable_eggs = prop_nonviable_eggs*1000) %>%
+  mutate(log_prop_nonviable_eggs = log(scale_prop_nonviable_eggs)) %>%
+  mutate(log_adult_nicos = log(number_adult_nicos + 1)) %>%
+  mutate(log_juvenile_nicos = log(number_juvenile_nicos + 1)) %>%
+  mutate(log_total_nicos = log(total_nicos + 1)) %>%
+  mutate(log_nico_eggs = log(number_nico_eggs + 1)) 
+
+
+#plot the number of adult nicos against the total number of viable eggs
+adult_plot_log_non <- ggplot(data = egg_mortality_log_non, 
+       aes(y = prop_nonviable_eggs, x = log_adult_nicos)) +
+  geom_point(color = adults) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Nonviable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+#plot the number of juvenile nicos against the total number of viable eggs 
+juvenile_plot_log_non <- ggplot(data = egg_mortality_log_non, 
+       aes(y = prop_nonviable_eggs, x = log_juvenile_nicos)) +
+  geom_point(color = juveniles) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Larval Nicos") +
+  ylab("Proportion of Nonviable Crab Eggs") + 
+  ggtitle("Larval Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+
+#plot the number of total number of nicos against the total number of viable eggs
+total_plot_log_non <- ggplot(data = egg_mortality_log_non, 
+       aes( y = prop_nonviable_eggs, x = log_total_nicos)) +
+  geom_point(color = totals) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Total Number of Nicos (Larvae/Adults)") +
+  ylab("Proportion of Nonviable Crab Eggs") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_log_non <- ggplot(data = egg_mortality_log_non, 
+       aes(y = prop_nonviable_eggs, x = log_nico_eggs)) +
+  geom_point(color = nico_eggs) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Nico Eggs") +
+  ylab("Proportion of Nonviable Crab Eggs") + 
+  ggtitle("Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+  
+#add the plots together
+log_transformed_non <- ggarrange(adult_plot_log_non, juvenile_plot_log_non, total_plot_log_non, nico_egg_plot_log_non,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(log_transformed_non,
+               top = text_grob("Log-Transformed Data", color = "black", face = "bold", size = 14))
+
+```
 
 ## c) Squareroot Trasform the Data (no)
 ```{r}
@@ -1413,10 +1496,12 @@ nico_egg_plot_sqrt <- ggplot(data = egg_mortality_sqrt,
         axis.title.x = element_text(size = 8)) 
   
 #add the plots together
-ggarrange(adult_plot_sqrt, juvenile_plot_sqrt, total_plot_sqrt, nico_egg_plot_sqrt,
+sqrt_transformed <- ggarrange(adult_plot_sqrt, juvenile_plot_sqrt, total_plot_sqrt, nico_egg_plot_sqrt,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
-
+#add a title for the figure 
+annotate_figure(sqrt_transformed,
+               top = text_grob("Squareroot-Transformed Data", color = "black", face = "bold", size = 14))
 
 
 ```
