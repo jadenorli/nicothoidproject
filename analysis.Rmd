@@ -1654,7 +1654,7 @@ egg_mortality_sqrt <- egg_mortality %>%
 adult_plot_sqrt <- ggplot(data = egg_mortality_sqrt, 
        aes(y = prop_viable_eggs, x = sqrt_adult_nicos)) +
   geom_point(color = adults) + 
-  geom_smooth(method = lm, level = 0.95, color = "black") +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Number of Adult Nicos") +
   ylab("Proportion of Viable Crab Eggs") + 
@@ -1667,7 +1667,7 @@ adult_plot_sqrt <- ggplot(data = egg_mortality_sqrt,
 juvenile_plot_sqrt <- ggplot(data = egg_mortality_sqrt, 
        aes(y = prop_viable_eggs, x = sqrt_juvenile_nicos)) +
   geom_point(color = juveniles) + 
-  geom_smooth(method = lm, level = 0.95, color = "black") +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Number of Larval Nicos") +
   ylab("Proportion of Viable Crab Eggs") + 
@@ -1680,7 +1680,7 @@ juvenile_plot_sqrt <- ggplot(data = egg_mortality_sqrt,
 total_plot_sqrt <- ggplot(data = egg_mortality_sqrt, 
        aes(y = prop_viable_eggs, x = sqrt_total_nicos)) +
   geom_point(color = totals) + 
-  geom_smooth(method = lm, level = 0.95, color = "black") +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Total Number of Nicos (Larvae/Adults)") +
   ylab("Proportion of Viable Crab Eggs") + 
@@ -1694,7 +1694,7 @@ total_plot_sqrt <- ggplot(data = egg_mortality_sqrt,
 nico_egg_plot_sqrt <- ggplot(data = egg_mortality_sqrt, 
        aes(y = prop_viable_eggs, x = sqrt_nico_eggs)) +
   geom_point(color = nico_eggs) + 
-  geom_smooth(method = lm, level = 0.95, color = "black") +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Number of Nico Eggs") +
   ylab("Proportion of Viable Crab Eggs") + 
