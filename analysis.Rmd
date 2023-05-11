@@ -670,7 +670,6 @@ all_timeseries_day <- ggarrange(adult_timeseries, juvenile_timeseries, total_nic
 annotate_figure(all_timeseries_day,
                top = text_grob("Timeseries by Development Day", color = "black", face = "bold", size = 14))
 
-
 ```
 
 #### - by eds
@@ -1522,7 +1521,7 @@ nico_egg_timeseries_all_new_day
 ```
 
 
-###### -) prop averages
+###### -) averages
 ```{r}
 #create a dataframe with the average nico eggs
 nico_egg_all_avg_new_day <-  nico_egg_all_new %>%
