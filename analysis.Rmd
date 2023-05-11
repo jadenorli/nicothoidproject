@@ -191,9 +191,13 @@ adult_counts_summary_new <- adult_counts_new %>%
 
 ```
 
-# 2. Timeseries Visualization
+# 2. Egg Mortality Timeseries
 
 ### a) Egg Mortality Data by EDS 
+
+#### i) All Crabs
+
+##### - prop viable eggs
 ```{r}
 #visualize the change in proportion of viable eggs over time
 #subset the data with the desired columns
@@ -212,6 +216,13 @@ eggs_mort_eds_vis <- ggplot(data = egg_mort_viable,
   ggtitle("Egg Mortality Across EDS") +
   theme(plot.title = element_text(hjust = 0.5))
 
+eggs_mort_eds_vis
+
+```
+
+
+##### - average at eds
+```{r}
 #create a data frame with the average values across each EDS 
 eggs_mort_eds_avg <- egg_mortality %>%
   group_by(eds) %>%
@@ -231,24 +242,53 @@ eggs_mort_eds_avg_vis <- ggplot(data = eggs_mort_eds_avg,
   ggtitle("Average Egg Mortality Across EDS") +
   theme(plot.title = element_text(hjust = 0.5))
 
+eggs_mort_eds_avg_vis
 
-#remove the most highly infested crabs (037, 043, and 045)
-new_crab_eds <- egg_mortality %>%
+```
+
+
+#### ii) Low Infestation
+
+##### - prop viable eggs 
+```{r}
+#remove the most highly infested crabs (034, 037, 045, and 053)
+low_crab_eds <- egg_mortality %>%
+  filter(!crab_id == "ANT-GAV-034") %>%
   filter(!crab_id == "ANT-GAV-037") %>%
   filter(!crab_id == "ANT-GAV-045") %>%
-  filter(!crab_id == "ANT-GAV-043")
+  filter(!crab_id == "ANT-GAV-053") 
 
+#plot the data for the longer dataframe with the averages as groups
+eggs_mort_vis_low_eds <- ggplot(data = low_crab_eds, 
+       aes(x = eds, y = prop_viable_eggs)) +
+  geom_point(color= low) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Proportion Viable Crab Eggs") +
+  xlab("Egg Development Stage (EDS)") + 
+  ggtitle(label = "Egg Mortality Across EDS",
+          subtitle = "Low Infestation Crabs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+eggs_mort_vis_low_eds
+
+```
+
+
+##### - average at eds
+```{r}
 #create a data frame with the average values across each eds 
-eggs_mort_avg_new_eds <- new_crab_eds %>%
+eggs_mort_avg_low_avg_eds <- low_crab_eds %>%
   group_by(eds) %>%
   summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
             avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
   as_tibble()
 
 #plot the data for the longer dataframe with the averages as groups
-eggs_mort_vis_new_eds <- ggplot(data = eggs_mort_avg_new_eds, 
+eggs_mort_vis_low_avg_eds <- ggplot(data = eggs_mort_avg_low_avg_eds, 
        aes(x = eds, y = avg_prop_viable_eggs)) +
-  geom_point(color= crab_eggs) +
+  geom_point(color= low) +
   theme_gray() +
   geom_smooth(method = lm, level = 0.95, color = "black") +
   ylab("Average Proportion Viable Crab Eggs") +
@@ -258,12 +298,111 @@ eggs_mort_vis_new_eds <- ggplot(data = eggs_mort_avg_new_eds,
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
 
-#plot the graphs
-eggs_mort_eds_vis
-eggs_mort_eds_avg_vis
-eggs_mort_vis_new_eds
+eggs_mort_vis_low_avg_eds
 
 ```
+
+
+
+#### iii) High Infestation
+
+##### - prop viable eggs 
+```{r}
+#remove the most highly infested crabs (034, 037, 045, and 053)
+high_crab_eds <- egg_mortality %>%
+  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-053"))
+
+#plot the data for the longer dataframe with the averages as groups
+eggs_mort_vis_high_eds <- ggplot(data = high_crab_eds, 
+       aes(x = eds, y = prop_viable_eggs)) +
+  geom_point(color = high) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Proportion Viable Crab Eggs") +
+  xlab("Egg Development Stage (EDS)") + 
+  ggtitle(label = "Egg Mortality Across EDS",
+          subtitle = "High Infestation Crabs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+eggs_mort_vis_high_eds
+
+```
+
+
+##### - average at eds
+```{r}
+#create a data frame with the average values across each eds 
+eggs_mort_avg_high_avg_eds <- high_crab_eds %>%
+  group_by(eds) %>%
+  summarize(avg_prop_viable_eggs = mean(prop_viable_eggs),
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
+  as_tibble()
+
+#plot the data for the longer dataframe with the averages as groups
+eggs_mort_vis_high_avg_eds <- ggplot(data = eggs_mort_avg_high_avg_eds, 
+       aes(x = eds, y = avg_prop_viable_eggs)) +
+  geom_point(color= high) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Egg Development Stage (EDS)") + 
+  ggtitle(label = "Average Egg Mortality Across EDS",
+          subtitle = "High Infestation Crabs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+eggs_mort_vis_high_avg_eds
+
+```
+
+
+#### iv) Combined Plots 
+
+##### - prop viable eggs
+```{r}
+#plot the data for the longer dataframe with the averages as groups
+eggs_mort_vis_both_eds <- ggplot() +
+  geom_point(data = high_crab_eds, 
+       aes(x = eds, y = prop_viable_eggs), color = high) +
+  geom_point(data = low_crab_eds, 
+       aes(x = eds, y = prop_viable_eggs), color = low) + 
+  theme_gray() +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Proportion Viable Crab Eggs") +
+  xlab("Egg Development Stage (EDS)") + 
+  ggtitle(label = "Egg Mortality Across EDS",
+          subtitle = "Combined Plot") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+eggs_mort_vis_both_eds
+
+```
+
+
+
+##### - average at eds 
+```{r}
+#plot the data for the longer dataframe with the averages as groups
+eggs_mort_vis_both_avg_eds <- ggplot() +
+  geom_point(data = eggs_mort_avg_high_avg_eds, 
+       aes(x = eds, y = avg_prop_viable_eggs), color = high) +
+  geom_point(data = eggs_mort_avg_low_avg_eds, 
+       aes(x = eds, y = avg_prop_viable_eggs), color = low) + 
+  theme_gray() +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Average Proportion Viable Crab Eggs") +
+  xlab("Egg Development Stage (EDS)") + 
+  ggtitle(label = "Egg Mortality Across EDS",
+          subtitle = "Combined Plot") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+eggs_mort_vis_both_avg_eds
+
+```
+
 
 
 ### b) Egg Mortality Data by Development Day
@@ -317,6 +456,7 @@ eggs_mort_day_vis <- ggplot(data = eggs_mort_day_avg,
 eggs_mort_day_vis
 
 ```
+
 
 
 
@@ -420,7 +560,7 @@ eggs_mort_vis_high
 ```
 
 
-#### iv) Plot with Low and High
+#### iv) Combined Plot
 ```{r}
 #plot the data for the low and high infestations 
 eggs_mort_vis_both <- ggplot() +
@@ -446,9 +586,11 @@ eggs_mort_vis_both
 
 
 
-### c) Life Stage Timeseries (only egg mortality data)
+# 3. Life Stage Timeseries 
 
-#### i) Life Stages All Crabs
+## a) Egg Mortality Data
+
+### i) All crabs
 ```{r}
 #create a dataframe which has the proportion of the life stage per the number of crab eggs in the sample then times 1000 (scaled)
 timeseries <- egg_mortality_day %>%
@@ -602,7 +744,7 @@ annotate_figure(all_timeseries_eds,
 ```
 
 
-#### ii) High Infestation Crabs 
+### ii) High Infestation Crabs 
 ```{r}
 #select the highly infested crabs only
 high_timeseries <- timeseries %>%
@@ -754,7 +896,7 @@ annotate_figure(high_timeseries_eds,
 ```
 
 
-#### iii) Low Infestation Crabs
+### iii) Low Infestation Crabs
 ```{r}
 #select the low infested crabs only
 low_timeseries <- timeseries %>%
@@ -908,9 +1050,11 @@ annotate_figure(low_timeseries_eds,
 ```
 
 
-### d) Examine by EDS 
 
-#### i) All Adults
+
+## b) Egg Mortality and Autoinfection Data 
+
+### i) All Adults by EDS
 
 ##### - old autoinfection
 ```{r}
@@ -941,7 +1085,10 @@ adult_timeseries_all <- ggplot(data = adult_all_avg,
         plot.subtitle = element_text(hjust = 0.5))
 
 adult_timeseries_all
-
+  
+```
+##### - all broods
+```{r}
 ##autoinfection data from all broods and egg mortality
 #create a dataframe with the proportion of adult nicos per 1000 eggs for all samples
 adult_all_broods <- adult_counts_all_broods %>%
@@ -969,7 +1116,7 @@ adult_timeseries_all_broods <- ggplot(data = adult_all_broods_avg,
         plot.subtitle = element_text(hjust = 0.5))
 
 adult_timeseries_all_broods
-  
+
 ```
 
 
@@ -1006,7 +1153,7 @@ adult_timeseries_all_new
 ```
 
 
-#### ii) All Nico Eggs by EDS
+### ii) All Nico Eggs by EDS
 
 ##### - old autoinfection
 ```{r}
@@ -1038,6 +1185,11 @@ nico_egg_timeseries_all <- ggplot(data = nico_egg_all_avg,
 
 nico_egg_timeseries_all
 
+
+```
+
+##### - all broods
+```{r}
 ##autoinfection data from all broods and egg mortality
 #create a dataframe with the proportion of nico eggs per 1000 eggs for all samples
 nico_egg_all_broods <- adult_counts_all_broods %>%
@@ -1066,8 +1218,10 @@ nico_egg_timeseries_all_broods <- ggplot(data = nico_egg_all_broods_avg,
 
 nico_egg_timeseries_all_broods
 
-
 ```
+
+
+
 
 ##### - new autoinfection
 ```{r}
@@ -1102,7 +1256,7 @@ nico_egg_timeseries_all_new
 ```
 
 
-#### iii) Comparision Plots
+### iii) Comparision Plots
 
 ##### - first vs. all broods
 ```{r}
@@ -1130,9 +1284,9 @@ annotate_figure(autoinfection_choices,
 
 ```
 
-### e) Examine by Day
 
-#### i) All Adults
+
+### iv) All Adults by Day
 
 ##### - old autoinfection
 ```{r}
@@ -1168,7 +1322,7 @@ adult_timeseries_all_new_day
 ```
 
 
-#### ii) All Nico Eggs by EDS
+### v) All Nico Eggs by Day
 
 ##### - old autoinfection
 ```{r}
@@ -1205,7 +1359,7 @@ nico_egg_timeseries_all_new_day
 
 
 
-### f) Timeseries for ANT-GAV-009
+## c) Timeseries for ANT-GAV-009
 ```{r}
 #create a dataframe for just ANT-GAV-009 by eds
 ant_gav_009 <- all_broods %>%
@@ -1283,7 +1437,7 @@ nico_egg_timeseries_009
 ```
 
 
-### g) Group by Crab ID
+## d) Group by Crab ID
 ```{r}
 #group the data by crab ID
 crab_id <- egg_mortality_day %>%
@@ -1980,7 +2134,6 @@ juvenile_plot_sqrt_high <- ggplot() +
 total_plot_sqrt_high <- ggplot() +
   geom_point(data = egg_mortality_sqrt_high, 
        aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = high) +
-  geom_point(color = totals) + 
   #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Total Number of Nicos (Larvae/Adults)") +
@@ -2053,10 +2206,9 @@ juvenile_plot_sqrt_both <- ggplot() +
 #plot the number of total number of nicos against the total number of viable eggs
 total_plot_sqrt_both <- ggplot() +
   geom_point(data = egg_mortality_sqrt_low, 
-       aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = low) + 
-  geom_point(data = egg_mortality_log_high, 
-       aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = high) + 
-  geom_point(color = totals) + 
+       aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = low) +
+  geom_point(data = egg_mortality_sqrt_high, 
+       aes(y = prop_viable_eggs, x = sqrt_total_nicos), color = high) +
   #geom_smooth(method = lm, level = 0.95, color = "black") +
   theme_gray() +
   xlab("Total Number of Nicos (Larvae/Adults)") +
