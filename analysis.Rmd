@@ -407,7 +407,7 @@ eggs_mort_vis_both_avg_eds
 
 ### b) Egg Mortality Data by Development Day
 
-#### i) All the Crabs
+#### i) All the Crabs (averages)
 ```{r}
 #create a data frame with the average values across each development day 
 eggs_mort_day_avg <- egg_mortality_day %>%
@@ -460,7 +460,7 @@ eggs_mort_day_vis
 
 
 
-#### ii) Low Infestation Only
+#### ii) Low Infestation Only (averages)
 ```{r}
 #remove the most highly infested crabs (034, 037, 045, and 053)
 low_infested <- egg_mortality_day %>%
@@ -512,7 +512,7 @@ eggs_mort_vis_low
 ```
 
 
-#### iii) High Infestation Only
+#### iii) High Infestation Only (averages)
 ```{r}
 #keep the most highly infested crabs (034, 037, 045, 053)
 high_infested <- egg_mortality_day %>%
@@ -560,7 +560,7 @@ eggs_mort_vis_high
 ```
 
 
-#### iv) Combined Plot
+#### iv) Combined Plot (averages)
 ```{r}
 #plot the data for the low and high infestations 
 eggs_mort_vis_both <- ggplot() +
