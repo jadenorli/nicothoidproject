@@ -576,7 +576,7 @@ eggs_mort_vis_both <- ggplot() +
   ylab("Average Proportion Viable Crab Eggs") +
   xlab("Development Day") + 
   ggtitle(label = "Average Egg Mortality Across Development Day",
-          subtitle = "High Infestation Crabs") +
+          subtitle = "Low vs. High Infestation") +
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
 
@@ -2361,6 +2361,7 @@ annotate_figure(sqrt_transformed_high,
 
 
 
+
 #### iv) Combined Plots 
 ```{r}
 #plot the number of adult nicos against the total number of viable eggs 
@@ -2435,6 +2436,90 @@ annotate_figure(sqrt_transformed_both,
 
 
 ```
+
+
+
+## d) Arcsine Transform the Data
+
+
+### i) All the crabs
+```{r}
+#scale up the data then arcsine transform the data
+egg_mortality_arcsine <- egg_mortality %>%
+  mutate(scale_prop_viable_eggs = prop_viable_eggs*1000) %>%
+  mutate(arcsine_prop_viable_eggs = asin(sqrt(prop_viable_eggs))) %>%
+  mutate(arcsine_adult_nicos = asin(sqrt(number_adult_nicos))) %>%
+  mutate(arcsine_juvenile_nicos = asin(sqrt(number_juvenile_nicos))) %>%
+  mutate(arcsine_total_nicos = asin(sqrt(total_nicos))) %>%
+  mutate(arcsine_nico_eggs = asin(sqrt(number_nico_eggs))) 
+
+
+#plot the number of adult nicos against the total number of viable eggs
+adult_plot_arcsine <- ggplot(data = egg_mortality_arcsine, 
+       aes(y = prop_viable_eggs, x = arcsine_adult_nicos)) +
+  geom_point(color = adults) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+#plot the number of juvenile nicos against the total number of viable eggs 
+juvenile_plot_arcsine <- ggplot(data = egg_mortality_arcsine, 
+       aes(y = prop_viable_eggs, x = arcsine_juvenile_nicos)) +
+  geom_point(color = juveniles) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Larval Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Larval Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+
+#plot the number of total number of nicos against the total number of viable eggs
+total_plot_arcsine <- ggplot(data = egg_mortality_arcsine, 
+       aes(y = prop_viable_eggs, x = arcsine_total_nicos)) +
+  geom_point(color = totals) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Total Number of Nicos (Larvae/Adults)") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8))
+
+
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_arcsine <- ggplot(data = egg_mortality_arcsine, 
+       aes(y = prop_viable_eggs, x = arcsine_nico_eggs)) +
+  geom_point(color = nico_eggs) + 
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Nico Eggs") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+  
+#add the plots together
+arcsine_transformed <- ggarrange(adult_plot_arcsine, juvenile_plot_arcsine, total_plot_arcsine, nico_egg_plot_arcsine,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+#add a title for the figure 
+annotate_figure(arcsine_transformed,
+               top = text_grob("Arcsine-Transformed Data", color = "black", face = "bold", size = 14))
+
+
+
+```
+
+
 
 
 
