@@ -111,9 +111,43 @@ new_autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_ne
 ```
 
 
-### c) Dataframe All Adults 
+### c) Dataframes Continued
 
-#### i) Old Autoinfection Data 
+#### i) Egg Mortality
+```{r}
+#make a dataframe with the extrapolated counts from the totals per crab ID 
+totals_per_crab_id <- egg_mortality_day %>% 
+  group_by(crab_id) %>% 
+  summarise(adults = sum(number_adult_nicos),
+            juveniles = sum(number_juvenile_nicos),
+            total_nicos = sum(total_nicos),
+            nico_eggs = sum(number_nico_eggs),
+            total_crab_eggs = sum(total_number_crab_eggs)) %>%
+  mutate(adults_per_egg = adults/total_crab_eggs) %>%
+  mutate(juveniles_per_egg = juveniles/total_crab_eggs) %>%
+  mutate(total_nicos_per_egg = total_nicos/total_crab_eggs) %>%
+  mutate(nico_eggs_per_egg = nico_eggs/total_crab_eggs) %>%
+  mutate(adults_scaled = adults_per_egg*1000000) %>%
+  mutate(juveniles_scaled = juveniles_per_egg*1000000) %>%
+  mutate(total_nicos_scaled = total_nicos_per_egg*1000000) %>%
+  mutate(nico_eggs_scaled = nico_eggs_per_egg*1000000) %>%
+  as_tibble()
+
+
+  summarise(total_nicos = sum(adult_nicos),
+            mean_nicos_per_count = mean(adult_nicos),
+            observations = n(), 
+            eggs_searched = sum(crab_eggs)) %>% 
+  mutate(nicos_per_egg = total_nicos/eggs_searched) %>% 
+  mutate(nicos_extrapolated_1mil = nicos_per_egg*1000000)
+
+
+
+```
+
+
+
+#### ii) Old Autoinfection Data 
 ```{r all adult nicothoid counts by crab ID}
 # want a table with cols:
 ## crab_id, study (diss, autoinf, eggmort), count_date, nico_count, total_crab_eggs, num_nemerteans
@@ -160,7 +194,7 @@ adult_counts_summary <- adult_counts%>%
 ```
 
 
-#### ii) New Autoinfection Data 
+#### iii) New Autoinfection Data 
 ```{r all adult nicothoid counts by crab ID}
 # want a table with cols:
 ## crab_id, study (diss, autoinf, eggmort), count_date, nico_count, total_crab_eggs, num_nemerteans
@@ -179,7 +213,7 @@ adult_counts_new <- new_autoinfection %>%
 
 
 # want to make a summary table now with extrapolated count assuming 1 million eggs, total count of nicos, total number of crab eggs searched, number of observations on that crab, all per crab    
-adult_counts_summary_new <- adult_counts_new %>% 
+adult_summary_new <- adult_counts_new %>% 
   group_by(crab_id) %>% 
   summarise(total_nicos = sum(adult_nicos),
             mean_nicos_per_count = mean(adult_nicos),
@@ -1468,6 +1502,7 @@ adult_timeseries_all_new_day
 adult_all_avg_new_day <- adult_all_new %>%
   group_by(day) %>%
   summarize(avg_prop_adults = mean(prop_adults)) %>%
+  mutate(scaled_adults = avg_prop_adults*1000000) %>%
   as_tibble()
 
 #plot the number of adults over time per 1000 host eggs
@@ -1527,6 +1562,7 @@ nico_egg_timeseries_all_new_day
 nico_egg_all_avg_new_day <-  nico_egg_all_new %>%
   group_by(day) %>%
   summarize(avg_prop_nico_eggs = mean(prop_nico_eggs)) %>%
+  mutate(scaled_nico_eggs = avg_prop_nico_eggs*1000000) %>%
   as_tibble()
 
 
@@ -1631,15 +1667,27 @@ nico_egg_timeseries_009
 ```{r}
 #group the data by crab ID
 crab_id <- egg_mortality_day %>%
-  mutate(prop_adult_nicos = number_adult_nicos/total_number_crab_eggs *1000) %>%
-  mutate(prop_juvenile_nicos = number_juvenile_nicos/total_number_crab_eggs *1000) %>%
-  mutate(prop_total_nicos = total_nicos/total_number_crab_eggs *1000) %>%
-  mutate(prop_nico_eggs = number_nico_eggs/total_number_crab_eggs *1000) %>%
+  mutate(prop_adult_nicos = number_adult_nicos/total_number_crab_eggs) %>%
+  mutate(prop_juvenile_nicos = number_juvenile_nicos/total_number_crab_eggs) %>%
+  mutate(prop_total_nicos = total_nicos/total_number_crab_eggs) %>%
+  mutate(prop_nico_eggs = number_nico_eggs/total_number_crab_eggs) %>%
+  mutate(scaled_prop_adult_nicos = prop_adult_nicos*1000000) %>%
+  mutate(scaled_prop_juvenile_nicos = prop_juvenile_nicos*1000000) %>%
+  mutate(scaled_prop_total_nicos = prop_total_nicos*1000000) %>%
+  mutate(scaled_prop_nico_eggs = prop_nico_eggs*1000000) %>%
   group_by(crab_id) %>%
-    summarize(avg_adult_nicos = mean(prop_adult_nicos),
-            avg_juvenile_nicos = mean(prop_juvenile_nicos),
-            avg_total_nicos = mean(prop_total_nicos),
-            avg_nico_eggs = mean(prop_nico_eggs)) %>%
+    summarise(adults = sum(number_adult_nicos),
+              juveniles = sum(number_juvenile_nicos),
+              total_nicos = sum(total_nicos),
+              nico_nicos = sum(number_nico_eggs),
+              avg_adult_nicos = mean(prop_adult_nicos),
+              avg_juvenile_nicos = mean(prop_juvenile_nicos),
+              avg_total_nicos = mean(prop_total_nicos),
+              avg_nico_eggs = mean(prop_nico_eggs),
+              adults_scaled = sum(scaled_prop_adult_nicos),
+              juveniles_scaled = sum(scaled_prop_juvenile_nicos),
+              total_nicos_scaled = sum(scaled_prop_total_nicos),
+              nico_eggs_scaled = sum(scaled_prop_nico_eggs),) %>%
   as_tibble()
 
 #high infestation crabs
@@ -1651,6 +1699,102 @@ low_crab_id <- crab_id %>%
   filter(avg_adult_nicos < 20) %>%
   filter(avg_juvenile_nicos < 120)
   
+```
+
+
+
+## e) Publication Timeseries
+
+### i) Adults 
+```{r}
+#plot the number of adults over time per 1000 host eggs
+timeseries_adult <- ggplot(data = adult_all_avg_new_day, 
+       aes(x = day, y = scaled_adults)) +
+  geom_point(color = adults) +
+  theme_gray() +
+  ylab("Adult Nicothoids per One Million Crab Eggs") +
+  xlab("Development Day") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+timeseries_adult
+
+```
+
+
+### ii) Juveniles
+```{r}
+#scale up the number of each life stage from the egg mortality data 
+scaled_data_egg_mort <- egg_mortality_day %>%
+  mutate(prop_adults = number_adult_nicos/total_number_crab_eggs) %>%
+  mutate(prop_juveniles = number_juvenile_nicos/total_number_crab_eggs) %>%
+  mutate(prop_total_nicos = total_nicos/total_number_crab_eggs) %>%
+  mutate(prop_nico_eggs = number_nico_eggs/total_number_crab_eggs) %>%
+  group_by(day) %>%
+  summarize(avg_prop_adults = mean(prop_adults), 
+              avg_prop_juveniles = mean(prop_juveniles),
+              avg_prop_total_nicos = mean(prop_total_nicos), 
+              avg_prop_nico_eggs = mean(prop_nico_eggs)) %>%
+  mutate(scaled_adults = avg_prop_adults*1000000) %>%
+  mutate(scaled_juveniles = avg_prop_juveniles*1000000) %>%
+  mutate(scaled_total_nicos = avg_prop_total_nicos*1000000) %>%
+  mutate(scaled_nico_eggs = avg_prop_nico_eggs*1000000) %>%
+  as_tibble()
+
+#plot the number of juveniles over time per one million host eggs
+timeseries_juveniles <- ggplot(data = scaled_data_egg_mort, 
+       aes(x = day, y = scaled_juveniles)) +
+  geom_point(color = juveniles) +
+  theme_gray() +
+  ylab("Larval Nicothoids per One Million Crab Eggs") +
+  xlab("Development Day") + 
+  #ggtitle(label = "Larval Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+timeseries_juveniles
+
+
+```
+
+
+### iii) Total Nicos
+```{r}
+#plot the number of total nicos over time per one million host eggs
+timeseries_total_nicos <- ggplot(data = scaled_data_egg_mort, 
+       aes(x = day, y = scaled_total_nicos)) +
+  geom_point(color = totals) +
+  theme_gray() +
+  ylab("Total Nicothoids per One Million Crab Eggs") +
+  xlab("Development Day") + 
+  #ggtitle(label = "Larval Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+timeseries_total_nicos
+
+```
+
+### iv) Nico Eggs
+```{r}
+#plot the number of nico eggs over time per one million host eggs
+timeseries_nico_eggs <- ggplot(data = nico_egg_all_avg_new_day, 
+       aes(x = day, y = scaled_nico_eggs)) +
+  geom_point(color = nico_eggs) +
+  theme_gray() +
+  ylab("Nicothoid Eggs per One Million Crab Eggs") +
+  xlab("Development Day") + 
+  #ggtitle(label = "Nico Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+timeseries_nico_eggs
+
 ```
 
 
@@ -2526,14 +2670,116 @@ annotate_figure(arcsine_transformed,
 # 4. Frequency Distribution
 
 ### a) Distribution from Egg Mortality Data
+
+#### i) Adults
 ```{r}
 #use Freedman Diaconis rule to determine optimal binwidth:
-bw <-2 *IQR(egg_mortality_density$total_nicos)/length(adult_summary$total_nicos)^(1/3)
+bw_eggs_adults_crab_id <-2 *IQR(crab_id$adults_scaled)/length(crab_id$adults_scaled)^(1/3)
 
-#look at the frequency of the proportion of each life stage in a sample of 1000 eggs 
+#create a histogram of the distribution of adults (averages per sample)
+freqdist_eggs_adults_crab_id <- gghistogram(data = crab_id, 
+                              x = "adults_scaled", 
+                              fill = adults,
+                              binwidth = bw_eggs_adults_crab_id)+
+  ylab("Frequency of Crabs") +
+  xlab("Average Count of Adult Nicothoids per One Million Crab Eggs") + 
+  #ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(expand =c(0,0)) +
+  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  theme_classic()
 
+freqdist_eggs_adults_crab_id
+
+#create a histogram of the distribution of adults (averaged per totals)
+freqdist_eggs_adults <- gghistogram(data = totals_per_crab_id, 
+                              x = "adults_scaled", 
+                              fill = adults,
+                              binwidth = bw_eggs_adults)+
+  ylab("Frequency of Crabs") +
+  xlab("Average Count of Adult Nicothoids per One Million Crab Eggs") + 
+  #ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(expand =c(0,0)) +
+  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  theme_classic()
+
+freqdist_eggs_adults
 
 ```
+
+
+#### ii) Juveniles
+```{r}
+#use Freedman Diaconis rule to determine optimal binwidth:
+bw_eggs_juveniles <-2 *IQR(totals_per_crab_id$juveniles_scaled)/length(totals_per_crab_id$juveniles_scaled)^(1/3)
+
+#create a histogram of the distribution of adults
+freqdist_eggs_juveniles <- gghistogram(data = totals_per_crab_id, 
+                              x = "juveniles_scaled", 
+                              fill = juveniles,
+                              binwidth = bw_eggs_juveniles)+
+  ylab("Frequency of Crabs") +
+  xlab("Average Count of Larval Nicothoids per One Million Crab Eggs") + 
+  #ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(expand =c(0,0)) +
+  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  theme_classic()
+
+freqdist_eggs_juveniles
+
+```
+
+
+
+#### iii) Total Nicos 
+```{r}
+#use Freedman Diaconis rule to determine optimal binwidth:
+bw_eggs_total_nicos <-2 *IQR(totals_per_crab_id$total_nicos_scaled)/length(totals_per_crab_id$total_nicos_scaled)^(1/3)
+
+#create a histogram of the distribution of adults
+freqdist_eggs_total_nicos <- gghistogram(data = totals_per_crab_id, 
+                              x = "total_nicos_scaled", 
+                              fill = totals,
+                              binwidth = bw_eggs_total_nicos)+
+  ylab("Frequency of Crabs") +
+  xlab("Average Count of Total Nicothoids per One Million Crab Eggs") + 
+  #ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(expand =c(0,0)) +
+  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  theme_classic()
+
+freqdist_eggs_total_nicos
+
+```
+
+
+
+
+#### iv) Nico Eggs
+```{r}
+#use Freedman Diaconis rule to determine optimal binwidth:
+bw_eggs_nico_eggs <-2 *IQR(totals_per_crab_id$nico_eggs_scaled)/length(totals_per_crab_id$nico_eggs_scaled)^(1/3)
+
+#create a histogram of the distribution of adults
+freqdist_eggs_nico_eggs <- gghistogram(data = totals_per_crab_id, 
+                              x = "nico_eggs_scaled", 
+                              fill = nico_eggs,
+                              binwidth = bw_eggs_nico_eggs)+
+  ylab("Frequency of Crabs") +
+  xlab("Average Count of Nico Eggs per One Million Crab Eggs") + 
+  #ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(expand =c(0,0)) +
+  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  theme_classic()
+
+freqdist_eggs_nico_eggs
+
+```
+
 
 
 ### b) Histogram for Adults
@@ -2545,46 +2791,42 @@ bw <-2 *IQR(egg_mortality_density$total_nicos)/length(adult_summary$total_nicos)
 ## made a new df above (1c)
 
 #use Freedman Diaconis rule to determine optimal binwidth:
-bw <-2 *IQR(adult_summary$total_nicos)/length(adult_summary$total_nicos)^(1/3)
+bw_old <-2 *IQR(adult_summary$nicos_extrapolated_1mil)/length(adult_summary$nicos_extrapolated_1mil)^(1/3)
 
-freqdist_adults <- gghistogram(data = adult_summary, 
-                              x = "total_nicos", 
+freqdist_adults_old <- gghistogram(data = adult_summary, 
+                              x = "nicos_extrapolated_1mil", 
                               fill = "#D7301F",
-                              binwidth = bw)+
+                              binwidth = bw_old)+
   ylab("Frequency of Crabs") +
-  xlab("Average Count of Adult Nicothoids/1000 Eggs") + 
+  xlab("Average Count of Adult Nicothoids per One Million Crab Eggs") + 
   #ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5))+
   scale_y_continuous(expand =c(0,0))+
-  geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
   theme_classic()
 
-ggsave("adult_nico_freq_distribution.png", freqdist_adults, device = "png")
+ggsave("adult_nico_freq_distribution.png", freqdist_adults_old, device = "png")
 
-freqdist_adults
+freqdist_adults_old
 
 ```
 
 #### ii) New Autoinfection Data
 ```{r a nice freq dist histogram}
-#plot the frequency of adult nicos 
-## need to use data grouped by crab_id to accurately understand distribution among crabs
-## made a new df above (1c)
-
 #use Freedman Diaconis rule to determine optimal binwidth:
-bw <-2 *IQR(adult_counts_summary_new$total_nicos)/length(adult_counts_summary_new$total_nicos)^(1/3)
+bw_new <-2 *IQR(adult_summary_new$nicos_extrapolated_1mil)/length(adult_summary_new$nicos_extrapolated_1mil)^(1/3)
 
 #create a histogram of the frequency distribution of the all the adult nicos found in a crab
-freqdist_adults_new <- gghistogram(data = adult_counts_summary_new, 
-                              x = "total_nicos", 
+freqdist_adults_new <- gghistogram(data = adult_summary_new, 
+                              x = "nicos_extrapolated_1mil", 
                               fill = "#D7301F",
-                              binwidth = bw)+
+                              binwidth = bw_new)+
   ylab("Frequency of Crabs") +
-  xlab("Average Count of Adult Nicothoids/1000 Eggs") + 
+  xlab("Average Count of Adult Nicothoids per One Million Crab Eggs") + 
   #ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5))+
   scale_y_continuous(expand =c(0,0))+
-  geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
   theme_classic()
 
 #save the output as as png
