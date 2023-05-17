@@ -240,11 +240,15 @@ adult_summary_new <- adult_counts_new %>%
   mutate(nicos_per_egg = total_nicos/eggs_searched) %>% 
   mutate(nicos_extrapolated_1mil = nicos_per_egg*1000000)
 
-#create a dataframe with the average number of adults per day per one million host eggs
+#create a dataframe with the average number, max number, and min number of adults per day per one million host eggs
 adult_all_avg_new_day <- adult_all_new %>%
   group_by(day) %>%
-  summarize(avg_prop_adults = mean(prop_adults)) %>%
+  summarize(avg_prop_adults = mean(prop_adults),
+            max_prop_adults = max(prop_adults),
+            min_prop_adults = min(prop_adults)) %>%
   mutate(scaled_adults = avg_prop_adults*1000000) %>%
+  mutate(max_scaled_adults = max_prop_adults*1000000) %>%
+  mutate(min_scaled_adults = min_prop_adults*1000000) %>%
   as_tibble()
 
 #create a dataframe with the average nico eggs per day per one million host eggs
@@ -1775,9 +1779,19 @@ low_crab_id <- egg_mortality_day %>%
 ### i) Adults 
 ```{r}
 #plot the number of adults over time per 1000 host eggs
-timeseries_adult <- ggplot(data = adult_all_avg_new_day, 
-       aes(x = day, y = scaled_adults)) +
-  geom_point(color = adults) +
+timeseries_adult <- ggplot() +
+  geom_line(data = adult_all_avg_new_day,
+            aes(x = day, y = max_scaled_adults)) +
+  geom_line(data = adult_all_avg_new_day,
+            aes(x = day, y = min_scaled_adults)) +
+  geom_ribbon(data = adult_all_avg_new_day,
+              aes(x = day, 
+                  ymin = min_scaled_adults,
+                  ymax = max_scaled_adults),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = adult_all_avg_new_day,
+            aes(x = day, y = scaled_adults), color = adults) +
   theme_gray() +
   ylab("Adult Nicothoids per One Million Crab Eggs") +
   xlab("Development Day") + 
