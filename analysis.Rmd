@@ -365,34 +365,94 @@ eggs_mort_day_long <- eggs_mort_day_avg %>%
 
 #average the various life stages for all crabs
 timeseries_avg_eds <- timeseries %>%
+  mutate(prop_adults_alone = number_adult_nicos/total_number_crab_eggs) %>%
+  mutate(prop_juveniles_alone = number_juvenile_nicos/total_number_crab_eggs) %>%
+  mutate(prop_total_nicos_alone = total_nicos/total_number_crab_eggs) %>%
+  mutate(prop_nico_eggs_alone = number_nico_eggs/total_number_crab_eggs) %>%
   group_by(eds) %>%
-  summarize(avg_prop_adults = mean(prop_adults),
-            avg_prop_juveniles = mean(prop_juveniles),
-            avg_prop_nico_eggs = mean(prop_nico_eggs),
-            avg_prop_total_nicos = mean(prop_total_nicos)) %>%
+  summarize(avg_prop_adults = mean(prop_adults_alone),
+            max_prop_adults = max(prop_adults_alone),
+            min_prop_adults = min(prop_adults_alone),
+            avg_prop_juveniles = mean(prop_juveniles_alone),
+            max_prop_juveniles = max(prop_juveniles_alone),
+            min_prop_juveniles = min(prop_juveniles_alone),
+            avg_prop_total_nicos = mean(prop_total_nicos_alone),
+            max_prop_total_nicos = max(prop_total_nicos_alone),
+            min_prop_total_nicos = min(prop_total_nicos_alone),
+            avg_prop_nico_eggs = mean(prop_nico_eggs_alone),
+            max_prop_nico_eggs = max(prop_nico_eggs_alone),
+            min_prop_nico_eggs = min(prop_nico_eggs_alone)) %>%
+  mutate(scaled_adults = avg_prop_adults*1000000) %>%
+  mutate(max_scaled_adults = max_prop_adults*1000000) %>%
+  mutate(min_scaled_adults = min_prop_adults*1000000) %>%
+  mutate(scaled_juveniles = avg_prop_juveniles*1000000) %>%
+  mutate(max_scaled_juveniles = max_prop_juveniles*1000000) %>%
+  mutate(min_scaled_juveniles = min_prop_juveniles*1000000) %>%  
+  mutate(scaled_total_nicos = avg_prop_total_nicos*1000000) %>%
+  mutate(max_scaled_total_nicos = max_prop_total_nicos*1000000) %>%
+  mutate(min_scaled_total_nicos = min_prop_total_nicos*1000000) %>%
+  mutate(scaled_nico_eggs = avg_prop_nico_eggs*1000000) %>%
+  mutate(max_scaled_nico_eggs = max_prop_nico_eggs*1000000) %>%
+  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>%
   as_tibble()
 
 #select the high infested crabs only and average the life stages per eds 
 high_timeseries_avg_eds <- high_timeseries %>%
   group_by(eds) %>%
-  summarize(avg_prop_adults = mean(prop_adults),
-            avg_prop_juveniles = mean(prop_juveniles),
-            avg_prop_nico_eggs = mean(prop_nico_eggs),
-            avg_prop_total_nicos = mean(prop_total_nicos)) %>%
+  summarize(avg_prop_adults = mean(prop_adults_alone),
+            max_prop_adults = max(prop_adults_alone),
+            min_prop_adults = min(prop_adults_alone),
+            avg_prop_juveniles = mean(prop_juveniles_alone),
+            max_prop_juveniles = max(prop_juveniles_alone),
+            min_prop_juveniles = min(prop_juveniles_alone),
+            avg_prop_total_nicos = mean(prop_total_nicos_alone),
+            max_prop_total_nicos = max(prop_total_nicos_alone),
+            min_prop_total_nicos = min(prop_total_nicos_alone),
+            avg_prop_nico_eggs = mean(prop_nico_eggs_alone),
+            max_prop_nico_eggs = max(prop_nico_eggs_alone),
+            min_prop_nico_eggs = min(prop_nico_eggs_alone)) %>%
+  mutate(scaled_adults = avg_prop_adults*1000000) %>%
+  mutate(max_scaled_adults = max_prop_adults*1000000) %>%
+  mutate(min_scaled_adults = min_prop_adults*1000000) %>%
+  mutate(scaled_juveniles = avg_prop_juveniles*1000000) %>%
+  mutate(max_scaled_juveniles = max_prop_juveniles*1000000) %>%
+  mutate(min_scaled_juveniles = min_prop_juveniles*1000000) %>%  
+  mutate(scaled_total_nicos = avg_prop_total_nicos*1000000) %>%
+  mutate(max_scaled_total_nicos = max_prop_total_nicos*1000000) %>%
+  mutate(min_scaled_total_nicos = min_prop_total_nicos*1000000) %>%
+  mutate(scaled_nico_eggs = avg_prop_nico_eggs*1000000) %>%
+  mutate(max_scaled_nico_eggs = max_prop_nico_eggs*1000000) %>%
+  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>%
   as_tibble()
 
 #select the high infested crabs only and average the life stages per eds 
 low_timeseries_avg_eds <- low_timeseries %>%
   group_by(eds) %>%
-  summarize(avg_prop_adults = mean(prop_adults),
-            avg_prop_juveniles = mean(prop_juveniles),
-            avg_prop_nico_eggs = mean(prop_nico_eggs),
-            avg_prop_total_nicos = mean(prop_total_nicos)) %>%
+  summarize(avg_prop_adults = mean(prop_adults_alone),
+            max_prop_adults = max(prop_adults_alone),
+            min_prop_adults = min(prop_adults_alone),
+            avg_prop_juveniles = mean(prop_juveniles_alone),
+            max_prop_juveniles = max(prop_juveniles_alone),
+            min_prop_juveniles = min(prop_juveniles_alone),
+            avg_prop_total_nicos = mean(prop_total_nicos_alone),
+            max_prop_total_nicos = max(prop_total_nicos_alone),
+            min_prop_total_nicos = min(prop_total_nicos_alone),
+            avg_prop_nico_eggs = mean(prop_nico_eggs_alone),
+            max_prop_nico_eggs = max(prop_nico_eggs_alone),
+            min_prop_nico_eggs = min(prop_nico_eggs_alone)) %>%
+  mutate(scaled_adults = avg_prop_adults*1000000) %>%
+  mutate(max_scaled_adults = max_prop_adults*1000000) %>%
+  mutate(min_scaled_adults = min_prop_adults*1000000) %>%
+  mutate(scaled_juveniles = avg_prop_juveniles*1000000) %>%
+  mutate(max_scaled_juveniles = max_prop_juveniles*1000000) %>%
+  mutate(min_scaled_juveniles = min_prop_juveniles*1000000) %>%  
+  mutate(scaled_total_nicos = avg_prop_total_nicos*1000000) %>%
+  mutate(max_scaled_total_nicos = max_prop_total_nicos*1000000) %>%
+  mutate(min_scaled_total_nicos = min_prop_total_nicos*1000000) %>%
+  mutate(scaled_nico_eggs = avg_prop_nico_eggs*1000000) %>%
+  mutate(max_scaled_nico_eggs = max_prop_nico_eggs*1000000) %>%
+  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>%
   as_tibble()
-
-
-
-
 
 
 
@@ -3958,6 +4018,8 @@ table_yellow
 ## a) Low Infestation
 
 ### i) Adults
+
+#### -by day 
 ```{r}
 #plot the number of adults over time per one million host eggs
 low_timeseries_adults <- ggplot() +
@@ -3972,7 +4034,7 @@ low_timeseries_adults <- ggplot() +
               fill = "gray",
               alpha = 0.4) +
   geom_point(data = low_timeseries_avg,
-            aes(x = day, y = scaled_adults), color = adults) +
+            aes(x = day, y = scaled_adults), color = low) +
   theme_gray() +
   ylab("Adult Nicothoids per One Million Crab Eggs") +
   xlab("Development Day") + 
@@ -3985,7 +4047,39 @@ low_timeseries_adults
 
 ```
 
+
+#### -by eds 
+```{r}
+#plot the number of adults over time per one million host eggs
+low_timeseries_adults_eds <- ggplot() +
+  geom_line(data = low_timeseries_avg_eds,
+            aes(x = eds, y = max_scaled_adults)) +
+  geom_line(data = low_timeseries_avg_eds,
+            aes(x = eds, y = min_scaled_adults)) +
+  geom_ribbon(data = low_timeseries_avg_eds,
+              aes(x = eds, 
+                  ymin = min_scaled_adults,
+                  ymax = max_scaled_adults),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = low_timeseries_avg_eds,
+            aes(x = eds, y = scaled_adults), color = low) +
+  theme_gray() +
+  ylab("Adult Nicothoids per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+low_timeseries_adults_eds
+
+```
+
+
 ### ii) Juveniles
+
+#### -by day 
 ```{r}
 #plot the number of juveniles over time per one million host eggs
 low_timeseries_juveniles <- ggplot() +
@@ -4000,7 +4094,7 @@ low_timeseries_juveniles <- ggplot() +
               fill = "gray",
               alpha = 0.4) +
   geom_point(data = low_timeseries_avg,
-            aes(x = day, y = scaled_juveniles), color = adults) +
+            aes(x = day, y = scaled_juveniles), color = low) +
   theme_gray() +
   ylab("Larval Nicothoids per One Million Crab Eggs") +
   xlab("Development Day") + 
@@ -4014,7 +4108,38 @@ low_timeseries_juveniles
 ```
 
 
+#### -by eds 
+```{r}
+#plot the number of adults over time per one million host eggs
+low_timeseries_juveniles_eds <- ggplot() +
+  geom_line(data = low_timeseries_avg_eds,
+            aes(x = eds, y = max_scaled_juveniles)) +
+  geom_line(data = low_timeseries_avg_eds,
+            aes(x = eds, y = min_scaled_juveniles)) +
+  geom_ribbon(data = low_timeseries_avg_eds,
+              aes(x = eds, 
+                  ymin = min_scaled_juveniles,
+                  ymax = max_scaled_juveniles),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = low_timeseries_avg_eds,
+            aes(x = eds, y = scaled_juveniles), color = low) +
+  theme_gray() +
+  ylab("Larval Nicothoids per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+low_timeseries_juveniles_eds
+
+```
+
+
 ### iii) Total Nicos
+
+#### -by day 
 ```{r}
 #plot the number of adults over time per one million host eggs
 low_timeseries_total_nicos <- ggplot() +
@@ -4029,7 +4154,7 @@ low_timeseries_total_nicos <- ggplot() +
               fill = "gray",
               alpha = 0.4) +
   geom_point(data = low_timeseries_avg,
-            aes(x = day, y = scaled_total_nicos), color = adults) +
+            aes(x = day, y = scaled_total_nicos), color = low) +
   theme_gray() +
   ylab("Total Nicothoids per One Million Crab Eggs") +
   xlab("Development Day") + 
@@ -4043,7 +4168,39 @@ low_timeseries_total_nicos
 ```
 
 
+#### -by eds 
+```{r}
+#plot the number of adults over time per one million host eggs
+low_timeseries_total_nicos_eds <- ggplot() +
+  geom_line(data = low_timeseries_avg_eds,
+            aes(x = eds, y = max_scaled_total_nicos)) +
+  geom_line(data = low_timeseries_avg_eds,
+            aes(x = eds, y = min_scaled_total_nicos)) +
+  geom_ribbon(data = low_timeseries_avg_eds,
+              aes(x = eds, 
+                  ymin = min_scaled_total_nicos,
+                  ymax = max_scaled_total_nicos),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = low_timeseries_avg_eds,
+            aes(x = eds, y = scaled_total_nicos), color = low) +
+  theme_gray() +
+  ylab("Total Nicothoids per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+low_timeseries_total_nicos_eds
+
+```
+
+
+
 ### iv) Nico Eggs
+
+#### -by day 
 ```{r}
 #plot the number of nico eggs over time per one million host eggs
 low_timeseries_nico_eggs <- ggplot() +
@@ -4058,7 +4215,7 @@ low_timeseries_nico_eggs <- ggplot() +
               fill = "gray",
               alpha = 0.4) +
   geom_point(data = low_timeseries_avg,
-            aes(x = day, y = scaled_nico_eggs), color = adults) +
+            aes(x = day, y = scaled_nico_eggs), color = low) +
   theme_gray() +
   ylab("Nicothoids Eggs per One Million Crab Eggs") +
   xlab("Development Day") + 
@@ -4072,10 +4229,41 @@ low_timeseries_nico_eggs
 ```
 
 
+#### -by eds 
+```{r}
+#plot the number of adults over time per one million host eggs
+low_timeseries_nico_eggs_eds <- ggplot() +
+  geom_line(data = low_timeseries_avg_eds,
+            aes(x = eds, y = max_scaled_nico_eggs)) +
+  geom_line(data = low_timeseries_avg_eds,
+            aes(x = eds, y = min_scaled_nico_eggs)) +
+  geom_ribbon(data = low_timeseries_avg_eds,
+              aes(x = eds, 
+                  ymin = min_scaled_nico_eggs,
+                  ymax = max_scaled_nico_eggs),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = low_timeseries_avg_eds,
+            aes(x = eds, y = scaled_nico_eggs), color = low) +
+  theme_gray() +
+  ylab("Nicothoids Eggs per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+low_timeseries_nico_eggs_eds
+
+```
+
+
 
 ## b) High Infestation
 
 ### i) Adults
+
+#### -by day 
 ```{r}
 #plot the number of adults over time per one million host eggs
 high_timeseries_adults <- ggplot() +
@@ -4090,7 +4278,7 @@ high_timeseries_adults <- ggplot() +
               fill = "gray",
               alpha = 0.4) +
   geom_point(data = high_timeseries_avg,
-            aes(x = day, y = scaled_adults), color = adults) +
+            aes(x = day, y = scaled_adults), color = high) +
   theme_gray() +
   ylab("Adult Nicothoids per One Million Crab Eggs") +
   xlab("Development Day") + 
@@ -4103,7 +4291,41 @@ high_timeseries_adults
 
 ```
 
+
+#### -by eds
+```{r}
+#plot the number of adults over time per one million host eggs
+high_timeseries_adults_eds <- ggplot() +
+  geom_line(data = high_timeseries_avg_eds,
+            aes(x = eds, y = max_scaled_adults)) +
+  geom_line(data = high_timeseries_avg_eds,
+            aes(x = eds, y = min_scaled_adults)) +
+  geom_ribbon(data = high_timeseries_avg_eds,
+              aes(x = eds, 
+                  ymin = min_scaled_adults,
+                  ymax = max_scaled_adults),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = high_timeseries_avg_eds,
+            aes(x = eds, y = scaled_adults), color = high) +
+  theme_gray() +
+  ylab("Adult Nicothoids per One Million Crab Eggs") +
+  xlab("Development Day") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+high_timeseries_adults_eds
+
+```
+
+
+
+
 ### ii) Juveniles
+
+#### -by day 
 ```{r}
 #plot the number of juveniles over time per one million host eggs
 high_timeseries_juveniles <- ggplot() +
@@ -4118,10 +4340,10 @@ high_timeseries_juveniles <- ggplot() +
               fill = "gray",
               alpha = 0.4) +
   geom_point(data = high_timeseries_avg,
-            aes(x = day, y = scaled_juveniles), color = adults) +
+            aes(x = day, y = scaled_juveniles), color = high) +
   theme_gray() +
   ylab("Larval Nicothoids per One Million Crab Eggs") +
-  xlab("Development Day") + 
+  xlab("Egg Development Stage") + 
   #ggtitle(label = "Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5),
         axis.title.y = element_text(size = 10),
@@ -4132,7 +4354,39 @@ high_timeseries_juveniles
 ```
 
 
+#### -by eds
+```{r}
+#plot the number of adults over time per one million host eggs
+high_timeseries_juveniles_eds <- ggplot() +
+  geom_line(data = high_timeseries_avg_eds,
+            aes(x = eds, y = max_scaled_juveniles)) +
+  geom_line(data = high_timeseries_avg_eds,
+            aes(x = eds, y = min_scaled_juveniles)) +
+  geom_ribbon(data = high_timeseries_avg_eds,
+              aes(x = eds, 
+                  ymin = min_scaled_juveniles,
+                  ymax = max_scaled_juveniles),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = high_timeseries_avg_eds,
+            aes(x = eds, y = scaled_juveniles), color = high) +
+  theme_gray() +
+  ylab("Larval Nicothoids per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+high_timeseries_juveniles_eds
+
+```
+
+
+
 ### iii) Total Nicos
+
+#### -by day 
 ```{r}
 #plot the number of adults over time per one million host eggs
 high_timeseries_total_nicos <- ggplot() +
@@ -4147,7 +4401,7 @@ high_timeseries_total_nicos <- ggplot() +
               fill = "gray",
               alpha = 0.4) +
   geom_point(data = high_timeseries_avg,
-            aes(x = day, y = scaled_total_nicos), color = adults) +
+            aes(x = day, y = scaled_total_nicos), color = high) +
   theme_gray() +
   ylab("Total Nicothoids per One Million Crab Eggs") +
   xlab("Development Day") + 
@@ -4160,9 +4414,39 @@ high_timeseries_total_nicos
 
 ```
 
+#### -by eds
+```{r}
+#plot the number of adults over time per one million host eggs
+high_timeseries_total_nicos_eds <- ggplot() +
+  geom_line(data = high_timeseries_avg_eds,
+            aes(x = eds, y = max_scaled_total_nicos)) +
+  geom_line(data = high_timeseries_avg_eds,
+            aes(x = eds, y = min_scaled_total_nicos)) +
+  geom_ribbon(data = high_timeseries_avg_eds,
+              aes(x = eds, 
+                  ymin = min_scaled_total_nicos,
+                  ymax = max_scaled_total_nicos),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = high_timeseries_avg_eds,
+            aes(x = eds, y = scaled_total_nicos), color = high) +
+  theme_gray() +
+  ylab("Total Nicothoids per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+high_timeseries_total_nicos_eds
+
+```
+
 
 
 ### iv) Nico Eggs
+
+#### -by day 
 ```{r}
 #plot the number of nico eggs over time per one million host eggs
 high_timeseries_nico_eggs <- ggplot() +
@@ -4177,7 +4461,7 @@ high_timeseries_nico_eggs <- ggplot() +
               fill = "gray",
               alpha = 0.4) +
   geom_point(data = high_timeseries_avg,
-            aes(x = day, y = scaled_nico_eggs), color = adults) +
+            aes(x = day, y = scaled_nico_eggs), color = high) +
   theme_gray() +
   ylab("Nicothoids Eggs per One Million Crab Eggs") +
   xlab("Development Day") + 
@@ -4190,10 +4474,41 @@ high_timeseries_nico_eggs
 
 ```
 
+#### -by eds
+```{r}
+#plot the number of adults over time per one million host eggs
+high_timeseries_nico_eggs_eds <- ggplot() +
+  geom_line(data = high_timeseries_avg_eds,
+            aes(x = eds, y = max_scaled_nico_eggs)) +
+  geom_line(data = high_timeseries_avg_eds,
+            aes(x = eds, y = min_scaled_nico_eggs)) +
+  geom_ribbon(data = high_timeseries_avg_eds,
+              aes(x = eds, 
+                  ymin = min_scaled_nico_eggs,
+                  ymax = max_scaled_nico_eggs),
+              fill = "gray",
+              alpha = 0.4) +
+  geom_point(data = high_timeseries_avg_eds,
+            aes(x = eds, y = scaled_nico_eggs), color = high) +
+  theme_gray() +
+  ylab("Nicothoids Eggs per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+high_timeseries_nico_eggs_eds
+
+```
+
+
 
 ## c) Combined Plot
 
 ### i) Adults
+
+#### -by day 
 ```{r}
 #plot the data for the low and high infestations 
 timeseries_vis_both_adults <- ggplot() +
@@ -4217,7 +4532,35 @@ timeseries_vis_both_adults
 
 ```
 
+
+#### -by eds 
+```{r}
+#plot the data for the low and high infestations 
+timeseries_vis_both_adults_eds <- ggplot() +
+  geom_point(data = low_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_adults), color = low) +
+  geom_line(data = low_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_adults), color = low) +
+  geom_point(data = high_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_adults), color = high) +
+  geom_line(data = high_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_adults), color = high) +
+  theme_gray() +
+  ylab("Adult Nicothoids per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  ggtitle(label = "Average Count Across Egg Development Stage",
+          subtitle = "Low vs. High Infestation") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+timeseries_vis_both_adults_eds
+
+```
+
+
 ### ii) Juveniles
+
+#### -by day 
 ```{r}
 #plot the data for the low and high infestations 
 timeseries_vis_both_juveniles <- ggplot() +
@@ -4242,7 +4585,35 @@ timeseries_vis_both_juveniles
 ```
 
 
+#### -by eds 
+```{r}
+#plot the data for the low and high infestations 
+timeseries_vis_both_juveniles_eds <- ggplot() +
+  geom_point(data = low_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_juveniles), color = low) +
+  geom_line(data = low_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_juveniles), color = low) +
+  geom_point(data = high_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_juveniles), color = high) +
+  geom_line(data = high_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_juveniles), color = high) +
+  theme_gray() +
+  ylab("Larval Nicothoids per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  ggtitle(label = "Average Count Across Egg Development Stage",
+          subtitle = "Low vs. High Infestation") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+timeseries_vis_both_juveniles_eds
+
+```
+
+
+
 ### iii) Total Nicos
+
+#### -by day 
 ```{r}
 #plot the data for the low and high infestations 
 timeseries_vis_both_total_nicos <- ggplot() +
@@ -4267,8 +4638,36 @@ timeseries_vis_both_total_nicos
 ```
 
 
+#### -by eds 
+```{r}
+#plot the data for the low and high infestations 
+timeseries_vis_both_total_nicos_eds <- ggplot() +
+  geom_point(data = low_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_total_nicos), color = low) +
+  geom_line(data = low_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_total_nicos), color = low) +
+  geom_point(data = high_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_total_nicos), color = high) +
+  geom_line(data = high_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_total_nicos), color = high) +
+  theme_gray() +
+  ylab("Total Nicothoids per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  ggtitle(label = "Average Count Across Egg Development Stage",
+          subtitle = "Low vs. High Infestation") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+timeseries_vis_both_total_nicos_eds
+
+```
+
+
+
 
 ### iv) Nico Eggs
+
+#### -by day 
 ```{r}
 #plot the data for the low and high infestations 
 timeseries_vis_both_nico_eggs <- ggplot() +
@@ -4292,8 +4691,35 @@ timeseries_vis_both_nico_eggs
 
 ```
 
+#### -by eds 
+```{r}
+#plot the data for the low and high infestations 
+timeseries_vis_both_nico_eggs_eds <- ggplot() +
+  geom_point(data = low_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_nico_eggs), color = low) +
+  geom_line(data = low_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_nico_eggs), color = low) +
+  geom_point(data = high_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_nico_eggs), color = high) +
+  geom_line(data = high_timeseries_avg_eds, 
+       aes(x = eds, y = scaled_nico_eggs), color = high) +
+  theme_gray() +
+  ylab("Nicothoids Eggs per One Million Crab Eggs") +
+  xlab("Egg Development Stage") + 
+  ggtitle(label = "Average Count Across Egg Development Stage",
+          subtitle = "Low vs. High Infestation") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+timeseries_vis_both_nico_eggs_eds
+
+```
+
+
 
 ### v) All Together
+
+#### -by day 
 ```{r}
 #add the plots together
 all_timeseries_low_high <- ggarrange(timeseries_vis_both_adults, timeseries_vis_both_juveniles, timeseries_vis_both_total_nicos, timeseries_vis_both_nico_eggs,
@@ -4306,3 +4732,16 @@ annotate_figure(all_timeseries_low_high,
 
 ```
 
+
+#### -by eds 
+```{r}
+#add the plots together
+all_timeseries_low_high_eds <- ggarrange(timeseries_vis_both_adults_eds, timeseries_vis_both_juveniles_eds, timeseries_vis_both_total_nicos_eds, timeseries_vis_both_nico_eggs_eds,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+
+#add a title for the figure 
+annotate_figure(all_timeseries_low_high_eds,
+               top = text_grob("Timeseries by Egg Development Stage", color = "black", face = "bold", size = 14))
+
+```
