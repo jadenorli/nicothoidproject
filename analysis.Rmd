@@ -15,6 +15,8 @@ library(MASS)
 library(lme4)
 library(kableExtra)
 library(rcompanion)
+library(magrittr)
+library(magick)
 source("my_functions.R")
 setup_libs()
 
@@ -73,12 +75,12 @@ egg_mortality_day <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_day
 #read in the dissections data
 dissections <- read_csv("NicothoidProjectAnalysis/RawData/all_dissections.csv") %>% 
   clean_names() %>%
-  select(1:4, 9, 10) %>%
-  filter(!is.na(nicothoid_count)) %>%
-  filter(!nicothoid_count == "N/A") %>%
-  filter(!number_of_lamellae == "NA") %>%
-  mutate_at(c(5,6), as.numeric) %>%
-  mutate(prop_nicos = nicothoid_count/number_of_lamellae)
+  filter(!is.na(nico_count)) %>%
+  filter(!nico_count == "N/A") %>%
+  filter(!number_lamellae == "NA") %>%
+  mutate_at(c(6,7), as.numeric) %>%
+  mutate(prop_nicos = nico_count/number_lamellae) %>%
+  rename(nicothoid_count = nico_count)
 
 #read in the autoinfection data for the first brood
 autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/first_broods_only.csv") %>% 
@@ -283,7 +285,8 @@ adult_all_avg_new <-  adult_all_new %>%
   group_by(eds) %>%
   summarize(avg_scaled_adults = mean(scaled_adults),
             max_scaled_adults = max(scaled_adults),
-            min_scaled_adults = min(scaled_adults)) %>%
+            min_scaled_adults = min(scaled_adults),
+            avg_prop_adults = mean(prop_adults)) %>%
   as_tibble()
 
 ##autoinfection data from first broods and egg mortality
@@ -299,7 +302,8 @@ nico_egg_all_avg_new <- nico_egg_all_new %>%
   group_by(eds) %>%
   summarize(avg_scaled_nico_eggs = mean(scaled_nico_eggs),
             max_scaled_nico_eggs = max(scaled_nico_eggs),
-            min_scaled_nico_eggs = min(scaled_nico_eggs)) %>%
+            min_scaled_nico_eggs = min(scaled_nico_eggs),
+            avg_prop_nico_eggs = mean(prop_nico_eggs)) %>%
   as_tibble()
 
 
@@ -3731,27 +3735,36 @@ max_egg_mortality_high_late
 
 #### i) All Species/All Sexes
 ```{r}
-##sample size n = 27
+##sample size n = 37
 
-#create a data frame with the density of juvenile nicos per lamellae 
+#calculate the average number of lamellae in a gill
+average_lamellae_count <- mean(dissections$number_lamellae)
+average_lamellae_count
+
+
+#create a data frame with the density of juvenile nicos per lamellae and add in this density scaled to all gills
 gill_density <- dissections %>%
-  mutate(density_nicos_gills = (nicothoid_count/number_of_lamellae)) 
+  mutate(nico_per_lamellae = (nicothoid_count/number_lamellae)) %>%
+  mutate(nico_per_gill = nico_per_lamellae*average_lamellae_count) %>%
+  mutate(total_nicos_gill = nico_per_gill*12)
+  
 
 #remove the two males that were held too long before being dissected (MANT-GAV-003 and MANT-GAV-005)
 clean_dissections <- gill_density %>%
-  filter(!crab_id %in% c("MANT-GAV-003", "MANT-GAV-005"))
+  filter(!dissection_id %in% c("Dissection-027", "Dissection-028"))
 
-##sample size n = 25
+##sample size n = 35
 
 #calculate the mean density of the nicos in the gills
-mean_density_gills <- mean(clean_dissections$density_nicos_gills)
+mean_density_gills <- mean(clean_dissections$total_nicos_gill)
 mean_density_gills
 
 #calculate standard deviation of mean density of the adults in the gills
-mean_density_gills_sd <- sd(clean_dissections$density_nicos_gills)
+mean_density_gills_sd <- sd(clean_dissections$total_nicos_gill)
 mean_density_gills_sd
 
 ```
+
 
 #### ii) All Sexes Yellow Crabs
 ```{r}
@@ -3759,17 +3772,18 @@ mean_density_gills_sd
 
 ##sample size n = 21
 yellow_all <- clean_dissections %>%
-  filter(!crab_id %in% c("PRO-GAV-001", "PAG-GAV-001", "MPRO-GAV-002")) 
+  filter(species == "yellow") 
 
 #calculate the mean density of the nicos in the gills of both male and female yellows
-yellow_all_mean_density <- mean(yellow_all$density_nicos_gills)
+yellow_all_mean_density <- mean(yellow_all$total_nicos_gill)
 yellow_all_mean_density
 
 #calculate standard deviation of the mean density
-yellow_all_mean_density_gills_sd <- sd(yellow_all$density_nicos_gills)
+yellow_all_mean_density_gills_sd <- sd(yellow_all$total_nicos_gill)
 yellow_all_mean_density_gills_sd
 
 ```
+
 
 
 #### iii) All Sexes Red Crabs 
@@ -3778,14 +3792,14 @@ yellow_all_mean_density_gills_sd
 
 ##sample size n = 2
 red_all <- clean_dissections %>%
-  filter(crab_id %in% c("PRO-GAV-001","MPRO-GAV-002")) 
+  filter(species == "red") 
 
 #calculate the mean density of the nicos in the gills of both male and female reds
-red_all_mean_density <- mean(red_all$density_nicos_gills)
+red_all_mean_density <- mean(red_all$total_nicos_gill)
 red_all_mean_density
 
 #calculate standard deviation of the mean density
-red_all_mean_density_gills_sd <- sd(red_all$density_nicos_gills)
+red_all_mean_density_gills_sd <- sd(red_all$total_nicos_gill)
 red_all_mean_density_gills_sd
 
 ```
@@ -3797,14 +3811,14 @@ red_all_mean_density_gills_sd
 
 ##sample size n = 1
 brown_all <- clean_dissections %>%
-  filter(crab_id %in% c("PAG-GAV-001")) 
+  filter(species == "brown") 
 
 #calculate the mean density of the nicos in the gills of both male and female browns
-brown_all_mean_density <- mean(brown_all$density_nicos_gills)
+brown_all_mean_density <- mean(brown_all$total_nicos_gill)
 brown_all_mean_density
 
 #calculate standard deviation of the mean density
-brown_all_mean_density_gills_sd <- sd(brown_all$density_nicos_gills)
+brown_all_mean_density_gills_sd <- sd(brown_all$total_nicos_gill)
 brown_all_mean_density_gills_sd
 
 ```
@@ -3816,14 +3830,14 @@ brown_all_mean_density_gills_sd
 
 ##sample size n = 7
 males_all <- clean_dissections %>%
-  filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
+  filter(sex == "male") 
 
 #calculate the mean density of the nicos in the gills of males of all species
-males_all_mean_density <- mean(males_all$density_nicos_gills)
+males_all_mean_density <- mean(males_all$total_nicos_gill)
 males_all_mean_density
 
 #calculate standard deviation of the mean density
-males_all_mean_density_gills_sd <- sd(males_all$density_nicos_gills)
+males_all_mean_density_gills_sd <- sd(males_all$total_nicos_gill)
 males_all_mean_density_gills_sd
 
 ```
@@ -3835,14 +3849,14 @@ males_all_mean_density_gills_sd
 
 ##sample size n = 20
 females_all <- clean_dissections %>%
-  filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
+  filter(sex == "female") 
 
 #calculate the mean density of the nicos in the gills of females of all species
-females_all_mean_density <- mean(females_all$density_nicos_gills)
+females_all_mean_density <- mean(females_all$total_nicos_gill)
 females_all_mean_density
 
 #calculate standard deviation of the mean density
-females_all_mean_density_gills_sd <- sd(females_all$density_nicos_gills)
+females_all_mean_density_gills_sd <- sd(females_all$total_nicos_gill)
 females_all_mean_density_gills_sd
 
 ```
@@ -3869,15 +3883,15 @@ females_all_mean_density_gills_sd
 ##I chose to exclude two males (MANT-GAV-003 and MANT-GAV-005) we dissected because they had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
 
 ##sample size n = 6
-yellow_males <- clean_dissections %>%
-  filter(crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011")) 
+yellow_males <- yellow_all %>%
+  filter(sex == "male") 
 
 #calculate the mean density of the nicos in the gills of yellow males
-yellow_males_mean_density <- mean(yellow_males$density_nicos_gills)
+yellow_males_mean_density <- mean(yellow_males$total_nicos_gill)
 yellow_males_mean_density
 
 #calculate standard deviation of the mean density
-yellow_males_mean_density_gills_sd <- sd(yellow_males$density_nicos_gills)
+yellow_males_mean_density_gills_sd <- sd(yellow_males$total_nicos_gill)
 yellow_males_mean_density_gills_sd
 
 ```
@@ -3885,24 +3899,36 @@ yellow_males_mean_density_gills_sd
 #### ii) Red Males
 ```{r}
 #subset for red males only
-##I chose to exclude two males we dissected because they had been held for over a month before dissection and I believe that this is why they didn't have nicos -- we are planning to do a few more male dissections
 
 ##sample size n = 1
-red_males <- clean_dissections %>%
-  filter(crab_id == "MPRO-GAV-002") 
+red_males <- red_all %>%
+  filter(sex == "male") 
 
 #calculate the mean density of the nicos in the gills of red males
-red_males_mean_density <- mean(red_males$density_nicos_gills)
+red_males_mean_density <- mean(red_males$total_nicos_gill)
 red_males_mean_density
 
 #calculate standard deviation of the mean density
-red_males_mean_density_gills_sd <- sd(red_males$density_nicos_gills)
+red_males_mean_density_gills_sd <- sd(red_males$total_nicos_gill)
 red_males_mean_density_gills_sd
 
 ```
 
 #### iii) Brown Males
 ```{r}
+#subset for brown males only
+
+##sample size n = 1
+brown_males <- brown_all %>%
+  filter(sex == "male") 
+
+#calculate the mean density of the nicos in the gills of red males
+brown_males_mean_density <- mean(red_males$total_nicos_gill)
+brown_males_mean_density
+
+#calculate standard deviation of the mean density
+brown_males_mean_density_gills_sd <- sd(red_males$total_nicos_gill)
+brown_males_mean_density_gills_sd
 
 ```
 
@@ -3914,15 +3940,15 @@ red_males_mean_density_gills_sd
 #subset for yellow females only
 
 ##sample size n = 16
-yellow_females <- clean_dissections %>%
-  filter(!crab_id %in% c("MANT-GAV-001","MANT-GAV-002", "MANT-GAV-003", "MANT-GAV-005", "PRO-GAV-001", "PAG-GAV-001", "MANT-GAV-008", "MANT-GAV-009", "MANT-GAV-010", "MANT-GAV-011", "MPRO-GAV-002")) 
+yellow_females <- yellow_all %>%
+  filter(sex == "female") 
 
 #calculate the mean density of the nicos in the gills of yellow females
-yellow_females_mean_density <- mean(yellow_females$density_nicos_gills)
+yellow_females_mean_density <- mean(yellow_females$total_nicos_gill)
 yellow_females_mean_density
 
 #calculate standard deviation of the mean density
-yellow_females_mean_density_gills_sd <- sd(yellow_females$density_nicos_gills)
+yellow_females_mean_density_gills_sd <- sd(yellow_females$total_nicos_gill)
 yellow_females_mean_density_gills_sd
 
 ```
@@ -3933,15 +3959,15 @@ yellow_females_mean_density_gills_sd
 #subset for red females only
 
 ##sample size n = 1
-red_females <- clean_dissections %>%
-  filter(crab_id == "PRO-GAV-001") 
+red_females <- red_all %>%
+  filter(sex == "female") 
 
 #calculate the mean density of the nicos in the gills of red females
-red_females_mean_density <- mean(red_females$density_nicos_gills)
+red_females_mean_density <- mean(red_females$total_nicos_gill)
 red_females_mean_density
 
 #calculate standard deviation of the mean density
-red_females_mean_density_gills_sd <- sd(red_females$density_nicos_gills)
+red_females_mean_density_gills_sd <- sd(red_females$total_nicos_gill)
 red_females_mean_density_gills_sd
 
 ```
@@ -3952,15 +3978,15 @@ red_females_mean_density_gills_sd
 #subset for brown females only
 
 ##sample size n = 1
-brown_females <- clean_dissections %>%
-  filter(crab_id == "PAG-GAV-001") 
+brown_females <- brown_all %>%
+  filter(sex == "female") 
 
 #calculate the mean density of the nicos in the gills of red females
-brown_females_mean_density <- mean(brown_females$density_nicos_gills)
+brown_females_mean_density <- mean(brown_females$total_nicos_gill)
 brown_females_mean_density
 
 #calculate standard deviation of the mean density
-brown_females_mean_density_gills_sd <- sd(brown_females$density_nicos_gills)
+brown_females_mean_density_gills_sd <- sd(brown_females$total_nicos_gill)
 brown_females_mean_density_gills_sd
 
 ```
@@ -3987,33 +4013,76 @@ female_mean_intensity_gills
 
 # 10. Tables with Density
 
-#### a) Create a Table 
+## a) Calculate Table Values
 ```{r}
-#create a string with all the data 
-data_yellow <- c(NA, NA, yellow_males_mean_density, NA, mean_nico_egg_density, mean_juvenile_density, yellow_females_mean_density, mean_adult_density_all)
+#calculate sample size for each sex of each species 
+yellow_male_n = length(yellow_males$crab_id)
+yellow_male_n
 
-#turn the string into a matrix
-matrix_yellow <- matrix(data_yellow, ncol = 4, byrow = TRUE)
-colnames(matrix_yellow) <- c("Nicothoid Eggs", "Larval Nicothoids in Egg Mass", "Larval Nicothoids in Gills", "Adult Nicothoids in Egg Mass")
-rownames(matrix_yellow) <- c("Male C. anthonyi", "Female C. anthonyi")
+yellow_female_n = length(yellow_females$crab_id)
+yellow_female_n
 
-#create the table
-table_yellow <- matrix_yellow %>%
-  kbl(caption = "<center>Density of Nicothoids</center>", html_font = "Times New Roman") %>%
-  kable_classic(full_width = F, html_font = "Times New Roman") %>%
-  row_spec(row = 1, italic = TRUE) %>%
-  row_spec(row = 2, italic = TRUE) %>%
-  kable_styling(font_size = 8) %>%
-  footnote(symbol = "The density of the nicothoids in the egg mass are calculated per one thousand crab eggs.")
+red_male_n = length(red_males$crab_id)
+red_male_n
 
-table_yellow
+red_female_n = length(red_females$crab_id)
+red_female_n
 
+brown_male_n = length(brown_males$crab_id)
+brown_male_n
+
+brown_female_n = length(brown_females$crab_id)
+brown_female_n
+
+#calculate sample size of all for a species 
+total_yellow_n = (yellow_male_n + yellow_female_n)
+total_yellow_n
+
+total_red_n = (red_male_n + red_female_n)
+total_red_n
+
+total_brown_n = (brown_male_n + brown_female_n)
+total_brown_n
+
+#calculate the total sample size
+total_n = (total_yellow_n + total_red_n + total_brown_n)
+  
 ```
 
 
 
+## b) Create a Table 
+```{r}
+#create a string with all the 
+data_all <- c(yellow_male_n, yellow_female_n, red_male_n, red_female_n, brown_male_n, brown_female_n, yellow_males_mean_density, yellow_females_mean_density, red_males_mean_density, red_females_mean_density, brown_males_mean_density, brown_females_mean_density, yellow_males_mean_density_gills_sd, yellow_females_mean_density_gills_sd, red_males_mean_density_gills_sd, red_females_mean_density_gills_sd, brown_males_mean_density_gills_sd, brown_females_mean_density_gills_sd)
 
-# 11. Timeseries continues
+#turn the string into a matrix
+matrix_all <- matrix(data_all, ncol = 3, byrow = FALSE)
+colnames(matrix_all) <- c("Sample Size", "Mean Larval Nicothoids in Gills", "Standard Deviation")
+rownames(matrix_all) <- c("Male C. anthonyi", "Female C. anthonyi", "Male C. productus", "Female C. productus", "Male C. antennarius", "Female C. antennarius")
+
+#create the table
+table_all <- matrix_all %>%
+  kbl(caption = "<center>Density of Nicothoids</center>", html_font = "Times New Roman") %>%
+  kable_classic(full_width = F, html_font = "Times New Roman") %>%
+  row_spec(row = 1, italic = TRUE) %>%
+  row_spec(row = 2, italic = TRUE) %>%
+  row_spec(row = 3, italic = TRUE) %>%
+  row_spec(row = 4, italic = TRUE) %>%
+  row_spec(row = 5, italic = TRUE) %>%
+  row_spec(row = 6, italic = TRUE) %>%
+  kable_styling(font_size = 8) %>%
+  footnote(symbol = "The density of the nicothoids in the gills is calculated to calculated the average count of total larval nicothoids present in all twelve gills.") %>%
+  save_kable(file = "gill_density_all.png", 
+             zoom = 3)
+
+table_all
+
+
+```
+
+
+# 11. Timeseries continued
 
 ## a) Low Infestation
 
