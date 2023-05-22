@@ -3923,11 +3923,11 @@ brown_males <- brown_all %>%
   filter(sex == "male") 
 
 #calculate the mean density of the nicos in the gills of red males
-brown_males_mean_density <- mean(red_males$total_nicos_gill)
+brown_males_mean_density <- mean(brown_males$total_nicos_gill)
 brown_males_mean_density
 
 #calculate standard deviation of the mean density
-brown_males_mean_density_gills_sd <- sd(red_males$total_nicos_gill)
+brown_males_mean_density_gills_sd <- sd(brown_males$total_nicos_gill)
 brown_males_mean_density_gills_sd
 
 ```
