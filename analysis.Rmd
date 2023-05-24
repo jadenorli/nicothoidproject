@@ -1094,9 +1094,22 @@ nico_egg_timeseries <- ggplot(data = timeseries_avg,
 
 #plot the number of total nicos over time per 1000 host eggs
 total_nicos_timeseries <- ggplot(data = timeseries_avg, 
-       aes(x = day, y = avg_prop_total_nicos)) +
+       aes(x = day, y = (avg_prop_total_nicos + avg_prop_nico_eggs))) +
   geom_point(color =  totals) +
   theme_gray() +
+  ylab("Total Nicos per One Thousand Host Eggs") +
+  xlab("Development Day") + 
+  ggtitle("Total Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8)) 
+
+#plot the number of total nicos over time per 1000 host eggs with abline
+total_nicos_timeseries_abline <- ggplot(data = timeseries_avg, 
+       aes(x = day, y = (avg_prop_total_nicos + avg_prop_nico_eggs))) +
+  geom_point(color =  totals) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
   ylab("Total Nicos per One Thousand Host Eggs") +
   xlab("Development Day") + 
   ggtitle("Total Nicos") +
@@ -1112,6 +1125,10 @@ all_timeseries_day <- ggarrange(adult_timeseries, juvenile_timeseries, total_nic
 #add a title for the figure 
 annotate_figure(all_timeseries_day,
                top = text_grob("Timeseries by Development Day", color = "black", face = "bold", size = 14))
+
+
+#look at the total nicos with a regression line alone
+total_nicos_timeseries_abline
 
 ```
 
