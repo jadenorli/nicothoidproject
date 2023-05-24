@@ -510,6 +510,7 @@ timeseries <- egg_mortality_day %>%
   mutate(scaled_total_nicos = prop_total_nicos_alone*1000000) %>%
   mutate(scaled_nico_eggs = prop_nico_eggs_alone*1000000) %>%
   mutate(scaled_viable_eggs = prop_viable_eggs*1000000) %>%
+  mutate(scaled_nonviable_eggs = prop_nonviable_eggs*1000000) %>%
   as_tibble()
 
 ##create a dataframe with the averages from the above dataframe 
@@ -530,7 +531,13 @@ timeseries_avg <- timeseries %>%
             min_prop_total_nicos = min(prop_total_nicos_alone),
             avg_prop_nico_eggs = mean(prop_nico_eggs_alone),
             max_prop_nico_eggs = max(prop_nico_eggs_alone),
-            min_prop_nico_eggs = min(prop_nico_eggs_alone)) %>%
+            min_prop_nico_eggs = min(prop_nico_eggs_alone),
+            avg_prop_viable_eggs = mean(prop_viable_eggs),
+            max_prop_viable_eggs = max(prop_viable_eggs),
+            min_prop_viable_eggs = min(prop_viable_eggs),
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
+            max_prop_nonviable_eggs = max(prop_nonviable_eggs),
+            min_prop_nonviable_eggs = min(prop_nonviable_eggs)) %>%
   mutate(scaled_adults = avg_prop_adults*1000000) %>%
   mutate(max_scaled_adults = max_prop_adults*1000000) %>%
   mutate(min_scaled_adults = min_prop_adults*1000000) %>%
@@ -542,7 +549,13 @@ timeseries_avg <- timeseries %>%
   mutate(min_scaled_total_nicos = min_prop_total_nicos*1000000) %>%
   mutate(scaled_nico_eggs = avg_prop_nico_eggs*1000000) %>%
   mutate(max_scaled_nico_eggs = max_prop_nico_eggs*1000000) %>%
-  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>%
+  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>% 
+  mutate(scaled_prop_viable_eggs = avg_prop_viable_eggs*1000000) %>%
+  mutate(max_scaled_prop_viable_eggs = max_prop_viable_eggs*1000000) %>%
+  mutate(min_scaled_prop_viable_eggs = min_prop_viable_eggs*1000000) %>% 
+  mutate(scaled_prop_nonviable_eggs = avg_prop_nonviable_eggs*1000000) %>%
+  mutate(max_scaled_prop_nonviable_eggs = max_prop_nonviable_eggs*1000000) %>%
+  mutate(min_scaled_prop_nonviable_eggs = min_prop_nonviable_eggs*1000000) %>%
   as_tibble()
   
 #select the highly infested crabs only from the timeseries dataframe 
@@ -563,7 +576,13 @@ high_timeseries_avg <- high_timeseries %>%
             min_prop_total_nicos = min(prop_total_nicos_alone),
             avg_prop_nico_eggs = mean(prop_nico_eggs_alone),
             max_prop_nico_eggs = max(prop_nico_eggs_alone),
-            min_prop_nico_eggs = min(prop_nico_eggs_alone)) %>%
+            min_prop_nico_eggs = min(prop_nico_eggs_alone),
+            avg_prop_viable_eggs = mean(prop_viable_eggs),
+            max_prop_viable_eggs = max(prop_viable_eggs),
+            min_prop_viable_eggs = min(prop_viable_eggs),
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
+            max_prop_nonviable_eggs = max(prop_nonviable_eggs),
+            min_prop_nonviable_eggs = min(prop_nonviable_eggs)) %>%
   mutate(scaled_adults = avg_prop_adults*1000000) %>%
   mutate(max_scaled_adults = max_prop_adults*1000000) %>%
   mutate(min_scaled_adults = min_prop_adults*1000000) %>%
@@ -575,7 +594,13 @@ high_timeseries_avg <- high_timeseries %>%
   mutate(min_scaled_total_nicos = min_prop_total_nicos*1000000) %>%
   mutate(scaled_nico_eggs = avg_prop_nico_eggs*1000000) %>%
   mutate(max_scaled_nico_eggs = max_prop_nico_eggs*1000000) %>%
-  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>%
+  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000)  %>% 
+  mutate(scaled_prop_viable_eggs = avg_prop_viable_eggs*1000000) %>%
+  mutate(max_scaled_prop_viable_eggs = max_prop_viable_eggs*1000000) %>%
+  mutate(min_scaled_prop_viable_eggs = min_prop_viable_eggs*1000000) %>%
+  mutate(scaled_prop_nonviable_eggs = avg_prop_nonviable_eggs*1000000) %>%
+  mutate(max_scaled_prop_nonviable_eggs = max_prop_nonviable_eggs*1000000) %>%
+  mutate(min_scaled_prop_nonviable_eggs = min_prop_nonviable_eggs*1000000) %>%
   as_tibble()
 
 #select the loww infested crabs only from the timeseries dataframe 
@@ -603,7 +628,13 @@ low_timeseries_avg <- low_timeseries %>%
             min_prop_total_nicos = min(prop_total_nicos_alone),
             avg_prop_nico_eggs = mean(prop_nico_eggs_alone),
             max_prop_nico_eggs = max(prop_nico_eggs_alone),
-            min_prop_nico_eggs = min(prop_nico_eggs_alone)) %>%
+            min_prop_nico_eggs = min(prop_nico_eggs_alone),
+            avg_prop_viable_eggs = mean(prop_viable_eggs),
+            max_prop_viable_eggs = max(prop_viable_eggs),
+            min_prop_viable_eggs = min(prop_viable_eggs),
+            avg_prop_nonviable_eggs = mean(prop_nonviable_eggs),
+            max_prop_nonviable_eggs = max(prop_nonviable_eggs),
+            min_prop_nonviable_eggs = min(prop_nonviable_eggs)) %>%
   mutate(scaled_adults = avg_prop_adults*1000000) %>%
   mutate(max_scaled_adults = max_prop_adults*1000000) %>%
   mutate(min_scaled_adults = min_prop_adults*1000000) %>%
@@ -615,7 +646,13 @@ low_timeseries_avg <- low_timeseries %>%
   mutate(min_scaled_total_nicos = min_prop_total_nicos*1000000) %>%
   mutate(scaled_nico_eggs = avg_prop_nico_eggs*1000000) %>%
   mutate(max_scaled_nico_eggs = max_prop_nico_eggs*1000000) %>%
-  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>%
+  mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>% 
+  mutate(scaled_prop_viable_eggs = avg_prop_viable_eggs*1000000) %>%
+  mutate(max_scaled_prop_viable_eggs = max_prop_viable_eggs*1000000) %>%
+  mutate(min_scaled_prop_viable_eggs = min_prop_viable_eggs*1000000) %>%
+  mutate(scaled_prop_nonviable_eggs = avg_prop_nonviable_eggs*1000000) %>%
+  mutate(max_scaled_prop_nonviable_eggs = max_prop_nonviable_eggs*1000000) %>%
+  mutate(min_scaled_prop_nonviable_eggs = min_prop_nonviable_eggs*1000000) %>%
   as_tibble()
 
 #group the data by crab ID for the egg mortality day dataframe 
@@ -2356,6 +2393,53 @@ ggarrange(adult_plot_trans, juvenile_plot_trans, total_plot_trans, nico_egg_plot
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
 
+
+```
+
+
+
+
+
+#### v) Ratios 
+```{r}
+#plot the data for the dataframe with the averages as groups
+ratio_viable_eggs <- ggplot(data = timeseries_avg, 
+       aes(x = day, y = (avg_prop_nico_eggs/avg_prop_viable_eggs))) +
+  geom_point(color = adults) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Ratio of Nicothoid Eggs to Viable Host Eggs") +
+  xlab("Development Day") + 
+  #ggtitle("Egg Mortality Across Development Days") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+ratio_viable_eggs
+
+#high infestation with ratios
+ratio_viable_eggs_high <- ggplot(data = high_timeseries_avg, 
+       aes(x = day, y = (avg_prop_nico_eggs/avg_prop_viable_eggs))) +
+  geom_point(color = high) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Ratio of Nicothoid Eggs to Viable Host Eggs") +
+  xlab("Development Day") + 
+  #ggtitle("Egg Mortality Across Development Days") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+ratio_viable_eggs_high
+
+#low infestation with ratios
+ratio_viable_eggs_low <- ggplot(data = low_timeseries_avg, 
+       aes(x = day, y = (avg_prop_nico_eggs/avg_prop_viable_eggs))) +
+  geom_point(color = high) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Ratio of Nicothoid Eggs to Viable Host Eggs") +
+  xlab("Development Day") + 
+  #ggtitle("Egg Mortality Across Development Days") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+ratio_viable_eggs_low
 
 ```
 
@@ -4834,23 +4918,4 @@ annotate_figure(all_timeseries_low_high_eds,
 ```
 
 
-
-# 12. Viable Eggs vs. Life Stages
-
-## a) Viable Eggs vs. Adults
-```{r}
-#plot the data for the dataframe with the averages as groups
-adults_viable_eggs <- ggplot(data = timeseries, 
-       aes(x = scaled_viable_eggs, y = scaled_adult_nicos)) +
-  geom_point(color= crab_eggs) +
-  theme_gray() +
-  geom_smooth(method = lm, level = 0.95, color = "black") +
-  ylab("Aadult Nicothoids") +
-  xlab("Proportion Viable Crab Eggs (per One Million Eggs)") + 
-  #ggtitle("Egg Mortality Across Development Days") +
-  theme(plot.title = element_text(hjust = 0.5)) 
-
-adults_viable_eggs
-
-```
 
