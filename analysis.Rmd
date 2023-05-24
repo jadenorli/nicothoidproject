@@ -509,6 +509,7 @@ timeseries <- egg_mortality_day %>%
   mutate(scaled_juveniles = prop_juveniles_alone*1000000) %>%
   mutate(scaled_total_nicos = prop_total_nicos_alone*1000000) %>%
   mutate(scaled_nico_eggs = prop_nico_eggs_alone*1000000) %>%
+  mutate(scaled_viable_eggs = prop_viable_eggs*1000000) %>%
   as_tibble()
 
 ##create a dataframe with the averages from the above dataframe 
@@ -4831,3 +4832,25 @@ annotate_figure(all_timeseries_low_high_eds,
                top = text_grob("Timeseries by Egg Development Stage", color = "black", face = "bold", size = 14))
 
 ```
+
+
+
+# 12. Viable Eggs vs. Life Stages
+
+## a) Viable Eggs vs. Adults
+```{r}
+#plot the data for the dataframe with the averages as groups
+adults_viable_eggs <- ggplot(data = timeseries, 
+       aes(x = scaled_viable_eggs, y = scaled_adult_nicos)) +
+  geom_point(color= crab_eggs) +
+  theme_gray() +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  ylab("Aadult Nicothoids") +
+  xlab("Proportion Viable Crab Eggs (per One Million Eggs)") + 
+  #ggtitle("Egg Mortality Across Development Days") +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+adults_viable_eggs
+
+```
+
