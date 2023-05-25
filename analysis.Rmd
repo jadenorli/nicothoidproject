@@ -2249,7 +2249,7 @@ eds_nico_eggs
 ```{r}
 #plot the number of adult nicos against the total number of viable eggs
 adult_plot <- ggplot(data = egg_mortality, 
-       aes( y = prop_viable_eggs, x = number_adult_nicos)) +
+       aes( y = asin(sqrt(prop_viable_eggs)), x = number_adult_nicos)) +
   geom_point(data = egg_mortality, 
              aes(color = color)) + 
   scale_color_manual(labels = c("D-F", "G-I", "J-L"),
@@ -2269,7 +2269,7 @@ adult_plot <- ggplot(data = egg_mortality,
 
 #plot the number of juvenile nicos against the total number of viable eggs 
 juvenile_plot <- ggplot(data = egg_mortality, 
-       aes(y = prop_viable_eggs, x = number_juvenile_nicos)) +
+       aes(y = asin(sqrt(prop_viable_eggs)), x = number_juvenile_nicos)) +
   geom_point(data = egg_mortality, 
              aes(color = color)) + 
   scale_color_manual(labels = c("D-F", "G-I", "J-L"),
@@ -2288,7 +2288,7 @@ juvenile_plot <- ggplot(data = egg_mortality,
 
 #plot the number of total number of nicos against the total number of viable eggs
 total_plot <- ggplot(data = egg_mortality, 
-       aes( y = prop_viable_eggs, x = total_nicos)) +
+       aes( y = asin(sqrt(prop_viable_eggs)), x = total_nicos)) +
   geom_point(data = egg_mortality, 
              aes(color = color)) + 
   scale_color_manual(labels = c("D-F", "G-I", "J-L"),
@@ -2308,7 +2308,7 @@ total_plot <- ggplot(data = egg_mortality,
 
 #plot the number of nico eggs against the total number of viable eggs
 nico_egg_plot <- ggplot(data = egg_mortality, 
-       aes(y = prop_viable_eggs, x = number_nico_eggs)) +
+       aes(y = asin(sqrt(prop_viable_eggs)), x = number_nico_eggs)) +
   geom_point(data = egg_mortality, 
              aes(color = color)) + 
   scale_color_manual(labels = c("D-F", "G-I", "J-L"),
@@ -3573,8 +3573,8 @@ freqdist_adults_new
 #create a generalized linear model to evaluate the relationship between viable eggs and number of adult nicos
 
 ##poisson 
-glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos + (1|crab_id), 
-                   data = egg_mortality, 
+glm.adults.poisson <- glmer(prop_viable_eggs ~ prop_adults_alone + (1|crab_id), 
+                   data = timeseries, 
                    family = "poisson")
 
 ##negative binomial 
@@ -3584,25 +3584,25 @@ glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos + (1|cr
 #create a generalized linear model to evaluate the relationship between viable eggs and number of juvenile nicos
 
 ##poisson 
-glm.juveniles.poisson <- glmer(number_viable_crab_eggs ~ number_juvenile_nicos + (1|crab_id), 
-                   data = egg_mortality, 
+glm.juveniles.poisson <- glmer(prop_viable_eggs ~ prop_juveniles_alone + (1|crab_id), 
+                   data = timeseries, 
                    family = "poisson")
 
 ##negative binomial 
-glm.juveniles.nb <- glmer.nb(number_viable_crab_eggs ~ number_juvenile_nicos + (1|crab_id), 
-                   data = egg_mortality)
+glm.juveniles.nb <- glmer.nb(prop_viable_eggs ~ prop_juveniles_alone + (1|crab_id), 
+                   data = timeseries)
  
 
 #create a generalized linear model to evaluate the relationship between viable eggs and number of nicos eggs
 
 ##poisson 
-glm.nicoeggs.poisson <- glmer(number_viable_crab_eggs ~ number_nico_eggs + (1|crab_id), 
-                   data = egg_mortality, 
+glm.nicoeggs.poisson <- glmer(prop_viable_eggs ~ prop_nico_eggs_alone + (1|crab_id), 
+                   data = timeseries, 
                    family = "poisson")
 
 ##negative binomial 
-glm.nicoeggs.nb <- glmer.nb(number_viable_crab_eggs ~ number_nico_eggs + (1|crab_id), 
-                   data = egg_mortality)
+glm.nicoeggs.nb <- glmer.nb(prop_viable_eggs ~ prop_nico_eggs_alone + (1|crab_id), 
+                   data = timeseries)
 
 #evaluate with interactions of all of the states
 
@@ -3620,9 +3620,19 @@ glm.nicoeggs.nb <- glmer.nb(number_viable_crab_eggs ~ number_nico_eggs + (1|crab
 
 ### b) Generalized Linear Models Development Day (ignore)
 ```{r}
-glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos + (1|eds), 
-                   data = egg_mortality_day, 
+glm.adults.poisson_prop <- glmer(prop_viable_eggs ~ prop_total_nicos_alone + prop_nico_eggs_alone + (1|crab_id), 
+                   data = timeseries, 
                    family = "poisson")
+
+summary(glm.adults.poisson_prop)
+
+glm.adults.poisson <- glmer(number_viable_crab_eggs ~ total_nicos + (1|crab_id), 
+                   data = timeseries, 
+                   family = "poisson")
+
+summary(glm.adults.poisson)
+
+
 ```
 
 
