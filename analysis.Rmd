@@ -3626,7 +3626,7 @@ glm.adults.poisson_prop <- glmer(prop_viable_eggs ~ prop_total_nicos_alone + pro
 
 summary(glm.adults.poisson_prop)
 
-glm.adults.poisson <- glmer(number_viable_crab_eggs ~ total_nicos + (1|crab_id), 
+glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos*number_juvenile_nicos*eds + (1|crab_id), 
                    data = timeseries, 
                    family = "poisson")
 
