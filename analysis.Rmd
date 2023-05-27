@@ -17,6 +17,7 @@ library(kableExtra)
 library(rcompanion)
 library(magrittr)
 library(magick)
+library(patchwork)
 source("my_functions.R")
 setup_libs()
 
@@ -2238,7 +2239,56 @@ eds_nico_eggs
 ```
 
 
+### v) Combined Life Stage Plot 
 
+#### - by day 
+```{r}
+#plot the number of total nicos over time per one million host eggs
+timeseries_all <- ggplot(data = timeseries_avg) +
+  geom_point(data = timeseries_avg,
+            aes(x = day, y = avg_prop_adults), color = adults) +
+  geom_point(data = timeseries_avg,
+            aes(x = day, y = avg_prop_juveniles/10), color = juveniles) +
+  geom_point(data = timeseries_avg,
+            aes(x = day, y = avg_prop_nico_eggs/10), color = "pink") +
+  scale_y_continuous(name = "Adult Abundance", 
+                     sec.axis = sec_axis(~ . *10, name = "Larvae and Nico Egg Abundance")) +
+  theme_gray() +
+  xlab("Development Day") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+timeseries_all
+
+
+```
+
+
+#### - by eds 
+```{r}
+#plot the number of total nicos over time per one million host eggs
+timeseries_all_eds <- ggplot(data = timeseries_avg_eds) +
+  geom_point(data = timeseries_avg_eds,
+            aes(x = eds, y = avg_prop_adults), color = adults) +
+  geom_point(data = timeseries_avg_eds,
+            aes(x = eds, y = avg_prop_juveniles/10), color = juveniles) +
+  geom_point(data = timeseries_avg_eds,
+            aes(x = eds, y = avg_prop_nico_eggs/10), color = "pink") +
+  scale_y_continuous(name = "Adult Abundance", 
+                     sec.axis = sec_axis(~ . *10, name = "Larvae and Nico Egg Abundance")) +
+  theme_gray() +
+  xlab("Development Day") + 
+  #ggtitle(label = "Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10))
+
+timeseries_all_eds
+
+
+```
 
 
 # 3. Counts Visualization
@@ -3620,14 +3670,19 @@ glm.nicoeggs.nb <- glmer.nb(prop_viable_eggs ~ prop_nico_eggs_alone + (1|crab_id
 
 ### b) Generalized Linear Models Development Day (ignore)
 ```{r}
-glm.adults.poisson_prop <- glmer(prop_viable_eggs ~ prop_total_nicos_alone + prop_nico_eggs_alone + (1|crab_id), 
-                   data = timeseries, 
+#subset the data to be modeled with 
+model <- timeseries %>%
+  select(c(2,4,8,12:14,17,19,24))
+
+#start playing with some model combinations
+glm.adults.poisson_prop <- glmer(prop_viable_eggs ~ prop_total_nicos_alone*eds + (1|crab_id), 
+                   data = model, 
                    family = "poisson")
 
 summary(glm.adults.poisson_prop)
 
-glm.adults.poisson <- glmer(number_viable_crab_eggs ~ number_adult_nicos*number_juvenile_nicos*eds + (1|crab_id), 
-                   data = timeseries, 
+glm.adults.poisson <- glmer(number_viable_crab_eggs ~ total_nicos*eds + (1|crab_id), 
+                   data = model, 
                    family = "poisson")
 
 summary(glm.adults.poisson)
@@ -5227,4 +5282,21 @@ annotate_figure(all_timeseries_low_high_eds,
 ```
 
 
+## d) Nicos per Nonviable Eggs 
+
+```{r}
+#plot the prop of nonviable eggs per total nicos
+predation <- ggplot() +
+  geom_point(data = low_timeseries_avg, 
+       aes(x = day, y = (avg_prop_nonviable_eggs/avg_prop_total_nicos)), color = low) +
+  geom_point(data = high_timeseries_avg, 
+       aes(x = day, y = (avg_prop_nonviable_eggs/avg_prop_total_nicos)), color = high) +
+  theme_gray() +
+  ylab("Nonviable Crab Eggs per Total Nicothoids") +
+  xlab("Development Day") + 
+  theme()
+
+predation
+
+```
 
