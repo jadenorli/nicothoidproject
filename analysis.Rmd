@@ -5300,3 +5300,20 @@ predation
 
 ```
 
+
+
+## e) Descriptive Stats
+```{r}
+#calculate the minimum and maximum counts from the egg mortality data alone
+##calculate the minimum from samples proportions scaled to 1000 host eggs
+min_total_nicos <- min(timeseries$prop_total_nicos)
+min_total_nicos
+
+##calculate the maximum from samples proportions scaled to 1000 host eggs
+max_total_nicos <- max(timeseries$prop_total_nicos)
+max_total_nicos
+
+#calculate the mean number of adults from all the data 
+
+```
+
