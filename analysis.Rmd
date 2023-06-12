@@ -5729,16 +5729,16 @@ sd_nico_eggs
 ```{r}
 #calculate the minimum, maximum, mean, and sd from the combined data
 ##adults
-min_adults <- min(adult_summary_new$adults_sample)
+min_adults <- min(adult_summary_new$nicos_per_egg_sample)
 min_adults
 
-max_adults <- max(adult_summary_new$adults_sample)
+max_adults <- max(adult_summary_new$nicos_per_egg_sample)
 max_adults
 
-mean_adults <- mean(adult_summary_new$adults_sample)
+mean_adults <- mean(adult_summary_new$nicos_per_egg_sample)
 mean_adults
 
-sd_adults <- sd(adult_summary_new$adults_sample)
+sd_adults <- sd(adult_summary_new$nicos_per_egg_sample)
 sd_adults
 
 
