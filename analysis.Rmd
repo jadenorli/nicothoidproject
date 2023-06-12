@@ -322,9 +322,10 @@ adult_summary_new <- adult_counts_new %>%
             mean_nicos_per_count = mean(adult_nicos),
             observations = n(), 
             eggs_searched = sum(crab_eggs),
-            adults_scaled = sum(scaled_prop_adult_nicos),
-            adults_sample = sum(prop_adult_nicos_sample)) %>% 
+            adults_scaled_sum = sum(scaled_prop_adult_nicos),
+            adults_sample_sum = sum(prop_adult_nicos_sample)) %>%
   mutate(nicos_per_egg = total_nicos/eggs_searched) %>% 
+  mutate(nicos_per_egg_sample = nicos_per_egg*1000) %>% 
   mutate(nicos_extrapolated_1mil = nicos_per_egg*1000000) %>%
   as_tibble()
   
@@ -5663,44 +5664,87 @@ predation
 
 
 ## e) Descriptive Stats
+
+### i) Total Nicos
 ```{r}
-#calculate the minimum and maximum counts from the egg mortality data alone
+#calculate the minimum, maximum, mean, and sd from the egg mortality data alone
 ##total nicos
 min_total_nicos <- min(crab_id$total_nicos_sample)
 min_total_nicos
 
-
 max_total_nicos <- max(crab_id$total_nicos_sample)
 max_total_nicos
 
+mean_total_nicos <- mean(crab_id$total_nicos_sample)
+mean_total_nicos
 
+sd_total_nicos <- sd(crab_id$total_nicos_sample)
+sd_total_nicos
+
+```
+
+### ii) Juveniles
+```{r}
+#calculate the minimum, maximum, mean, and sd from the egg mortality data alone
 ##juveniles
 min_juveniles <- min(crab_id$juveniles_sample)
 min_juveniles
 
-
 max_juveniles <- max(crab_id$juveniles_sample)
 max_juveniles
 
+mean_juveniles <- mean(crab_id$juveniles_sample)
+mean_juveniles
+
+sd_juveniles <- sd(crab_id$juveniles_sample)
+sd_juveniles
+
+
+```
+
+
+
+### iii) Nico Eggs
+```{r}
+#calculate the minimum, maximum, mean, and sd from the egg mortality data alone
 ##nico eggs
 min_nico_eggs <- min(crab_id$nico_eggs_sample)
 min_nico_eggs
 
-
 max_nico_eggs <- max(crab_id$nico_eggs_sample)
 max_nico_eggs
 
-#calculate the minimum and maximum counts from the combined data
+mean_nico_eggs <- mean(crab_id$nico_eggs_sample)
+mean_nico_eggs
+
+sd_nico_eggs <- sd(crab_id$nico_eggs_sample)
+sd_nico_eggs
+
+```
+
+
+
+
+### iv) Adults
+```{r}
+#calculate the minimum, maximum, mean, and sd from the combined data
 ##adults
 min_adults <- min(adult_summary_new$adults_sample)
 min_adults
 
-
 max_adults <- max(adult_summary_new$adults_sample)
 max_adults
 
+mean_adults <- mean(adult_summary_new$adults_sample)
+mean_adults
+
+sd_adults <- sd(adult_summary_new$adults_sample)
+sd_adults
+
 
 ```
+
+
 
 
 # Publication Figures
