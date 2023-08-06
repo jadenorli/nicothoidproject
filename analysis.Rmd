@@ -324,6 +324,9 @@ adult_summary_new <- adult_counts_new %>%
             eggs_searched = sum(crab_eggs),
             adults_scaled_sum = sum(scaled_prop_adult_nicos),
             adults_sample_sum = sum(prop_adult_nicos_sample)) %>%
+  mutate(adults_per_egg = adults_sample_sum/eggs_searched) %>% 
+  mutate(adults_per_egg_sample = adults_per_egg*1000) %>% 
+  mutate(adults_extrapolated_1mil = adults_per_egg*1000000) %>%
   mutate(nicos_per_egg = total_nicos/eggs_searched) %>% 
   mutate(nicos_per_egg_sample = nicos_per_egg*1000) %>% 
   mutate(nicos_extrapolated_1mil = nicos_per_egg*1000000) %>%
@@ -429,6 +432,29 @@ nico_egg_all_group <- nico_egg_all_new %>%
 
 
 #### iv) Random Dataframes
+
+##### - egg mortality prop dataframe
+```{r}
+#create a dataframe with the proportions of adults in a sample and scaled
+egg_mort <- egg_mortality_day %>%
+  mutate(prop_adult_nicos = number_adult_nicos/number_viable_crab_eggs) %>%
+  mutate(scaled_prop_adult_nicos = prop_adult_nicos*1000000) %>%
+  mutate(prop_adult_nicos_sample = prop_adult_nicos*1000) 
+
+
+high_crabs <- high_crab_id %>%
+  mutate(prop_adult_nicos = number_adult_nicos/number_viable_crab_eggs) %>%
+  mutate(scaled_prop_adult_nicos = prop_adult_nicos*1000000) %>%
+  mutate(prop_adult_nicos_sample = prop_adult_nicos*1000) 
+
+
+low_crabs <- low_crab_id %>%
+  mutate(prop_adult_nicos = number_adult_nicos/number_viable_crab_eggs) %>%
+  mutate(scaled_prop_adult_nicos = prop_adult_nicos*1000000) %>%
+  mutate(prop_adult_nicos_sample = prop_adult_nicos*1000) 
+  
+```
+
 
 
 ##### - egg mortality eds dataframe 
@@ -835,6 +861,7 @@ totals_per_crab_id <- egg_mortality_day %>%
   mutate(juveniles_scaled = juveniles_per_egg*1000000) %>%
   mutate(total_nicos_scaled = total_nicos_per_egg*1000000) %>%
   mutate(nico_eggs_scaled = nico_eggs_per_egg*1000000) %>%
+  mutate(adults_per_1000 = adults_per_egg*1000) %>%
   as_tibble()
 
 #scale up the number of each life stage per each day from the egg mortality data 
@@ -1156,7 +1183,7 @@ eggs_mort_day_vis
 #plot the data for the longer dataframe with the averages as groups with an abline
 eggs_mort_vis_low_abline <- ggplot(data = eggs_mort_day_avg_low, 
        aes(x = day, y = avg_prop_viable_eggs)) +
-  geom_point(color = crab_eggs) +
+  geom_point(color = "red3") +
   theme_gray() +
   geom_smooth(method = lm, level = 0.95, color = "black") +
   ylab("Average Proportion Viable Crab Eggs") +
@@ -1171,16 +1198,16 @@ eggs_mort_vis_low_abline
 
 #plot the data for the longer dataframe with the averages as groups wihtout an abline
 eggs_mort_vis_low <- ggplot(data = eggs_mort_day_avg_low, 
-       aes(x = day, y = avg_prop_viable_eggs)) +
-  geom_point(color = crab_eggs) + 
+       aes(x = day, y = (avg_prop_viable_eggs*100))) +
+  geom_point(color = "red3") + 
   theme_gray() +
-  ylab("Average Proportion Viable Crab Eggs") +
+  ylab("Average Percent Viable Crab Eggs") +
   xlab("Development Day") + 
   ggtitle(label = "Average Egg Mortality Across Development Day",
           subtitle = "Low Infestation Crabs") +
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5)) +
-  scale_y_continuous(limits = c(0, 1))
+  scale_y_continuous(limits = c(0, 100))
 
 #plot the graph
 eggs_mort_vis_low
@@ -1193,7 +1220,7 @@ eggs_mort_vis_low
 #plot the data for the longer dataframe with the averages as groups with an abline
 eggs_mort_vis_high_abline <- ggplot(data = eggs_mort_day_avg_high, 
        aes(x = day, y = avg_prop_viable_eggs)) +
-  geom_point(color = crab_eggs) +
+  geom_point(color = "red3") +
   theme_gray() +
   geom_smooth(method = lm, level = 0.95, color = "black") +
   ylab("Average Proportion Viable Crab Eggs") +
@@ -1208,16 +1235,16 @@ eggs_mort_vis_high_abline
 
 #plot the data for the longer dataframe with the averages as groups without an abline
 eggs_mort_vis_high <- ggplot(data = eggs_mort_day_avg_high, 
-       aes(x = day, y = avg_prop_viable_eggs)) +
-  geom_point(color = crab_eggs) +
+       aes(x = day, y = (avg_prop_viable_eggs*100))) +
+  geom_point(color = "red3") +
   theme_gray() +
-  ylab("Average Proportion Viable Crab Eggs") +
+  ylab("Average Precent Viable Crab Eggs") +
   xlab("Development Day") + 
   ggtitle(label = "Average Egg Mortality Across Development Day",
           subtitle = "High Infestation Crabs") +
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5)) +
-  scale_y_continuous(limits = c(0, 1))
+  scale_y_continuous(limits = c(0, 100))
 
 #plot the graph
 eggs_mort_vis_high
@@ -2655,15 +2682,192 @@ timeseries_nico_eggs_final_sd_test
 ```
 
 
-# 3. Counts Visualization
+# 3. Adult Counts Visualization
+
+
+## - random visualizations 
+```{r}
+#plot the number of adult nicos against the total number of viable eggs
+adult_plot_test_low <- ggplot(data = egg_mort, 
+       aes(y = prop_viable_eggs, x = prop_adult_nicos)) +
+  geom_point(data = egg_mort, 
+             aes(color = color)) + 
+  scale_color_manual(labels = c("D-F", "G-I", "J-L"),
+                     values = c("darkgoldenrod1" = "darkgoldenrod1",
+                               "coral2" = "coral2",
+                               "brown4" = "brown4")) +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        legend.position = "none") +
+  guides(color = guide_legend("EDS")) + 
+  xlim(c(0,0.1))
+
+adult_plot_test_low
+
+
+#plot the number of adult nicos against the total number of viable eggs
+adult_plot_test_high <- ggplot(data = egg_mort, 
+       aes(y = prop_viable_eggs, x = prop_adult_nicos_sample)) +
+  geom_point(data = egg_mort, 
+             aes(color = color)) + 
+  scale_color_manual(labels = c("D-F", "G-I", "J-L"),
+                     values = c("darkgoldenrod1" = "darkgoldenrod1",
+                               "coral2" = "coral2",
+                               "brown4" = "brown4")) +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        legend.position = "none") +
+  guides(color = guide_legend("EDS")) + 
+  xlim(c(100, 2000))
+
+adult_plot_test_high
+
+
+#plot the number of adult nicos against the total number of viable eggs
+low_adult_test <- ggplot(data = low_crabs, 
+       aes(y = prop_viable_eggs, x = prop_adult_nicos_sample)) +
+  geom_point(data = low_crabs, 
+             aes(color = color)) + 
+  scale_color_manual(labels = c("D-F", "G-I", "J-L"),
+                     values = c("darkgoldenrod1" = "darkgoldenrod1",
+                               "coral2" = "coral2",
+                               "brown4" = "brown4")) +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        legend.position = "none") +
+  guides(color = guide_legend("EDS")) 
+
+low_adult_test
+
+#plot the number of adult nicos against the total number of viable eggs
+high_adult_test <- ggplot(data = high_crabs, 
+       aes(y = prop_viable_eggs, x = prop_adult_nicos_sample)) +
+  geom_point(data = high_crabs, 
+             aes(color = color)) + 
+  scale_color_manual(labels = c("D-F", "G-I", "J-L"),
+                     values = c("darkgoldenrod1" = "darkgoldenrod1",
+                               "coral2" = "coral2",
+                               "brown4" = "brown4")) +
+  #geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicos") +
+  ylab("Proportion of Viable Crab Eggs") + 
+  ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        legend.position = "none") +
+  guides(color = guide_legend("EDS")) 
+
+high_adult_test
+
+
+```
+
+
+## - two plots
+```{r}
+#plot the prop of viable eggs over time overlayed with the prop of adult nicos over time 
+```
+
 
 ## a) Normal Counts
+
+#### - Plot for Presentation 
+```{r}
+#plot the number of adult nicos against the total number of viable eggs
+adult_plot_esa <- ggplot(data = egg_mortality, 
+       aes(y = (prop_viable_eggs*100), x = number_adult_nicos)) +
+  geom_point(data = egg_mortality, color = adults) +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Adult Nicothoids") +
+  ylab("Percent of Viable Crab Eggs") + 
+  ggtitle("Adult Nicothoids") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        legend.position = "none") + 
+  ylim(c(0,100))
+
+#plot the number of juvenile nicos against the total number of viable eggs 
+juvenile_plot_esa <- ggplot(data = egg_mortality, 
+       aes(y = (prop_viable_eggs*100), x = number_juvenile_nicos)) +
+  geom_point(data = egg_mortality, color = juveniles) +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Larval Nicothoids") +
+  ylab("Percent of Viable Crab Eggs") + 
+  ggtitle("Larval Nicothoids") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        legend.position = "none") + 
+  ylim(c(0,100))
+
+#plot the number of total number of nicos against the total number of viable eggs
+total_plot_esa <- ggplot(data = egg_mortality, 
+       aes( y = (prop_viable_eggs*100), x = total_nicos)) +
+  geom_point(data = egg_mortality, color = totals) +
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Total Number of Nicothoids (Larvae/Adults)") +
+  ylab("Percent of Viable Crab Eggs") + 
+  ggtitle("Total Nicothoids") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        legend.position = "none") + 
+  ylim(c(0,100))
+
+
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_esa <- ggplot(data = egg_mortality, 
+       aes(y = (prop_viable_eggs*100), x = number_nico_eggs)) +
+  geom_point(data = egg_mortality, color = "orangered4") + 
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Nicothoid Eggs") +
+  ylab("Percent of Viable Crab Eggs") + 
+  ggtitle("Nicothoid Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 6),
+        axis.title.x = element_text(size = 8),
+        legend.position = "none") + 
+  ylim(c(0,100))
+  
+#add the plots together
+esa <- ggarrange(adult_plot_esa, juvenile_plot_esa, total_plot_esa, nico_egg_plot_esa,
+                           labels = c("a)", "b)", "c)", "d)"),
+                           ncol = 2, nrow = 2)
+esa
+
+```
+
 
 #### i) Plot the Counts
 ```{r}
 #plot the number of adult nicos against the total number of viable eggs
 adult_plot <- ggplot(data = egg_mortality, 
-       aes( y = asin(sqrt(prop_viable_eggs)), x = number_adult_nicos)) +
+       aes(y = asin(sqrt(prop_viable_eggs)), x = number_adult_nicos)) +
   geom_point(data = egg_mortality, 
              aes(color = color)) + 
   scale_color_manual(labels = c("D-F", "G-I", "J-L"),
@@ -3849,6 +4053,25 @@ freqdist_eggs_adults <- gghistogram(data = totals_per_crab_id,
 
 freqdist_eggs_adults
 
+
+#use Freedman Diaconis rule to determine optimal binwidth:
+bw_eggs_adults_esa<- 2*IQR(crab_id$adults_per_1000)/length(crab_id$adults_per_1000)^(1/3)
+
+#create a histogram of the distribution of adults (averaged per totals)
+freqdist_eggs_adults_esa <- gghistogram(data = totals_per_crab_id, 
+                              x = "adults_per_1000", 
+                              fill = adults,
+                              binwidth = bw_eggs_adults_esa)+
+  ylab("Frequency of Crabs") +
+  xlab("Average Count of Adult Nicothoids per One Thousand Crab Eggs") + 
+  #ggtitle("Adult Nicos") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(expand = c(0,0)) +
+  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  theme_classic()
+
+freqdist_eggs_adults_esa
+
 ```
 
 
@@ -3957,21 +4180,21 @@ freqdist_adults_old
 #### ii) New Autoinfection Data
 ```{r a nice freq dist histogram}
 #use Freedman Diaconis rule to determine optimal binwidth:
-bw_new <-2 *IQR(adult_summary_new$nicos_extrapolated_1mil)/length(adult_summary_new$nicos_extrapolated_1mil)^(1/3)
+bw_new <-2 *IQR(adult_summary_new$nicos_per_egg_sample)/length(adult_summary_new$nicos_per_egg_sample)^(1/3)
 
 #create a histogram of the frequency distribution of the all the adult nicos found in a crab
 freqdist_adults_new <- gghistogram(data = adult_summary_new, 
-                              x = "nicos_extrapolated_1mil", 
+                              x = "nicos_per_egg_sample", 
                               fill = "#D7301F",
                               binwidth = bw_new)+
   ylab("Frequency of Crabs") +
-  xlab("Mean Count of Adult Nicothoids per One Million Crab Eggs") + 
+  xlab("Mean Count of Adult Nicothoids per One Thousand Crab Eggs") + 
   #ggtitle("Adult Nicos") +
   theme(plot.title = element_text(hjust = 0.5))+
   scale_y_continuous(expand = c(0,0), 
                      limits = c(0,12)) +
-  xlim(0, 40001) +
-  #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
+  xlim(0, 40) +
+  geom_vline(aes(xintercept = 30),color = "red", linewidth = 1)+
   theme_classic()
 
 #save the output as as png
@@ -4113,6 +4336,8 @@ mean_nico_egg_density_sd <- sd(egg_mortality_density$density_nico_eggs)
 mean_nico_egg_density_sd
 
 ```
+
+
 #### ii) Mean Density (adults with all datasets)
 ```{r}
 #create a column in the autoinfection data with the density of adult nicos
