@@ -2853,12 +2853,30 @@ nico_egg_plot_esa <- ggplot(data = egg_mortality,
         axis.title.x = element_text(size = 8),
         legend.position = "none") + 
   ylim(c(0,100))
-  
+
+
+#plot the number of nico eggs against the total number of viable eggs
+nico_egg_plot_esa_2 <- ggplot(data = egg_mortality, 
+       aes(y = (prop_viable_eggs*100), x = number_nico_eggs)) +
+  geom_point(data = egg_mortality, color = "orangered4") + 
+  geom_smooth(method = lm, level = 0.95, color = "black") +
+  theme_gray() +
+  xlab("Number of Nicothoid Eggs") +
+  ylab("Percent of Viable Crab Eggs") + 
+  ggtitle("Nicothoid Eggs") +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_text(size = 10),
+        legend.position = "none") + 
+  ylim(c(0,100))
+
 #add the plots together
 esa <- ggarrange(adult_plot_esa, juvenile_plot_esa, total_plot_esa, nico_egg_plot_esa,
                            labels = c("a)", "b)", "c)", "d)"),
                            ncol = 2, nrow = 2)
 esa
+
+nico_egg_plot_esa_2
 
 ```
 
