@@ -4203,7 +4203,7 @@ bw_new <-2 *IQR(adult_summary_new$nicos_per_egg_sample)/length(adult_summary_new
 #create a histogram of the frequency distribution of the all the adult nicos found in a crab
 freqdist_adults_new <- gghistogram(data = adult_summary_new, 
                               x = "nicos_per_egg_sample", 
-                              fill = "#D7301F",
+                              fill = "red4",
                               binwidth = bw_new)+
   ylab("Frequency of Crabs") +
   xlab("Mean Count of Adult Nicothoids per One Thousand Crab Eggs") + 
