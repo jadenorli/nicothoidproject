@@ -332,8 +332,19 @@ adult_summary_new <- adult_counts_new %>%
   mutate(nicos_extrapolated_1mil = nicos_per_egg*1000000) %>%
   as_tibble()
   
+#subset the adult_summary_new into low and high infestations
+high_summary <- adult_summary_new %>%
+  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-051", "ANT-GAV-052", "ANT-GAV-053", "ANT-GAV-060"))
+  
+low_summary <- adult_summary_new %>%
+  filter(!crab_id == "ANT-GAV-034") %>%
+  filter(!crab_id == "ANT-GAV-037") %>%
+  filter(!crab_id == "ANT-GAV-045") %>%
+  filter(!crab_id == "ANT-GAV-051") %>%
+  filter(!crab_id == "ANT-GAV-052") %>%
+  filter(!crab_id == "ANT-GAV-053") %>%
+  filter(!crab_id == "ANT-GAV-060")
 
-              
 
 #create a dataframe with the average number, max number, and min number of adults per day per one million host eggs
 adult_all_avg_new_day <- adult_all_new %>%
