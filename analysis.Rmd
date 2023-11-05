@@ -8,6 +8,9 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+#install.packages("devtools")
+devtools::install_github("r-lib/conflicted")
+
 library(RColorBrewer)
 library(caret)
 library(ggpubr)
@@ -6173,6 +6176,24 @@ freqdist_eggs_total_nicos <- gghistogram(data = totals_per_crab_id,
 ggsave("freqdist_eggs_total_nicos.png", freqdist_eggs_total_nicos, device = "png")
 
 freqdist_eggs_total_nicos
+
+```
+
+
+# 12. Map of Nicos
+
+```{r}
+# create data for world coordinates using  
+# map_data() function 
+world_coordinates <- map_data("world") 
+
+# create world map using ggplot() function 
+ggplot() + 
+  geom_map( 
+    data = world_coordinates, map = world_coordinates, 
+    aes(long, lat, map_id = region) 
+  )
+
 
 ```
 

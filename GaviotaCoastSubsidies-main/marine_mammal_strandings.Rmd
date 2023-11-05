@@ -1,0 +1,293 @@
+---
+title: "marinemammalstrandings"
+author: "Zoe Zilz"
+date: "6/29/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("janitor")
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(scales)
+library(stringr)
+```
+
+# Summary of Marine Mammal Stranding Data from 1983-2020
+
+
+### Importing Data
+Want to keep all rows with mammals that are DOA (not "alive"), spatial info, date, locality + detail, left/euthanized/died at site?,
+```{r data wrangling}
+mammals20 <- read_csv("MMstranding_2006_2020.csv") %>%
+  clean_names() %>% 
+  select(common_name, city, locality_detail, observation_date, how_observed, observation_status, date_of_examination, condition_at_examination, left_at_site, euthanized_at_site, died_at_site, relocated, condition_comments, sex, age_class, whole_carcass, partial_carcass, length, length_units, weight, weight_units, carcass_left_at_site, carcass_buried, carcass_other, carcass_other_description, additional_remarks) # we want these cols
+  #filter(observation_status != "Alive"| euthanized_at_site == "Y" | died_at_site == "Y")  # only keep dead stuff
+
+dates <- mdy(mammals20$observation_date) #make sure dates are dates
+
+years <- year(dates)
+
+mammals20 <- mammals20 %>% 
+  mutate(year_stranded = years)
+
+############################################### up to 2005 data #####################################  
+
+mammals05 <- read_csv("MMstranding_1983_2005.csv") %>% 
+  clean_names() %>%  #makes col headers easier to work with -- no spaces
+  select(common_name, date_of_occurance, city, location_details, type_of_occurance, initial_condition, sex, age, length, length_units, weight, weight_units, final_disposition_remarks) %>% 
+  rename(observation_date = date_of_occurance, 
+         locality_detail = location_details,
+         observation_status = initial_condition,
+         age_class = age,
+         additional_remarks = final_disposition_remarks)
+  #filter(observation_status != "ALIVE") # do this after combo
+
+dates05 <- mdy(mammals05$observation_date) #make sure dates are dates
+
+years05 <- year(dates05)
+
+mammals05 <- mammals05 %>% 
+  mutate(year_stranded = years05)
+
+############################################# COMBINING THEM ######################################
+
+combo20 <- mammals20 %>% 
+  select(common_name, observation_date, city, locality_detail, observation_status, sex, age_class, length, length_units, weight, weight_units, additional_remarks, year_stranded, carcass_left_at_site)
+
+combo05 <- mammals05 %>% 
+  select(common_name, observation_date, city, locality_detail, observation_status, sex, age_class, length, length_units, weight, weight_units, additional_remarks, year_stranded) %>% 
+  mutate(carcass_left_at_site = NA)
+
+live_mammals <- rbind(combo20, combo05) %>%   # need to tidy this up so all of the species names are the same
+  mutate(sex2 = case_when(
+    sex == "MALE" ~ "M",
+    sex == "FEMALE" ~ "F",
+    sex == "UNKNOWN" ~ "U",
+    TRUE ~ as.character(sex)
+  )) %>% 
+  mutate(sex2 = replace_na(sex2, "UNKNOWN")) %>%
+  mutate(age_class2 = case_when(
+    age_class == "PUP"|age_class == "CALF" ~ "PUP/CALF",
+    TRUE ~ as.character(age_class)
+  )) %>% 
+  mutate(age_class2 = replace_na(age_class2, "UNKNOWN")) %>% # is this the only way to get rid of NAs?
+  mutate(common_name2 = case_when(
+    common_name == "Cetacean, unidentified" ~ "UNIDENTIFIED CETACEAN",
+    common_name == "Dolphin, bottlenose" ~"BOTTLENOSE DOLPHIN"  ,
+    common_name == "Dolphin, common, long-beaked" ~ "LONG BEAKED COMMON DOLPHIN" ,
+    common_name == "Dolphin, Risso's" ~ "RISSO'S DOLPHIN" ,
+    common_name == "Dolphin, northern right whale" ~ "NORTHERN RIGHT WHALE",
+    common_name == "Dolphin, striped" ~ "STRIPED DOLPHIN" ,
+    common_name == "Dolphin, common, short-beaked" ~ "SHORT BEAKED COMMON DOLPHIN" ,
+    common_name == "SHORT-BEAKED COMMON DOLPHIN" ~ "SHORT BEAKED COMMON DOLPHIN" ,
+    common_name == "LONG-BEAKED COMMON DOLPHIN" ~ "LONG BEAKED COMMON DOLPHIN" ,
+    common_name == "COMMON DOLPHIN" ~ "UNIDENTIFIED COMMON DOLPHIN" ,
+    common_name == "Dolphin, Pacific white-sided" ~"PACIFIC WHITE-SIDED DOLPHIN" ,
+    common_name == "Dolphin, unidentified" ~ "UNIDENTIFIED DOLPHIN",
+    common_name == "Marine mammal, unidentified" ~ "UNIDENTIFIED",
+    common_name == "Otter, sea" ~ "SEA OTTER",
+    common_name == "pinniped, unidentified"
+    |common_name =="Pinniped, unidentified"
+    |common_name =="unidentified pinniped"
+    |common_name == "Seal, unidentified"  ~ "UNIDENTIFIED PINNIPED",
+    common_name == "Porpoise, Dall's" ~"DALL'S PORPOISE"   ,
+    common_name == "Porpoise, harbor" ~ "HARBOR PORPOISE"  ,
+    common_name == "Porpoise, unidentified phocoenidae" ~ "UNIDENTIFIED PORPOISE",
+    common_name == "Sea lion, California"  ~ "CALIFORNIA SEA LION" ,
+    common_name == "Sea lion, Steller" ~ "STELLAR SEA LION",
+    common_name == "Sea lion, unidentified" ~ "UNIDENTIFIED SEA LION",
+    common_name == "Seal, Northern fur" ~ "NORTHERN FUR SEAL"  ,
+    common_name == "Seal, Guadalupe fur"~ "GUADALUPE FUR SEAL",
+    common_name == "Seal, northern elephant"  ~"NORTHERN ELEPHANT SEAL"  ,
+    common_name == "Seal, harbor" ~ "HARBOR SEAL"   ,
+    common_name == "Whale, sperm" ~ "SPERM WHALE" ,
+    common_name == "Whale, blue" ~ "BLUE WHALE",
+    common_name == "Whale, minke" ~ "MINKE WHALE",
+    common_name == "Whale, fin"  ~ "FIN WHALE"  ,
+    common_name == "Whale, Cuvier's beaked" ~ "CUVIER'S BEAKED WHALE"  ,
+    common_name == "Whale, unidentified beaked"
+    |common_name == "Whale, unidentified baleen"  ~ "UNIDENTIFIED WHALE",
+    common_name == "Whale, gray"  ~"GRAY WHALE"  ,
+    common_name == "Whale, humpback" ~ "HUMPBACK WHALE",
+    common_name == "Whale, pygmy sperm" ~ "PYGMY SPERM WHALE" ,
+    common_name == "Whale, dwarf sperm" ~ "DWARF SPERM WHALE",
+    TRUE ~ as.character(common_name)  # weird syntax for "otherwise, do nothing"
+  ))
+
+mammals <- live_mammals %>% 
+  filter(observation_status != "ALIVE") #ugh, i'll just have to eliminate the died or euthanized on site, they were all likely removed anyway?
+```
+
+##How many mammals stranded per year?
+```{r yearly strandings}
+yearly_strandings <- as.data.frame(table(mammals$year_stranded)) %>% 
+  #pivot_wider() %>% # not sure if this is necessary?
+  rename(year = Var1,
+         total_dead = Freq) # new name = old name syntax
+
+barp <- ggplot(yearly_strandings)+
+  geom_col(aes(x = year, y = total_dead, fill = I("dodgerblue4")))+ # geom col represents values
+  scale_x_discrete(breaks = pretty_breaks())+
+  ylab("Marine Mammal Carcasses Count")+
+  xlab("Year")+
+  geom_vline(aes(xintercept = 2005, colour = I("red")))+ # add line for 2005 when data collection method changed
+  theme_classic()
+
+png("annual_mm_count.png", height = 300, width = 450, units = "px")
+barp
+dev.off()
+
+mean_yrly_dead <- mean(yearly_strandings$total_dead)
+sd_yrly_dead <- sd(yearly_strandings$total_dead)
+```
+
+
+##What is the biomass of marine mammal carcasses?
+- lots of blanks for weight, so we need to fill those in with means
+- different mean for each size class
+- general mean if size class is also unknown
+
+###We want to know how much is washed ashore.
+```{r wrangling weight data}
+# first have to convert all the lb weights into kilograms
+convert_pounds <- 0.453592
+# if weight units is lbs, multiply weight by convert_pounds; otherwise, do nothing
+live_mammals$weight_kg <- live_mammals$weight * ifelse(live_mammals$weight_units=="lb",convert_pounds,1)
+
+# we can apparently also calculate weight from this length relationship?
+
+# now that everything is in kg, we can get mean weights for pup/calf, pup, calf, yearling, subadult, adult
+# we have more data on weights if we use the live + dead dataset
+mean_weights <- live_mammals %>% 
+  group_by(common_name2, age_class2, sex2) %>% 
+  summarise(
+    mean_wt = mean(weight_kg, na.rm=TRUE), 
+    sd = sd(weight_kg, na.rm=TRUE),
+    n = n())
+
+
+
+#write_csv(mean_weights, "marinemammalweights.csv") # there are so many unknows I just need to export and manually fill in from the internet, only doing this once
+
+```
+
+Need to do some extrapolation to fill in blanks...
+https://stackoverflow.com/questions/38687674/replace-na-with-mean-based-on-row-subset-matching-another-column
+^ not helpful becayse I need to manyally fill in some
+```{r extrapolating biomass to unknowns based on averages}
+meanweights <- read_csv("marinemammalweights.csv") %>% 
+  mutate(id = paste(common_name2, age_class2, sex2, sep = "_")) # create matchable ID
+
+biomass <- mammals %>% 
+  mutate(common_name2 = case_when(common_name2 == "UNIDENTIFIED CETACEAN" ~ "UNIDENTIFIED WHALE",
+                                  common_name2 == "unidentified mysticete" ~ "UNIDENTIFIED WHALE",
+                                   TRUE ~ as.character(common_name2))) %>%  # had to remove this redundant bit ebcause there is no matching "cetacean" in averages df
+  mutate(sex2 = case_when(sex2 == "UNKNOWN" ~ "U",
+                                   TRUE ~ as.character(sex2))) %>% 
+  mutate(id = paste(common_name2, age_class2, sex2, sep = "_"))  # create matchable ID
+
+biomass$weight_kg <- biomass$weight * ifelse(biomass$weight_units=="lb",convert_pounds,1) # add weight in kg
+
+#trying with data_table
+setDT(biomass)
+setDT(meanweights)
+
+biomass[is.na(weight_kg), # in biomass, if weight_kg = NA, then:
+        weight_kg := meanweights # edit rows in weight_kg with values from meanweights
+        [.SD, # but only rows in the .SD(subset data, so rows w/NAs)
+          on=.(id), #and only if they match on the id column (which can be multiple columns)
+          x.mean_wt]] #replace with values from meanweights$mean_wt (x. means in previously stated datasex)
+# syntax:
+# DF[i, j] = biomass[if this, do this]
+# in j, .SD refers to the subset of data created by if-filtering done in i
+# when there is a := in j, this modifies columns in the datatable
+# using .SD to look up rows in meanweights on id and fetching values in column mean_wt, and modifying rows in biomass using :=
+# https://stackoverflow.com/questions/50010196/replacing-na-values-from-another-dataframe-by-id
+# https://stackoverflow.com/questions/49984172/comparing-values-in-multiple-columns-in-r-dataframes-updating-missing-values/49984344#49984344
+
+# checking everything filled in:
+# leave out na.rm = TRUE so that it throws an NA if tehre is *even one* NA
+checkcheck <- biomass %>% 
+  group_by(id) %>% 
+  summarise(kg = sum(weight_kg))
+
+```
+
+What is the yearly input?
+```{r mammal dead biomss graph}
+# get sum of biomass per year
+annual_biomass_bysp <- biomass %>% 
+  group_by(year_stranded, common_name2) %>% 
+  summarise(kg = sum(weight_kg))
+
+annual_biomass <- biomass %>% 
+  group_by(year_stranded) %>% 
+  summarise(kg = sum(weight_kg))
+
+# without whales
+annual_nowhales <- biomass %>% 
+  filter(!str_detect(common_name2, 'WHALE'))%>%  #stringr detect
+  group_by(year_stranded) %>% 
+  summarise(kg = sum(weight_kg))
+
+# just for visualization
+#ggplot(annual_biomass)+
+#  #geom_line(aes(x = year_stranded, y = kg, colour = common_name2))+ # by species -- horrible mess it turns out
+#  geom_line(aes(x = year_stranded, y = kg))+ # sum total
+#  geom_line(data = annual_nowhales, aes(x = year_stranded, y = kg, colour = I("dodgerblue4")))+
+#  scale_y_continuous(breaks = pretty_breaks())+ # force integers on y axis
+#  ylab("Kilograms of Dead Marine Mammal Biomass")+
+#  xlab("Year")+
+#  theme_classic()
+
+nowhales <- ggplot(annual_biomass)+
+  geom_line(data = annual_nowhales, aes(x = year_stranded, y = kg, colour = I("dodgerblue4")))+
+  scale_y_continuous(breaks = pretty_breaks())+ # force integers on y axis
+  ylab("Biomass (kg)")+
+  xlab("Year")+
+  geom_vline(aes(xintercept = 2005, colour = I("red")))+ # add line for 2005 when data collection method changed
+  theme_classic()
+
+total <- ggplot(annual_biomass)+
+  #geom_line(aes(x = year_stranded, y = kg, colour = common_name2))+ # by species -- horrible mess it turns out
+  geom_line(aes(x = year_stranded, y = kg, colour = I("dodgerblue4")))+ # sum total
+  scale_y_continuous(breaks = pretty_breaks())+ # force integers on y axis
+  ylab("Biomass (kg)")+
+  xlab("Year")+
+  geom_vline(aes(xintercept = 2005, colour = I("red")))+ # add line for 2005 when data collection method changed
+  theme_classic()
+
+png("annual_mm_biomass.png", height = 300, width = 450, units = "px")
+total
+dev.off()
+
+png("annual_mm_biomass_nowhales.png", height = 300, width = 450, units = "px")
+nowhales
+dev.off()
+```
+
+###And how much is left to be eaten.
+```{r biomass}
+carcasses <- biomass %>% 
+  filter(carcass_left_at_site == "Y")%>%  #only keep if carcass stayed on beach 
+  group_by(year_stranded) %>% 
+  summarise(kg = sum(weight_kg))
+
+carcass <- ggplot(carcasses)+
+  geom_line(aes(x = year_stranded, y = kg, colour = I("dodgerblue4")))+ # sum total
+  scale_y_continuous(breaks = pretty_breaks())+ # force integers on y axis
+  scale_x_continuous(breaks = seq(2006, 2020, by = 1))+
+  ylab("Biomass (kg)")+
+  xlab("Year")+
+  theme_classic()
+
+png("annual_carcass_biomass.png", height = 300, width = 450, units = "px")
+carcass
+dev.off()
+
+mean_carcass_biomass <- mean(carcasses$kg)
+```
+

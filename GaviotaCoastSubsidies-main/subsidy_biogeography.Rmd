@@ -1,0 +1,216 @@
+---
+title: "Global Biogeography of Subsidies"
+author: "Zoe Zilz"
+date: "6/15/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Goals
+To visualize where on the planet marine to terrestrial subsidies are important or at least studied
+
+To create the following figure(s):
+1. Global map of where resource subsidy studies have been carried out
+2. brown for terrestrial movement, blue for marine to terrestrial movement
+3. red circle around?? for mediterranean, or we can color med zones differently
+
+```{r packages}
+# necessary packages
+library(tidyverse)
+install.packages("ggmap")
+library(ggmap)
+library(stringr)
+#install.packages("maps")
+library(maps)
+install.packages("rnaturalearth")
+library(rnaturalearth)
+install.packages("rgeos")
+library(rgeos)
+library(sp)
+install.packages("plotly")
+library(plotly)
+library(processx)
+library(janitor)
+```
+
+```{r tidying data}
+
+# note when pulling in new versions of the csv that I had to manually go into excel and make sure that when a paper was associated with multiple rows, identical data was filled out for each (undergrad left these blank instead)
+
+global <- read_csv("global_subsidies.csv") %>% # pull in csv 
+  clean_names() %>%   #snake case
+  rename(ecotone = ecotone_ecosystem_boundary,
+         mediterranean = mediterannean_yes) %>%
+  filter(empirical_data == "Yes", #only pick rows where studies had empirical data
+         ecotone != "Lab setting",
+         ecotone != "n/a") %>%  # get rid of these bois
+  mutate(mediterranean = case_when(mediterranean == "Y" ~ "Yes",
+            mediterranean == "N"                    # this is the syntax for "rename values in this column this way"... although there might be a simpler way
+            | mediterranean== "n/a" 
+            | mediterranean=="LABORATORY" ~ "No",
+            TRUE ~ as.character(mediterranean))) %>%  # catch all to not throw out things that don't match the above
+  separate(lat_lon, # need to find a way to split lat lon into two columns
+           c("lat","lon"), # names of new columns
+           "," # character to separate by
+           ) %>% 
+  mutate(lat=as.numeric(lat)) %>% 
+  mutate(lon=as.numeric(lon))
+
+class(global$lon) #whyyyy is it character
+
+
+
+```
+We want to write up some summary tables for the global data. Our questions are:
+1. what percent of global subsidy studies focused on land to sea subsidies?
+2. what percent focused on mediterannean areas?
+3. what percent of mediterannean studies were land to sea subsidies?
+```{r summary stats}
+summary <- with(global, table(ecotone, mediterranean))
+
+med_count <- as.data.frame(table(global$mediterranean)) %>% # give me the frequency of Yes/No in the mediterranean col
+  #pivot_wider() %>% # not sure if this is necessary?
+  rename(Med = Var1,
+         Count = Freq)
+29/294
+# ~ 10%
+
+marine_count <- as.data.frame(table(global$ecotone)) %>% # give me the frequency of ecotones in data
+  #pivot_wider() %>% # not sure if this is necessary?
+  rename(Ecotone = Var1,
+         Count = Freq)
+
+# percent of subsidy literature focusing on marine > terrestrial
+155/327
+#[1] 0.4740061
+
+medit <- global %>% 
+  filter(mediterranean == "Yes")
+
+med_marine_count <- as.data.frame(table(medit$ecotone)) %>% # give me the frequency of ecotones in data
+  rename(Ecotone = Var1,
+         Count = Freq)
+
+16/29
+# 55%
+
+medmarinecount_fig <- ggplot(med_marine_count) +
+  geom_col(aes(x = Ecotone, y = Count, fill = I("dodgerblue4")))+ #i'm not sure why in the syntax I is required but I'd liek to figure it out // this color matches caption color
+  ylab("Number of Studies")+
+  xlab("Donor and Recipient Ecosystems")+
+  theme_classic()+
+  theme(axis.text.y=element_text(size = 16),
+        axis.text.x = element_text(size = 15),
+        axis.title = element_text(size = 24),
+        axis.title.x = element_text(margin = margin(t = 15, r = 10, b = 10, l = 1))) #margin = margin() increases distance around the axis label
+
+png(filename = "med_marine_count_fig.png",
+    width = 850, height = 500, units = "px")
+medmarinecount_fig
+dev.off()
+  
+```
+
+Now we want to create the map
+- to color the countries in we have to join our dataframe with the dataframe that creates the data for world, which sounds unwieldy and I dont want to: https://stackoverflow.com/questions/63858603/color-only-specific-countries-based-on-values-in-a-different-data-frame
+
+https://www.jessesadler.com/post/geocoding-with-r/
+```{r map}
+pal <- c("greenyellow",
+         "limegreen",
+         "green4",
+         "turquoise1",
+         "turquoise4",
+         "blue",
+         "tan",
+         "tan1",
+         "tan4"
+        )
+# getting map with ggmap
+
+world <- map_data("world")
+biogeo<- ggplot(world, aes(x=long, y=lat))+
+  geom_polygon(aes(group = group))+
+  geom_point(shape = 1, size = 3, stroke = 1.5, aes(y = lat, x = lon, colour = ecotone), data = global)+
+  scale_colour_manual(values = pal, name = "Donor and Recipient Ecosystem")+
+  theme_void()+
+  theme(
+    panel.background = element_rect(fill='transparent'), #transparent panel bg
+    plot.background = element_rect(fill='transparent', color=NA), #transparent plot bg
+    legend.background = element_rect(fill='transparent'), #transparent legend bg
+    legend.box.background = element_rect(fill='transparent') #transparent legend panel
+  )
+
+png("global_biogeo_map.png", width = 1200, height = 600, units = "px", bg = "transparent")
+biogeo
+dev.off()
+```
+
+
+```{r plotly map}
+######################################
+#ALL OF THE BELOW WAS A WASTE OF TIME#
+######################################
+### plotly version for problem solving
+m <- list(colorbar = list(title = "Donor and Recipient Ecosystem")) #something i dont know how to yse but changes legend title?
+# i still don't know where this goes in the below code
+
+#geostyling
+geo <- list(
+  scope = 'globe',
+  showland = TRUE,
+  landcolor = toRGB("gray92"),
+  showsubunits = TRUE,
+  showcountries = TRUE,
+  countrycolor = toRGB("white"),
+  resolution = 50,
+  #projection = list(
+  #  type = 'conic conformal',
+  #  rotation = list(lon = -100) # this makes the map conical and we don't like that
+  #),
+  lonaxis = list(
+    #showgrid = TRUE, # i don't lie the way the grid looks
+    gridwidth = 0.5, #put a lat lon grid on there
+    #range = c(-140, -55),
+    dtick = 20
+  ),
+  lataxis = list(
+    #showgrid = TRUE,
+    gridwidth = 0.5, #this makes the lines themselves fatter
+    #range = c(20, 60),
+    dtick = 20
+)) # dont know what any of this does, i wish plotly would ANNOTATE THEIR CODE
+
+# make a special color palette
+
+
+interactive <- plot_geo(global, lat = ~lat, lon = ~lon, color = ~ecotone, colors = pal) %>% 
+  add_markers(
+    text = ~paste(global$paper_title), hoverinfo = "text"
+  ) %>% 
+  layout(geo = geo)  # forces geostyling layout we set earler
+
+orca(interactive, "subsidy_biogeo_map.png")#best way to export to static, requires package processx
+
+#ggplot(global)+
+  #geom_point(aes(x= lat, y = lon, colour = mediterannean))
+
+# alternatively, getting map with rnaturalearth and shapefiles (but makes plotting geom point harder because the coordinates are not in decimal format I think?)
+#world <- ne_countries(returnclass = 'sf')
+
+#ggplot(world) +
+#  geom_sf(fill = 'coral') +
+#  geom_point(data = global, aes(x= lat, y = lon, colour = mediterannean))
+#  theme_void()
+```
+#What kind of subsidies exist in Mediterranean climate zones?
+Now we want to summarize subsidy data for Mediterannean climate zones. What types of subsidies are common? Who benefits from them?
+
+```{r}
+medit <- global %>% 
+  filter(mediterannean == "Yes")
+```
+
