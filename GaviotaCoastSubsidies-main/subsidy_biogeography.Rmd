@@ -20,17 +20,17 @@ To create the following figure(s):
 ```{r packages}
 # necessary packages
 library(tidyverse)
-install.packages("ggmap")
+#install.packages("ggmap")
 library(ggmap)
 library(stringr)
 #install.packages("maps")
 library(maps)
-install.packages("rnaturalearth")
+#install.packages("rnaturalearth")
 library(rnaturalearth)
-install.packages("rgeos")
-library(rgeos)
+#install.packages("rgeos")
+#library(rgeos)
 library(sp)
-install.packages("plotly")
+#install.packages("plotly")
 library(plotly)
 library(processx)
 library(janitor)
@@ -147,6 +147,7 @@ biogeo<- ggplot(world, aes(x=long, y=lat))+
 png("global_biogeo_map.png", width = 1200, height = 600, units = "px", bg = "transparent")
 biogeo
 dev.off()
+View(world)
 ```
 
 

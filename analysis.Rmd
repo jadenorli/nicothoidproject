@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("devtools")
 devtools::install_github("r-lib/conflicted")
 
+library(tidyverse)
+library(janitor)
 library(RColorBrewer)
 library(caret)
 library(ggpubr)
@@ -135,6 +137,10 @@ new_autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_ne
 #read in the metadata
 metadata <- read_csv("NicothoidProjectAnalysis/RawData/metadata.csv") %>%
   clean_names()
+
+#read in the distribution data
+distribution <- read_csv("NicothoidProjectAnalysis/RawData/choniosphaera_prevelance.csv") %>% 
+  clean_names() 
 
 ```
 
@@ -6183,16 +6189,26 @@ freqdist_eggs_total_nicos
 # 12. Map of Nicos
 
 ```{r}
-# create data for world coordinates using  
-# map_data() function 
-world_coordinates <- map_data("world") 
+#create a dataframe with the coordinates of the world map
+world <- map_data("world") %>%
+  subset(region != "Antarctica")
 
-# create world map using ggplot() function 
-ggplot() + 
-  geom_map( 
-    data = world_coordinates, map = world_coordinates, 
-    aes(long, lat, map_id = region) 
-  )
+#choose which countries to keep in the dataframe
+countries <- world %>%
+  subset(region %in% c("Canada", "USA", "Australia", "Vietnam", "France", "Germany", "India"))
+
+#map the distribution of choniosphaera species
+distribution_map <- ggplot() +
+  geom_map(data = world, map = world, 
+                    aes(y = lat, x = long, map_id = region), fill = "white", color = "black") + 
+  geom_map(data = countries, map = countries, 
+                    aes(y = lat, x = long, map_id = region), fill = publication, color = "black") +
+  geom_point(data = distribution,
+             shape = 1, size = 3, stroke = 1.5, 
+             aes(y = latitude, x = longitude, color = nico_species)) +
+  theme(legend.position="none") 
+
+distribution_map
 
 
 ```
