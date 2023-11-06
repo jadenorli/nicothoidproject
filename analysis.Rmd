@@ -6186,8 +6186,9 @@ freqdist_eggs_total_nicos
 ```
 
 
-# 12. Map of Nicos
+# 12. Map of Choniosphaera 
 
+## World Distribution Map
 ```{r}
 #create a dataframe with the coordinates of the world map
 world <- map_data("world") %>%
@@ -6210,6 +6211,8 @@ distribution_map <- ggplot() +
 
 distribution_map
 
+#save the output as as png
+ggsave("distribution_map.png", distribution_map, device = "png")
 
 ```
 
