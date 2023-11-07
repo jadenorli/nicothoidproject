@@ -47,7 +47,7 @@ crab_eggs = "#EF6548"
 low = "#FC8D59"
 high = "#990000"
 publication = "azure3" 
-
+publication_2 = "lightcyan3"
 
 ```
 
@@ -141,7 +141,6 @@ metadata <- read_csv("NicothoidProjectAnalysis/RawData/metadata.csv") %>%
 #read in the distribution data
 distribution <- read_csv("NicothoidProjectAnalysis/RawData/choniosphaera_prevelance.csv") %>% 
   clean_names() 
-
 ```
 
 
@@ -6203,11 +6202,20 @@ distribution_map <- ggplot() +
   geom_map(data = world, map = world, 
                     aes(y = lat, x = long, map_id = region), fill = "white", color = "black") + 
   geom_map(data = countries, map = countries, 
-                    aes(y = lat, x = long, map_id = region), fill = publication, color = "black") +
+                    aes(y = lat, x = long, map_id = region), fill = publication_2, color = "black") +
   geom_point(data = distribution,
-             shape = 1, size = 3, stroke = 1.5, 
-             aes(y = latitude, x = longitude, color = nico_species)) +
-  theme(legend.position="none") 
+             shape = 20, size = 1, stroke = 1.5,
+             aes(y = latitude, x = longitude, color = nico_species)) + 
+  ylab("Latitude") + 
+  xlab("Longitude") +
+  theme(text = element_text(family = "Times New Roman"),
+        axis.title.x = element_text(colour = "black", face = "bold"),
+        axis.title.y = element_text(colour = "black", face = "bold"),
+        legend.position = "bottom",
+        legend.title = element_text(colour = "black", face = "italic"),
+        legend.text = element_text(color = "black", face = "italic")) +
+  labs(col = "Choniosphaera Species") +
+  scale_color_manual(values = c("chocolate4", "goldenrod2", "brown3", "darkorange1"))
 
 distribution_map
 
