@@ -6,10 +6,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+
 knitr::opts_chunk$set(echo = TRUE)
 
 #install.packages("devtools")
-devtools::install_github("r-lib/conflicted")
+#devtools::install_github("r-lib/conflicted")
 
 library(tidyverse)
 library(janitor)
@@ -27,6 +28,7 @@ source("my_functions.R")
 setup_libs()
 
 display.brewer.all(colorblindFriendly = TRUE)
+
 ```
 
 
@@ -59,7 +61,7 @@ publication_2 = "lightcyan3"
 #read in the latest of the egg mortality data 
 egg_mortality <- read_csv("NicothoidProjectAnalysis/RawData/eggmortalitydata2.csv") %>% 
   clean_names() %>%
-  select(!16:18) %>% 
+  dplyr::select(!16:18) %>% 
   filter(!is.na(pleopod_number)) %>%
   filter(!eds == "M") %>%
   filter(!experiment_id == "Mortality-034") %>%
@@ -74,7 +76,7 @@ egg_mortality <- read_csv("NicothoidProjectAnalysis/RawData/eggmortalitydata2.cs
 #read in the egg mortality data that has development days
 egg_mortality_day <- read_csv("NicothoidProjectAnalysis/RawData/eggmortality_day2.csv") %>% 
   clean_names() %>%
-  select(!17:19) %>% 
+  dplyr::select(!17:19) %>% 
   filter(!is.na(pleopod_number)) %>%
   filter(!is.na(day)) %>%
   filter(!eds == "M") %>%
@@ -100,8 +102,8 @@ dissections <- read_csv("NicothoidProjectAnalysis/RawData/all_dissections.csv") 
 #read in the autoinfection data for the first brood
 autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/first_broods_only.csv") %>% 
   clean_names() %>%
-  select(!11) %>%
-  select(!13:18) %>%
+  dplyr::select(!11) %>%
+  dplyr::select(!13:18) %>%
   filter(!experiment_id == "Autoinfection-055") %>%
   mutate_at(9, as.numeric) %>%
   filter(!total_number_of_eggs == 0) %>%
@@ -112,8 +114,8 @@ autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/first_broods_only.cs
                            eds %in% c("J", "K", "L", "M") ~ "brown4"))#read in the autoinfection data for all of the broods
 all_broods <- read_csv("NicothoidProjectAnalysis/RawData/all_broods.csv") %>% 
   clean_names() %>%
-  select(!11) %>%
-  select(!13:18) %>%
+  dplyr::select(!11) %>%
+  dplyr::select(!13:18) %>%
   filter(!experiment_id == "Autoinfection-055") %>%
   mutate_at(9, as.numeric) %>%
   filter(!total_number_of_eggs == 0)
@@ -121,8 +123,8 @@ all_broods <- read_csv("NicothoidProjectAnalysis/RawData/all_broods.csv") %>%
 #read in the newly cleaned autoinfection data 
 new_autoinfection <- read_csv("NicothoidProjectAnalysis/RawData/autoinfection_new_first.csv") %>% 
   clean_names() %>%
-  select(!12) %>%
-  select(!14:16) %>%
+  dplyr::select(!12) %>%
+  dplyr::select(!14:16) %>%
   rename(eds = egg_development_stage) %>%
   filter(!eds == "M") %>%
   mutate_at(9, as.numeric) %>%
@@ -141,6 +143,7 @@ metadata <- read_csv("NicothoidProjectAnalysis/RawData/metadata.csv") %>%
 #read in the distribution data
 distribution <- read_csv("NicothoidProjectAnalysis/RawData/choniosphaera_prevelance.csv") %>% 
   clean_names() 
+
 ```
 
 
@@ -150,12 +153,12 @@ distribution <- read_csv("NicothoidProjectAnalysis/RawData/choniosphaera_prevela
 ```{r}
 #make a dataframe with the old autoinfection data combined with the egg mortality day data
 adult_counts <- autoinfection %>% 
-  select(experiment_id, crab_id, date, eds, number_of_adult_copepods, number_of_nemerteans, total_number_of_eggs, number_of_copepod_eggs) %>% 
+  dplyr::select(experiment_id, crab_id, date, eds, number_of_adult_copepods, number_of_nemerteans, total_number_of_eggs, number_of_copepod_eggs) %>% 
   rename(number_adult_nicos =  number_of_adult_copepods,
          total_number_crab_eggs = total_number_of_eggs,
          number_nico_eggs = number_of_copepod_eggs) %>% 
   full_join(., egg_mortality_day) %>% 
-  select(experiment_id, crab_id, date, eds, number_adult_nicos, number_of_nemerteans, total_number_crab_eggs, number_nico_eggs) %>% 
+  dplyr::select(experiment_id, crab_id, date, eds, number_adult_nicos, number_of_nemerteans, total_number_crab_eggs, number_nico_eggs) %>% 
   rename(adult_nicos = number_adult_nicos,
          nemerteans = number_of_nemerteans, 
          crab_eggs = total_number_crab_eggs,
@@ -163,20 +166,20 @@ adult_counts <- autoinfection %>%
 
 #create the same dataframe as above but with the autoinfection data from all the broods
 adult_counts_all_broods <- all_broods %>% 
-  select(experiment_id, crab_id, date, egg_development_stage, number_of_adult_copepods, number_of_nemerteans, total_number_of_eggs, number_of_copepod_eggs) %>% 
+  dplyr::select(experiment_id, crab_id, date, egg_development_stage, number_of_adult_copepods, number_of_nemerteans, total_number_of_eggs, number_of_copepod_eggs) %>% 
   rename(eds = egg_development_stage, # to match other dataframes
          number_adult_nicos =  number_of_adult_copepods,
          total_number_crab_eggs = total_number_of_eggs,
          number_nico_eggs = number_of_copepod_eggs) %>% 
   full_join(., egg_mortality_day) %>% 
-  select(experiment_id, crab_id, date, eds, number_adult_nicos, number_of_nemerteans, total_number_crab_eggs, number_nico_eggs) %>% 
+  dplyr::select(experiment_id, crab_id, date, eds, number_adult_nicos, number_of_nemerteans, total_number_crab_eggs, number_nico_eggs) %>% 
   rename(adult_nicos = number_adult_nicos,
          nemerteans = number_of_nemerteans, 
          crab_eggs = total_number_crab_eggs,
          nico_eggs = number_nico_eggs)
 
 # want to make a summary table now with extrapolated count assuming 1 million eggs, total count of nicos, total number of crab eggs searched, number of observations on that crab, all per crab    
-adult_counts_summary <- adult_counts%>% 
+adult_counts_summary <- adult_counts %>% 
   group_by(crab_id) %>% 
   summarise(total_nicos = sum(adult_nicos),
             mean_nicos_per_count = mean(adult_nicos),
@@ -248,6 +251,36 @@ nico_egg_all_broods_avg <- nico_egg_all_broods %>%
 
 ##### - by eds
 ```{r}
+#make a dataframe with the old autoinfection data combined with the egg mortality day data
+adult_counts_new <- new_autoinfection %>% 
+  dplyr::select(experiment_id, crab_id, day, eds, number_of_adult_copepods, number_of_nemerteans, total_number_of_eggs, number_of_copepod_eggs) %>% 
+  rename(number_adult_nicos =  number_of_adult_copepods,
+         total_number_crab_eggs = total_number_of_eggs,
+         number_nico_eggs = number_of_copepod_eggs) %>% 
+  full_join(., egg_mortality_day) %>% 
+  dplyr::select(experiment_id, crab_id, day, eds, number_adult_nicos, number_of_nemerteans, total_number_crab_eggs, number_nico_eggs) %>% 
+  rename(adult_nicos = number_adult_nicos,
+         nemerteans = number_of_nemerteans, 
+         crab_eggs = total_number_crab_eggs,
+         nico_eggs = number_nico_eggs)
+
+# want to make a summary table now with extrapolated count assuming 1 million eggs, total count of nicos, total number of crab eggs searched, number of observations on that crab, all per crab    
+adult_counts_summary <- adult_counts_new %>% 
+  group_by(crab_id) %>% 
+  summarise(total_nicos = sum(adult_nicos),
+            mean_nicos_per_count = mean(adult_nicos),
+            observations = n(), 
+            eggs_searched = sum(crab_eggs)) %>% 
+  mutate(nicos_per_egg = total_nicos/eggs_searched) %>% 
+  mutate(nicos_extrapolated_1mil = nicos_per_egg*1000000)
+
+##autoinfection data from first broods and egg mortality
+#create a dataframe with the proportion of adult nicos 
+adult_all <- adult_counts_new %>%
+  mutate(prop_adults = (adult_nicos/crab_eggs))
+
+
+
 ##new autoinfection data from first broods and egg mortality
 #create a dataframe with the proportion of adult nicos 
 adult_all_new <- adult_counts_new %>%
@@ -309,12 +342,12 @@ nico_egg_all_avg_new <- nico_egg_all_new %>%
 ```{r}
 #make a dataframe with the new autoinfection data combined with the egg mortality day data
 adult_counts_new <- new_autoinfection %>% 
-  select(experiment_id, crab_id, day, eds, number_of_adult_copepods, number_of_nemerteans, total_number_of_eggs, number_of_copepod_eggs) %>% 
+  dplyr::select(experiment_id, crab_id, day, eds, number_of_adult_copepods, number_of_nemerteans, total_number_of_eggs, number_of_copepod_eggs) %>% 
   rename(number_adult_nicos =  number_of_adult_copepods,
          total_number_crab_eggs = total_number_of_eggs,
          number_nico_eggs = number_of_copepod_eggs) %>% 
   full_join(., egg_mortality_day) %>% 
-  select(experiment_id, crab_id, day, eds, number_adult_nicos, number_of_nemerteans, total_number_crab_eggs, number_nico_eggs) %>% 
+  dplyr::select(experiment_id, crab_id, day, eds, number_adult_nicos, number_of_nemerteans, total_number_crab_eggs, number_nico_eggs) %>% 
   rename(adult_nicos = number_adult_nicos,
          nemerteans = number_of_nemerteans, 
          crab_eggs = total_number_crab_eggs,
@@ -452,6 +485,19 @@ nico_egg_all_group <- nico_egg_all_new %>%
 
 #### iv) Random Dataframes
 
+## d) Test for High vs. Low 
+```{r}
+#high infestation crabs
+high_crab_id <- egg_mortality_day %>%
+  filter(number_adult_nicos >= 20 | number_juvenile_nicos >= 120)
+
+#low infestation crabs 
+low_crab_id <- egg_mortality_day %>%
+  filter(number_adult_nicos < 20) %>%
+  filter(number_juvenile_nicos < 120)
+  
+```
+
 ##### - egg mortality prop dataframe
 ```{r}
 #create a dataframe with the proportions of adults in a sample and scaled
@@ -529,6 +575,24 @@ eggs_mort_day_long <- eggs_mort_day_avg %>%
   pivot_longer(names_to = "averages",
                cols = c("avg_prop_viable_eggs", "avg_prop_nonviable_eggs"))
 
+#create a dataframe which has the proportion of the life stage per the number of crab eggs in the sample then times 1000 (scaled)
+timeseries <- egg_mortality_day %>%
+  mutate(prop_adults_sample = (number_adult_nicos/total_number_crab_eggs)*1000) %>%
+  mutate(prop_juveniles_sample = (number_juvenile_nicos/total_number_crab_eggs)*1000) %>%
+  mutate(prop_nico_eggs_sample = (number_nico_eggs/total_number_crab_eggs)*1000) %>%
+  mutate(prop_total_nicos_sample = (total_nicos/total_number_crab_eggs)*1000) %>%
+  mutate(prop_adults_alone = number_adult_nicos/total_number_crab_eggs) %>%
+  mutate(prop_juveniles_alone = number_juvenile_nicos/total_number_crab_eggs) %>%
+  mutate(prop_total_nicos_alone = total_nicos/total_number_crab_eggs) %>%
+  mutate(prop_nico_eggs_alone = number_nico_eggs/total_number_crab_eggs) %>%
+  mutate(scaled_adults = prop_adults_alone*1000000) %>%
+  mutate(scaled_juveniles = prop_juveniles_alone*1000000) %>%
+  mutate(scaled_total_nicos = prop_total_nicos_alone*1000000) %>%
+  mutate(scaled_nico_eggs = prop_nico_eggs_alone*1000000) %>%
+  mutate(scaled_viable_eggs = prop_viable_eggs*1000000) %>%
+  mutate(scaled_nonviable_eggs = prop_nonviable_eggs*1000000) %>%
+  as_tibble()
+
 #average the various life stages for all crabs
 timeseries_avg_eds <- timeseries %>%
   mutate(prop_adults_alone = number_adult_nicos/total_number_crab_eggs) %>%
@@ -562,6 +626,10 @@ timeseries_avg_eds <- timeseries %>%
   mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>%
   as_tibble()
 
+#select the highly infested crabs only from the timeseries dataframe 
+high_timeseries <- timeseries %>%
+  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-051", "ANT-GAV-052", "ANT-GAV-053", "ANT-GAV-060"))
+
 #select the high infested crabs only and average the life stages per eds 
 high_timeseries_avg_eds <- high_timeseries %>%
   group_by(eds) %>%
@@ -590,6 +658,16 @@ high_timeseries_avg_eds <- high_timeseries %>%
   mutate(max_scaled_nico_eggs = max_prop_nico_eggs*1000000) %>%
   mutate(min_scaled_nico_eggs = min_prop_nico_eggs*1000000) %>%
   as_tibble()
+
+#select the low infested crabs only from the timeseries dataframe 
+low_timeseries <- timeseries %>%
+  filter(!crab_id == "ANT-GAV-034") %>%
+  filter(!crab_id == "ANT-GAV-037") %>%
+  filter(!crab_id == "ANT-GAV-045") %>%
+  filter(!crab_id == "ANT-GAV-051") %>%
+  filter(!crab_id == "ANT-GAV-052") %>%
+  filter(!crab_id == "ANT-GAV-053") %>%
+  filter(!crab_id == "ANT-GAV-060") 
 
 #select the high infested crabs only and average the life stages per eds 
 low_timeseries_avg_eds <- low_timeseries %>%
@@ -657,24 +735,6 @@ eggs_mort_day_avg_high <- high_infested %>%
             avg_prop_nonviable_eggs = mean(prop_nonviable_eggs)) %>%
   as_tibble()
 
-#create a dataframe which has the proportion of the life stage per the number of crab eggs in the sample then times 1000 (scaled)
-timeseries <- egg_mortality_day %>%
-  mutate(prop_adults_sample = (number_adult_nicos/total_number_crab_eggs)*1000) %>%
-  mutate(prop_juveniles_sample = (number_juvenile_nicos/total_number_crab_eggs)*1000) %>%
-  mutate(prop_nico_eggs_sample = (number_nico_eggs/total_number_crab_eggs)*1000) %>%
-  mutate(prop_total_nicos_sample = (total_nicos/total_number_crab_eggs)*1000) %>%
-  mutate(prop_adults_alone = number_adult_nicos/total_number_crab_eggs) %>%
-  mutate(prop_juveniles_alone = number_juvenile_nicos/total_number_crab_eggs) %>%
-  mutate(prop_total_nicos_alone = total_nicos/total_number_crab_eggs) %>%
-  mutate(prop_nico_eggs_alone = number_nico_eggs/total_number_crab_eggs) %>%
-  mutate(scaled_adults = prop_adults_alone*1000000) %>%
-  mutate(scaled_juveniles = prop_juveniles_alone*1000000) %>%
-  mutate(scaled_total_nicos = prop_total_nicos_alone*1000000) %>%
-  mutate(scaled_nico_eggs = prop_nico_eggs_alone*1000000) %>%
-  mutate(scaled_viable_eggs = prop_viable_eggs*1000000) %>%
-  mutate(scaled_nonviable_eggs = prop_nonviable_eggs*1000000) %>%
-  as_tibble()
-
 ##create a dataframe with the averages from the above dataframe 
 timeseries_avg <- timeseries %>%
   mutate(prop_adults_alone = number_adult_nicos/total_number_crab_eggs) %>%
@@ -733,9 +793,7 @@ timeseries_avg <- timeseries %>%
   mutate_at(c(1:49), ~replace(., is.na(.), 0)) %>%
   as_tibble()
   
-#select the highly infested crabs only from the timeseries dataframe 
-high_timeseries <- timeseries %>%
-  filter(crab_id %in% c("ANT-GAV-034", "ANT-GAV-037", "ANT-GAV-045", "ANT-GAV-051", "ANT-GAV-052", "ANT-GAV-053", "ANT-GAV-060"))
+
 
 #high infestation crabs with average amount of each life stage per 1000 host eggs per development day 
 high_timeseries_avg <- high_timeseries %>%
@@ -778,15 +836,6 @@ high_timeseries_avg <- high_timeseries %>%
   mutate(min_scaled_prop_nonviable_eggs = min_prop_nonviable_eggs*1000000) %>%
   as_tibble()
 
-#select the low infested crabs only from the timeseries dataframe 
-low_timeseries <- timeseries %>%
-  filter(!crab_id == "ANT-GAV-034") %>%
-  filter(!crab_id == "ANT-GAV-037") %>%
-  filter(!crab_id == "ANT-GAV-045") %>%
-  filter(!crab_id == "ANT-GAV-051") %>%
-  filter(!crab_id == "ANT-GAV-052") %>%
-  filter(!crab_id == "ANT-GAV-053") %>%
-  filter(!crab_id == "ANT-GAV-060") 
 
 
 #low infestation crabs with average amount of each life stage per 1000 host eggs per development day 
@@ -912,7 +961,7 @@ scaled_data_egg_mort <- egg_mortality_day %>%
 clean_metadata <- metadata %>%
   filter(!grepl("exclude", notes_15)) %>%
   filter(!is.na(carapace_width)) %>%
-  select(!c(10,15))
+  dplyr::select(!c(10,15))
 
 #look at only the Gaviota Coast crabs 
 gaviota <- clean_metadata %>%
@@ -2176,18 +2225,7 @@ nico_egg_timeseries_009
 ```
 
 
-## d) Test for High vs. Low 
-```{r}
-#high infestation crabs
-high_crab_id <- egg_mortality_day %>%
-  filter(number_adult_nicos >= 20 | number_juvenile_nicos >= 120)
 
-#low infestation crabs 
-low_crab_id <- egg_mortality_day %>%
-  filter(number_adult_nicos < 20) %>%
-  filter(number_juvenile_nicos < 120)
-  
-```
 
 
 
@@ -4076,19 +4114,19 @@ freqdist_eggs_adults_crab_id <- gghistogram(data = crab_id,
 freqdist_eggs_adults_crab_id
 
 #create a histogram of the distribution of adults (averaged per totals)
-freqdist_eggs_adults <- gghistogram(data = totals_per_crab_id, 
-                              x = "adults_scaled", 
-                              fill = adults,
-                              binwidth = bw_eggs_adults)+
-  ylab("Frequency of Crabs") +
-  xlab("Average Count of Adult Nicothoids per One Million Crab Eggs") + 
+#freqdist_eggs_adults <- gghistogram(data = totals_per_crab_id, 
+                              #x = "adults_scaled", 
+                              #fill = adults,
+                              #binwidth = bw_eggs_adults)+
+  #ylab("Frequency of Crabs") +
+ # xlab("Average Count of Adult Nicothoids per One Million Crab Eggs") + 
   #ggtitle("Adult Nicos") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_y_continuous(expand =c(0,0)) +
+  #theme(plot.title = element_text(hjust = 0.5)) +
+  #scale_y_continuous(expand =c(0,0)) +
   #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
-  theme_classic()
+  #theme_classic()
 
-freqdist_eggs_adults
+#freqdist_eggs_adults
 
 
 #use Freedman Diaconis rule to determine optimal binwidth:
@@ -4194,23 +4232,23 @@ freqdist_eggs_nico_eggs
 ## made a new df above (1c)
 
 #use Freedman Diaconis rule to determine optimal binwidth:
-bw_old <-2 *IQR(adult_summary$nicos_extrapolated_1mil)/length(adult_summary$nicos_extrapolated_1mil)^(1/3)
+#bw_old <-2 *IQR(adult_summary$nicos_extrapolated_1mil)/length(adult_summary$nicos_extrapolated_1mil)^(1/3)
 
-freqdist_adults_old <- gghistogram(data = adult_summary, 
-                              x = "nicos_extrapolated_1mil", 
-                              fill = "#D7301F",
-                              binwidth = bw_old)+
-  ylab("Frequency of Crabs") +
-  xlab("Average Count of Adult Nicothoids per One Million Crab Eggs") + 
+#freqdist_adults_old <- gghistogram(data = adult_summary, 
+                              #x = "nicos_extrapolated_1mil", 
+                              #fill = "#D7301F",
+                              #binwidth = bw_old)+
+  #ylab("Frequency of Crabs") +
+  #xlab("Average Count of Adult Nicothoids per One Million Crab Eggs") + 
   #ggtitle("Adult Nicos") +
-  theme(plot.title = element_text(hjust = 0.5))+
-  scale_y_continuous(expand =c(0,0))+
+  #theme(plot.title = element_text(hjust = 0.5))+
+  #scale_y_continuous(expand =c(0,0))+
   #geom_vline(aes(xintercept = 20),color = "red", linewidth = 1)+
-  theme_classic()
+  #theme_classic()
 
-ggsave("adult_nico_freq_distribution.png", freqdist_adults_old, device = "png")
+#ggsave("adult_nico_freq_distribution.png", freqdist_adults_old, device = "png")
 
-freqdist_adults_old
+#freqdist_adults_old
 
 ```
 
@@ -4326,7 +4364,7 @@ freqdist_adults_new
 ```{r}
 #subset the data to be modeled with 
 model <- timeseries %>%
-  select(c(2,4,8,12:14,17,19,24))
+  dplyr::select(c(2,4,8,12:14,17,19,24))
 
 #start playing with some model combinations
 #glm.adults.poisson_prop <- glmer(prop_viable_eggs ~ prop_total_nicos_alone*eds + (1|crab_id), 
@@ -4408,12 +4446,12 @@ mean_nico_egg_density_sd
 #create a column in the autoinfection data with the density of adult nicos
 autoinfection_density <- autoinfection %>%
   mutate(density_adult_nicos = ((number_of_adult_copepods/total_number_of_eggs)*1000)) %>%
-  select(1,9,13) %>%
+  dplyr::select(1,9,13) %>%
   rename(number_adult_nicos = number_of_adult_copepods)
 
 #subset the egg morality data for just the adults and the adult density
 mort_egg_density <- egg_mortality_density %>%
-  select(1,11,19)
+  dplyr::select(1,11,19)
 
 #join the two dataframes for the adult density
 mort_egg_density_combined <- rbind(mort_egg_density, autoinfection_density)
@@ -5109,7 +5147,7 @@ brown_females_mean_density_gills_sd
 ### e) Mean Intensity (Yellow Males) (ignore)
 ```{r}
 #calculate the mean intensity for the nicos in the gills 
-male_mean_intensity_gills <- mean(males$intensity_nicos_gills)
+male_mean_intensity_gills <- mean(males_all$intensity_nicos_gills)
 male_mean_intensity_gills
 
 ```
@@ -5118,7 +5156,7 @@ male_mean_intensity_gills
 ### f) Mean Intensity (Yellow Females) (ignore)
 ```{r}
 #calculate the mean intensity for the nicos in the gills 
-female_mean_intensity_gills <- mean(females$intensity_nicos_gills)
+female_mean_intensity_gills <- mean(females_all$intensity_nicos_gills)
 female_mean_intensity_gills
 
 
@@ -6170,21 +6208,31 @@ publication_timeseries
 freqdist_adults_new <- gghistogram(data = adult_summary_new, 
                               x = "nicos_extrapolated_1mil", 
                               fill = publication,
-                              binwidth = bw_new)+
+                              binwidth = bw_new) +
   ylab("Frequency of Crabs") +
   xlab("Mean Count of Adult Nicothoids per One Million Crab Eggs") +
   xlim(0, 40001) +
   scale_y_continuous(expand = c(0,0), 
                      limits = c(0,12)) +
   theme(text = element_text(family = "Times New Roman"),
-        axis.title.x = element_text(colour = "black", face = "bold"),
-        axis.title.y = element_text(colour = "black", face = "bold")) +
+        axis.title.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold")) +
   theme_classic()
 
-#save the output as as png
-ggsave("adult_nico_freq_distribution_new.png", freqdist_adults_new, device = "png")
 
-freqdist_adults_new
+#add the plot together to add the label
+freqdist_adults_new_2 <- ggarrange(freqdist_adults_new,
+                           labels = "a)",
+                           font.label = list(size = 10, 
+                                             color = "black",
+                                             face = "bold",
+                                             family = "Times New Roman"))
+
+#save the output as as png
+ggsave("adult_nico_freq_distribution_new.png", freqdist_adults_new_2, device = "png")
+
+freqdist_adults_new_2
+
 ```
 
 ### ii) Juveniles 
@@ -6197,16 +6245,25 @@ freqdist_juveniles_new <- gghistogram(data = totals_per_crab_id,
   ylab("Frequency of Crabs") +
   xlab("Mean Count of Larval Nicothoids per One Million Crab Eggs") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  scale_y_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(0,15)) +
   theme(text = element_text(family = "Times New Roman"),
         axis.title.x = element_text(colour = "black", face = "bold"),
-        axis.title.y = element_text(colour = "black", face = "bold"))
+        axis.title.y = element_text(colour = "black", face = "bold")) +
   theme_classic()
 
-#save the output as as png
-ggsave("freqdist_juveniles_new.png", freqdist_juveniles_new, device = "png")
+#add the plot together to add the label
+freqdist_juveniles_new_2 <- ggarrange(freqdist_juveniles_new,
+                           labels = "b)",
+                           font.label = list(size = 10, 
+                                             color = "black",
+                                             face = "bold",
+                                             family = "Times New Roman"))
 
-freqdist_juveniles_new
+#save the output as as png
+ggsave("freqdist_juveniles_new.png", freqdist_juveniles_new_2, device = "png")
+
+freqdist_juveniles_new_2
 
 ```
 
